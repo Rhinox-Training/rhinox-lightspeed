@@ -54,7 +54,7 @@ namespace Rhinox.Lightspeed
                 {
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
-                    var attr = CustomAttributeExtensions.GetCustomAttribute<T>(type);
+                    var attr = type.GetCustomAttribute<T>();
                     if (attr == null)
                         continue;
                     yield return type;

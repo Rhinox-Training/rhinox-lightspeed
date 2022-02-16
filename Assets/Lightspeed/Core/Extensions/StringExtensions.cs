@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Rhinox.Lightspeed
 {
@@ -171,6 +172,19 @@ namespace Rhinox.Lightspeed
 
                 return sb.ToString();
             }
+        }
+
+        private const string _camelCaseSplitPattern = @"(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z]) |(?<=[A-Za-z])(?=[^A-Za-z])";
+        private static Regex _camelCaseSplitRegex;
+        
+        public static string SplitCamelCase(this string input, string separator = " ")
+        {
+            if (input.IsNullOrEmpty()) return input;
+            
+            if (_camelCaseSplitRegex == null)
+                _camelCaseSplitRegex = new Regex(_camelCaseSplitPattern, RegexOptions.IgnorePatternWhitespace);
+            
+            return string.Join(separator, _camelCaseSplitRegex.Split(input));
         }
     }
 }
