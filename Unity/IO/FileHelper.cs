@@ -7,9 +7,8 @@ using System.Text.RegularExpressions;
 using Rhinox.Lightspeed;
 using UnityEngine;
 using UnityEngine.Networking;
-using LightFileHelper = Rhinox.Lightspeed.FileHelper;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.IO
 {
     public static partial class FileHelper
     {
@@ -32,7 +31,7 @@ namespace Rhinox.Lightspeed
 
         public static bool DirectoryExists(string path)
         {
-            if (LightFileHelper.IsFileUrl(path))
+            if (IsFileUrl(path))
             {
                 return ExecuteSynchronousWebRequest(path, suppressLog: true) != null;
             }
@@ -43,7 +42,7 @@ namespace Rhinox.Lightspeed
         
         public static bool Exists(string path)
         {
-            if (LightFileHelper.IsFileUrl(path))
+            if (IsFileUrl(path))
             {
                 return ExecuteSynchronousWebRequest(path, suppressLog: true) != null;
                 // var www = UnityWebRequest.Get(path);
@@ -57,7 +56,7 @@ namespace Rhinox.Lightspeed
         
         public static string ReadAllText(string path, int timeOut = 10)
         {
-            if (LightFileHelper.IsFileUrl(path))
+            if (IsFileUrl(path))
             {
                 var response = ExecuteSynchronousWebRequest(path, timeOut);
                 if (response == null)
@@ -73,7 +72,7 @@ namespace Rhinox.Lightspeed
     
         public static byte[] ReadAllBytes(string path, int timeOut = 10)
         {
-            if (LightFileHelper.IsFileUrl(path))
+            if (IsFileUrl(path))
             {
                 var response = ExecuteSynchronousWebRequest(path, timeOut);
                 if (response == null)
@@ -89,7 +88,7 @@ namespace Rhinox.Lightspeed
 
         public static string[] ReadAllLines(string path, int timeOut = 10)
         {
-            if (LightFileHelper.IsFileUrl(path))
+            if (IsFileUrl(path))
             {
                 var response = ExecuteSynchronousWebRequest(path, timeOut);
                 if (response == null)
