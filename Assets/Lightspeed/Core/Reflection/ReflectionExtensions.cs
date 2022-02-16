@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Rhinox.Lightspeed
 {
-    public static class ReflectionExtensions
+    public static partial class ReflectionExtensions
     {
         public static MethodInfo[] GetMethodsWithAttribute<T>(this Type t, bool publicMethods = true,
             bool instanceMethods = true) where T : Attribute
