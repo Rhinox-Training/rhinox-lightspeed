@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Collections
 {
 	public class LimitedQueue<T> : Queue<T>
 	{

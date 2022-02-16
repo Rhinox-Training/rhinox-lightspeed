@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.IO
 {
     public static class FileHelper
     {
