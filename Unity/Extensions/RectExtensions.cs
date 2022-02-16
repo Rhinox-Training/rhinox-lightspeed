@@ -1,7 +1,7 @@
 ﻿using Rhinox.GUIUtils;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     // TODO: migrate GUIUtils.RectExtensions to Lightspeed
     public static class RectExtensions

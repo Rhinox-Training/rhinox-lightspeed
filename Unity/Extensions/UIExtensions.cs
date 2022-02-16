@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class UIExtensions
     {

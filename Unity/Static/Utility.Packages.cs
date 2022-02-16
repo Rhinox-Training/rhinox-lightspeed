@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static partial class Utility
     {

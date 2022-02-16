@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
-using JetBrains.Annotations;
-using Rhinox.Lightspeed;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Component = UnityEngine.Component;
-using Object = UnityEngine.Object;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static partial class Utility
     {
@@ -58,7 +52,6 @@ namespace Rhinox.Utilities
             return gradient;
         }
         
-        [Pure]
         public static string GetRelativePath(string path, string relativeTo)
         {
             if (path == relativeTo)
@@ -233,7 +226,10 @@ namespace Rhinox.Utilities
                 if (results is ICollection<GameObject> typedResults)
                     go.GetAllChildren(typedResults, true);
                 else
-                    results.AddRange(go.GetComponentsInChildren<T>(true));
+                {
+                    foreach (var child in go.GetComponentsInChildren<T>(true))
+                        results.Add(child);
+                }
             }
         }
 

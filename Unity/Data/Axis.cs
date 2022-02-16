@@ -3,7 +3,7 @@ using Rhinox.Lightspeed;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [EnumToggleButtons, Flags]
     public enum Axis

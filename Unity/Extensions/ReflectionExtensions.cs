@@ -8,7 +8,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 using ReflectUtil = Rhinox.Lightspeed.ReflectionExtensions;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class ReflectionExtensions
     {

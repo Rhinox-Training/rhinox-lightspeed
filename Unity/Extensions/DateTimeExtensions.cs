@@ -1,6 +1,6 @@
 using System;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class DateTimeExtensions
     {

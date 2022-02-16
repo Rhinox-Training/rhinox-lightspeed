@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class GameObjectExtensions
     {

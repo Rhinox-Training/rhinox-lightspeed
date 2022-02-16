@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Sirenix.Utilities;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class EnumerableExtensions
     {

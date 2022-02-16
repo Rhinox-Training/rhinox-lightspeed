@@ -8,7 +8,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed.Collections
 {
     [Serializable, HideReferenceObjectPicker, HideLabel]
     public class Toggleable<T>

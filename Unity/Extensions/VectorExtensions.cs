@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Rhinox.Lightspeed;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class VectorExtensions
     {

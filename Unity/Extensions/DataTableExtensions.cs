@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class DataTableExtensions
     {
