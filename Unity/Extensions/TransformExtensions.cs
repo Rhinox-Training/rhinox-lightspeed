@@ -271,11 +271,11 @@ namespace Rhinox.Lightspeed
             
             Vector3 pivotPosition = GetCenterPosition(transforms);
 
-            if (groupName.IsNullOrWhitespace())
+            if (string.IsNullOrWhiteSpace(groupName))
             {
                 var names = transforms.Select(x => x.name).ToArray();
                 var prefix = names.GetCommonPrefix();
-                if (!prefix.IsNullOrWhitespace()) groupName = prefix;
+                if (!string.IsNullOrWhiteSpace(prefix)) groupName = prefix;
             }
             
             GameObject groupObject = new GameObject(groupName ?? "New Group");
