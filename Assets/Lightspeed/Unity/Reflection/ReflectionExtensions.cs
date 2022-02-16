@@ -50,7 +50,8 @@ namespace Rhinox.Lightspeed.Reflection
 
             return true;
         }
-
+        
+#if ODIN_INSPECTOR
         public static bool IsSerialized(this MemberInfo info)
         {
             if (UnitySerializationUtility.GuessIfUnityWillSerialize(info))
@@ -61,6 +62,7 @@ namespace Rhinox.Lightspeed.Reflection
 
             return false;
         }
+#endif
         
         public static bool ReturnsUnityObject(this MemberInfo memberInfo)
         {
