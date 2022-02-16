@@ -35,13 +35,17 @@ namespace Rhinox.Lightspeed.Reflection
         public static bool IsSerialized(this PropertyInfo propertyInfo)
         {
             bool nonSerializedAttr = propertyInfo.GetCustomAttribute<NonSerializedAttribute>() != null;
-            bool odinSerializeAttr = propertyInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
+#if ODIN_INSPECTOR
+            bool odinSerializeAttr = fieldInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
+#else
+            bool odinSerializeAttr = false;
+#endif
             bool unitySerializeAttr = propertyInfo.GetCustomAttribute<SerializeField>() != null;
             
             if (nonSerializedAttr && !odinSerializeAttr)
                 return false;
 
-            if (!ReflectUtil.IsPublic(propertyInfo) && !(unitySerializeAttr || odinSerializeAttr))
+            if (!IsPublic(propertyInfo) && !(unitySerializeAttr || odinSerializeAttr))
                 return false;
 
             return true;
@@ -76,6 +80,11 @@ namespace Rhinox.Lightspeed.Reflection
             if (!Attribute.IsDefined(type, typeof(T)))
                 return default(T);
             return Attribute.GetCustomAttribute(type, typeof(T)) as T;
+        }
+
+        public static bool InheritsFrom(this Type t, Type otherType)
+        {
+            return otherType != null && otherType.IsAssignableFrom(t);
         }
     }
 }
