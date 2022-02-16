@@ -1,6 +1,7 @@
-using Unity.Mathematics;
+#if UNITY_MATHEMATICS
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Rhinox.Utilities
@@ -195,3 +196,4 @@ namespace Rhinox.Utilities
 		}
     }
 }
+#endif
