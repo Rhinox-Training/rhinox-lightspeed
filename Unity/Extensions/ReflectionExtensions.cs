@@ -2,22 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sirenix.Serialization;
-using Sirenix.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using ReflectUtil = Rhinox.Lightspeed.ReflectionExtensions;
+
+#if ODIN_INSPECTOR
+using Sirenix.Serialization;
+using Sirenix.Utilities;
+#endif
 
 namespace Rhinox.Lightspeed
 {
-    public static class ReflectionExtensions
+    public static partial class ReflectionExtensions
     {
         public static bool IsSerialized(this FieldInfo fieldInfo)
         {
             bool nonSerializedAttr = fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null;
+            #if ODIN_INSPECTOR
             bool odinSerializeAttr = fieldInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
             bool unitySerializeAttr = fieldInfo.GetCustomAttribute<SerializeField>() != null;
-            
+            #endif
             if (nonSerializedAttr && !odinSerializeAttr)
                 return false;
 

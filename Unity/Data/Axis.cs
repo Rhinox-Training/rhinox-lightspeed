@@ -1,11 +1,16 @@
 using System;
 using Rhinox.Lightspeed;
-using Sirenix.OdinInspector;
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace Rhinox.Lightspeed
 {
-    [EnumToggleButtons, Flags]
+#if ODIN_INSPECTOR
+    [EnumToggleButtons]
+#endif
+    [Flags]
     public enum Axis
     {
         None = 0,
