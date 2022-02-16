@@ -1,0 +1,20 @@
+{
+    "name": "com.rhinox.open.lightspeed.unity.editor",
+    "references": [
+        "GUID:7262f4696183b8841b571481b3ac0765",
+        "GUID:46ea2aa263450394eb12c7d0dd4b4e96",
+        "GUID:fc025ba4ac3997440926e87ec084af89",
+        "GUID:3b169ccda512e504b9e2eb8b0bec14f9"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
