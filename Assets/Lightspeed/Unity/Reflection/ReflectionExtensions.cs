@@ -10,7 +10,7 @@ using Sirenix.Serialization;
 using Sirenix.Utilities;
 #endif
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Reflection
 {
     public static partial class ReflectionExtensions
     {
@@ -19,8 +19,10 @@ namespace Rhinox.Lightspeed
             bool nonSerializedAttr = fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null;
             #if ODIN_INSPECTOR
             bool odinSerializeAttr = fieldInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
-            bool unitySerializeAttr = fieldInfo.GetCustomAttribute<SerializeField>() != null;
+            #else
+            bool odinSerializeAttr = false;
             #endif
+            bool unitySerializeAttr = fieldInfo.GetCustomAttribute<SerializeField>() != null;
             if (nonSerializedAttr && !odinSerializeAttr)
                 return false;
 

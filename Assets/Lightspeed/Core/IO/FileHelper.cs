@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Rhinox.Lightspeed.IO
 {
-    public static class FileHelper
+    public static partial class FileHelper
     {
         public static void ClearDirectoryContentsIfExists(string path)
         {

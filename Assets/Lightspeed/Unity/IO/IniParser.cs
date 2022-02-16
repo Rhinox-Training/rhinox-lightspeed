@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.IO
 {
     public interface IniReader
     {
