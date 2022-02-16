@@ -36,6 +36,10 @@ namespace Rhinox.Utilities
         private GameObject _exactMatch;
         private bool _enableFuzzySearch;
 
+        public delegate void FreezeEventHandler(bool frozen);
+
+        public static event FreezeEventHandler FreezeStateChanged;
+
         public static GameObject Find(string path, bool fuzzy = false)
         {
             var tree = SceneHierarchyTree.Create();
@@ -44,16 +48,16 @@ namespace Rhinox.Utilities
 
         public static void Freeze(bool refresh = true)
         {
-            BetterLog.Trace<UtilityLogger>($"Initiated freeze on SceneHierarchyTree...");
-
-            if (refresh) RefreshState();
+            if (refresh) 
+                RefreshState();
             _frozen = true;
+            FreezeStateChanged?.Invoke(true);
         } 
 
         public static void UnFreeze()
-        { 
-            BetterLog.Trace<UtilityLogger>($"Released freeze on SceneHierarchyTree.");
+        {
             _frozen = false;
+            FreezeStateChanged?.Invoke(false);
         }
         
         // Private constr; use the Create method to get one
@@ -66,12 +70,15 @@ namespace Rhinox.Utilities
             // Load the active editor scene (only when not in build, otherwise the loop below will contain it)
             var currScene = SceneManager.GetActiveScene();
             if (!Utility.IsSceneInBuild(currScene))
-                GetSceneObjectTrees(currScene, RootTrees);
+                TryGetSceneObjectTrees(currScene, RootTrees);
 #endif
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            
+            for (int i = 0; i < SceneManager.sceneCount; ++i)
             {
                 var s = SceneManager.GetSceneAt(i);
-                GetSceneObjectTrees(s, RootTrees);
+                if (!TryGetSceneObjectTrees(s, RootTrees))
+                    BetterLog.Error<UtilityLogger>($"SceneHierarchy find failed due to scene '{s.name}' not being ready.");
+                    
             }
 
             _cachedTree = this;
@@ -140,17 +147,15 @@ namespace Rhinox.Utilities
             _cachedTree = null;
         }
         
-        private static void GetSceneObjectTrees(Scene s, ICollection<LazyTree<GameObject>> collection)
+        private static bool TryGetSceneObjectTrees(Scene s, ICollection<LazyTree<GameObject>> collection)
         {
             if (!s.isLoaded)
-            {
-                BetterLog.Error<UtilityLogger>($"SceneHierarchy find failed due to scene '{s.name}' not being ready.");
-                return;
-            }
-            GameObject[] rootObjects = s.GetRootGameObjects();
+                return false;
             
-            for (int i = 0; i < rootObjects.Length; i++)
+            GameObject[] rootObjects = s.GetRootGameObjects();
+            for (int i = 0; i < rootObjects.Length; ++i)
                 collection.Add(new LazyTree<GameObject>(rootObjects[i], GetChildren));
+            return true;
         }
 
         private static IEnumerable<GameObject> GetChildren(GameObject go)
