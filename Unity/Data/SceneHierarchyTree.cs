@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Rhinox.Lightspeed;
-using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

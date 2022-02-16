@@ -1,3 +1,4 @@
+#if ODIN_INSPECTOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,3 +40,4 @@ namespace Rhinox.Lightspeed.Reflection
         }
     }
 }
+#endif
