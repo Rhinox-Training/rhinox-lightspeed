@@ -1,0 +1,23 @@
+{
+    "name": "com.rhinox.utility.ecs",
+    "references": [
+        "GUID:d8b63aba1907145bea998dd612889d6b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_ECS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.mathematics",
+            "expression": "0.1.0",
+            "define": "UNITY_ECS"
+        }
+    ],
+    "noEngineReferences": false
+}
