@@ -1,11 +1,97 @@
-﻿using Rhinox.GUIUtils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Rhinox.Lightspeed
 {
-    // TODO: migrate GUIUtils.RectExtensions to Lightspeed
     public static class RectExtensions
     {
+        public static Rect AlignLeft(this Rect rect, float width)
+        {
+            rect.width = width;
+            return rect;
+        }
+
+        public static Rect AlignCenter(this Rect rect, float width)
+        {
+            rect.x = (float)(rect.x + rect.width * 0.5 - width * 0.5);
+            rect.width = width;
+            return rect;
+        }
+
+        public static Rect AlignCenter(this Rect rect, float width, float height)
+        {
+            rect.x = (float)(rect.x + rect.width * 0.5 - width * 0.5);
+            rect.y = (float)(rect.y + rect.height * 0.5 - height * 0.5);
+            rect.width = width;
+            rect.height = height;
+            return rect;
+        }
+
+        public static Rect AlignRight(this Rect rect, float width)
+        {
+            rect.x = rect.x + rect.width - width;
+            rect.width = width;
+            return rect;
+        }
+
+        public static Rect AlignRight(this Rect rect, float width, bool clamp)
+        {
+            if (clamp)
+            {
+                rect.xMin = Mathf.Max(rect.xMax - width, rect.xMin);
+                return rect;
+            }
+
+            rect.x = rect.x + rect.width - width;
+            rect.width = width;
+            return rect;
+        }
+
+        public static Rect VerticalPadding(this Rect rect, float padding)
+        {
+            rect.y += padding;
+            rect.height -= (2.0f * padding);
+            return rect;
+        }
+        
+        public static Rect VerticalPadding(this Rect rect, float top, float bottom)
+        {
+            rect.y += top;
+            rect.height -= (top + bottom);
+            return rect;
+        }
+        
+        public static Rect HorizontalPadding(this Rect rect, float padding)
+        {
+            rect.x += padding;
+            rect.width -= (2.0f * padding);
+            return rect;
+        }
+        
+        public static Rect HorizontalPadding(this Rect rect, float left, float right)
+        {
+            rect.x += left;
+            rect.width -= (left + right);
+            return rect;
+        }
+
+        public static Rect Padding(this Rect rect, float padding)
+        {
+            rect.y += padding;
+            rect.height -= (2.0f * padding);
+            rect.x += padding;
+            rect.width -= (2.0f * padding);
+            return rect;
+        }
+
+        public static Rect Padding(this Rect rect, float horizontalPadding, float verticalPadding)
+        {
+            rect.y += verticalPadding;
+            rect.height -= (2.0f * verticalPadding);
+            rect.x += horizontalPadding;
+            rect.width -= (2.0f * horizontalPadding);
+            return rect;
+        }
+        
         public static Rect PadLeft(this Rect r, float padding)
         {
             return r.VerticalPadding(padding, 0);
