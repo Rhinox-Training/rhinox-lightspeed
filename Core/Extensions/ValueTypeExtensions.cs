@@ -4,6 +4,17 @@ namespace Rhinox.Lightspeed
 {
     public static class ValueTypeExtensions
     {
+        public static bool IsSingleFlag<T>(this T e) where T : Enum
+        {
+            // => does not work if there are combinations defined
+            // return Enum.IsDefined(typeof(T), e);
+            
+            // Checks if the value of e is a power of two. This assumes that a single flag values will be power of two.
+            // Note: Will return TRUE when passing 0
+            var eAsInt = Convert.ToInt32(e);
+            return (eAsInt & (eAsInt - 1)) == 0;
+        }
+        
         public static bool IsMaxValue(this float val, float epsilon = .005f)
         {
             return Math.Abs(float.MaxValue - val) < epsilon;

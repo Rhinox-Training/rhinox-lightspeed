@@ -12,11 +12,12 @@ namespace Rhinox.Lightspeed
         /// </summary>
         public static bool EqualsOneOf<T>(this T first, params T[] others)
         {
-            foreach (var param in others)
+            for (var i = 0; i < others.Length; i++)
             {
-                if (first.Equals(param))
+                if (first.Equals(others[i]))
                     return true;
             }
+
             return false;
         }
         
@@ -254,6 +255,30 @@ namespace Rhinox.Lightspeed
                 return onMissing;
             return (TV) Convert.ChangeType(o, typeof(TV));
         }
+        
+        public static bool ContainsNonDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key, out TV value)
+        {
+            if (dict.IsNullOrEmpty())
+            {
+                value = default;
+                return false;
+            }
+            
+            if (dict.TryGetValue(key, out value))
+                return !value.IsDefault();
+
+            return false;
+        }
+        
+        public static bool ContainsNonDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key)
+        {
+            if (dict.IsNullOrEmpty()) return false;
+            
+            if (dict.TryGetValue(key, out TV value))
+                return !value.IsDefault();
+
+            return false;
+        }
 
         /// <summary>
         /// Removes all elements where the given condition is true.
@@ -426,7 +451,6 @@ namespace Rhinox.Lightspeed
             return false;
         }
         
-
         public static string StringJoin<T>(this IEnumerable<T> coll, string separator, Func<T, string> selector)
         {
             if (coll.IsNullOrEmpty()) return string.Empty;
