@@ -46,8 +46,8 @@ namespace Rhinox.Utilities
                 
             if (SerializedBytes.Length != 16)
             {
-                BetterLog.Warn<UtilityLogger>("Invalid SerializableGuid!");
-                return Guid.Empty;
+                throw new FormatException(
+                    $"Cannot convert to System.Guid, SerializedBytes is of incorrect length (length: {SerializedBytes.Length} - expected: 16)");
             }
                 
             _guidRef = new Guid(SerializedBytes);

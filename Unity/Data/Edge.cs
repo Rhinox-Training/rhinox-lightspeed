@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Rhinox.Utilities;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {    
     public class Edge
     {

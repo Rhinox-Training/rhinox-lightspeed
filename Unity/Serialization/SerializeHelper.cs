@@ -1,14 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Rhinox.Lightspeed;
-using UnityEngine;
 
-namespace Rhinox.Utilities.Serialization
+namespace Rhinox.Lightspeed
 {
     public static class SerializeHelper
     {
+#if ODIN_INSPECTOR
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Reflection;
+        using UnityEngine;
+        using Rhinox.Lightspeed.Reflection;
+
         public static IReadOnlyCollection<MemberInfo> GetPublicAndSerializedMembers<T>(this T t)
         {
             Type type = typeof(T);
@@ -27,5 +29,6 @@ namespace Rhinox.Utilities.Serialization
 
             return list.Distinct().ToArray();
         }
+#endif
     }
 }

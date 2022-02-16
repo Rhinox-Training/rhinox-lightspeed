@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using Rhinox.Lightspeed;
+using Rhinox.Lightspeed.Reflection;
 using UnityEngine;
 
 namespace Rhinox.Utilities

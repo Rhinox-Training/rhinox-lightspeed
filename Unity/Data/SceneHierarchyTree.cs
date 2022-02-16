@@ -22,7 +22,7 @@ namespace Rhinox.Utilities
             public PathData(string path, int index = 0)
             {
                 IsRooted = path.StartsWith("/");
-                PathParts = path.Split('/').Where(x => !x.IsNullOrWhitespace()).ToArray();
+                PathParts = path.Split('/').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                 CurrentIndex = index;
             }
         }

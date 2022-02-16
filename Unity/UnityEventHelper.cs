@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sirenix.Utilities;
+using Rhinox.Lightspeed.Reflection;
 using UnityEngine.Events;
 
 namespace Rhinox.Utilities
@@ -50,7 +50,7 @@ namespace Rhinox.Utilities
                 var argument = GetArgument(e, argumentCache, mode, out Type argumentType);
 
                 var allMethods = target.GetType()
-                    .GetMethods(Flags.AllMembers)
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                     .Where(x => x.Name == methodName)
                     .ToArray();
 
@@ -153,7 +153,7 @@ namespace Rhinox.Utilities
             {
                 // Unity Object is saved generically, get the type
                 var assemblyTypeName = (string) _objectTypeName.GetValue(argumentCache);
-                argumentType = Rhinox.Lightspeed.ReflectionUtility.FindTypeExtensively(ref assemblyTypeName);
+                argumentType = ReflectionUtility.FindTypeExtensively(ref assemblyTypeName);
             }
             else
                 argumentType = memberInfo.FieldType;
