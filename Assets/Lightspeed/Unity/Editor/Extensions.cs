@@ -1,6 +1,7 @@
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 
+// TODO: migrate to GUIUtils
 namespace Rhinox.Utilities.Editor
 {
     public static class Extensions

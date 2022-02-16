@@ -88,5 +88,31 @@ namespace Rhinox.Lightspeed.Reflection
         {
             return otherType != null && otherType.IsAssignableFrom(t);
         }
+        
+        public static bool InheritsFrom<T>(this Type t)
+        {
+            return InheritsFrom(t, typeof(T));
+        }
+        
+        public static bool HasParameters(this MethodInfo methodInfo, IList<Type> paramTypes, bool inherit = true)
+        {
+            var parameters = methodInfo.GetParameters();
+            if (parameters.Length != paramTypes.Count)
+                return false;
+            for (int i = 0; i < parameters.Length; ++i)
+            {
+                if (!inherit)
+                {
+                    if (parameters[i].ParameterType != paramTypes[i])
+                        return false;
+                }
+                else
+                {
+                    if (!paramTypes[i].InheritsFrom(parameters[i].ParameterType))
+                        return false;
+                }
+            }
+            return true;
+        }
     }
 }

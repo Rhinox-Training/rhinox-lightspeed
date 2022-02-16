@@ -1,9 +1,14 @@
 using System;
+#if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+#endif
 
 namespace Rhinox.Utilities
 {
-    [EnumToggleButtons, Flags]
+#if ODIN_INSPECTOR
+    [EnumToggleButtons]
+#endif
+    [Flags]
     public enum WindDirection
     {
         None = 0,

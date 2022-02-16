@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Rhinox.Lightspeed;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -274,6 +277,20 @@ namespace Rhinox.Lightspeed.IO
                 }
             }
         }
+       
+#if UNITY_EDITOR
+        public static void CreateAssetsDirectory(string directory)
+        {
+            var directories = directory.Split('\\', '/', Path.PathSeparator);
+            var currentPath = string.Empty;
+            foreach (var dir in directories)
+            {
+                currentPath = Path.Combine(currentPath, dir);
+                if (!AssetDatabase.IsValidFolder(currentPath))
+                    AssetDatabase.CreateFolder(Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath));
+            }
+        }
+#endif
 
         internal struct RegexMatcher
         {

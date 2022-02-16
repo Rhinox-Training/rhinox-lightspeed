@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Rhinox.Lightspeed;
 using Sirenix.Serialization;
 using Sirenix.Utilities;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed.Reflection
 {
     public class CheckForRefactoredTypes : ICustomTypeResolver
     {
@@ -17,8 +16,8 @@ namespace Rhinox.Utilities
             if (_refactoredTypesAttributes == null)
             {
                 var type = typeof(BindTypeNameToTypeAttribute);
-                var oldNameField = type.GetField("OldTypeName", Flags.InstancePublic);
-                var newTypeField = type.GetField("NewType", Flags.InstancePublic);
+                var oldNameField = type.GetField("OldTypeName", BindingFlags.Public | BindingFlags.Instance);
+                var newTypeField = type.GetField("NewType", BindingFlags.Public | BindingFlags.Instance);
 
                 if (oldNameField == null || newTypeField == null)
                 {

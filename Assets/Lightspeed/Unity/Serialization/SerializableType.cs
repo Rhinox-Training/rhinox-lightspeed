@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Rhinox.Lightspeed.Reflection;
 using UnityEngine;
 
 // Simple helper class that allows you to serialize System.Type objects.
@@ -49,7 +50,7 @@ namespace Rhinox.Utilities
 
         private void GetSystemType()
         {
-            _type = Rhinox.Lightspeed.ReflectionUtility.FindTypeExtensively(ref _assemblyQualifiedName);
+            _type = ReflectionUtility.FindTypeExtensively(ref _assemblyQualifiedName);
         }
 
         public static implicit operator Type(SerializableType x) => x.Type;

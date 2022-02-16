@@ -4,8 +4,8 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Rhinox.GUIUtils.Editor;
-using Sirenix.Utilities;
+using Rhinox.Lightspeed.IO;
+using Rhinox.Lightspeed.Reflection;
 
 namespace Rhinox.Utilities.Editor
 {
@@ -16,15 +16,15 @@ namespace Rhinox.Utilities.Editor
 		{
 			if (_createAssetMethod == null)
 				_createAssetMethod = typeof(ScriptableObjectUtility)
-					.GetMethods(Flags.StaticPublic)
+					.GetMethods(BindingFlags.Public | BindingFlags.Static)
 					.Where(x => x.Name == nameof(CreateAsset))
-					.FirstOrDefault(x => x.HasParamaters(new[] {typeof(string), typeof(string)}));
+					.FirstOrDefault(x => x.HasParameters(new[] {typeof(string), typeof(string)}));
 
 
 			if (!assetType.InheritsFrom<ScriptableObject>())
 			{
-				BetterLog.Error<UtilityLogger>("CreateAsset called with invalid type.");
-				return null;
+				throw new ArgumentException(
+					$"CreateAsset called with invalid type '{assetType.FullName}'. (Expected to inherit from ScriptableObject)");
 			}
 
 			var createMethod = _createAssetMethod.MakeGenericMethod(assetType);
@@ -44,7 +44,7 @@ namespace Rhinox.Utilities.Editor
 			if (string.IsNullOrEmpty(directory))
 				directory = "Assets";
 			
-			eUtility.CreateAssetsDirectory(directory);
+			FileHelper.CreateAssetsDirectory(directory);
 
 			if (string.IsNullOrEmpty(name))
 				name = $"New {typeof(T)}.asset";
@@ -72,7 +72,7 @@ namespace Rhinox.Utilities.Editor
 			if (string.IsNullOrEmpty(path))
 				path = Path.Combine("Assets", $"New {typeof(T)}.asset");
 			
-			eUtility.CreateAssetsDirectory(Path.GetDirectoryName(path));
+			FileHelper.CreateAssetsDirectory(Path.GetDirectoryName(path));
 
 			path = AssetDatabase.GenerateUniqueAssetPath(path);
 
