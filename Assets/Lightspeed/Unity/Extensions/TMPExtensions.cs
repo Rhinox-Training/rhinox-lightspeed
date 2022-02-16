@@ -1,6 +1,6 @@
 using TMPro;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class TMPExtensions
     {

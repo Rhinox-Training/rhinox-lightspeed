@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static partial class Utility
     {

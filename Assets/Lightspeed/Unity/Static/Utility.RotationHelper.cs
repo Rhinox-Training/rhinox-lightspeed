@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using Rhinox.Lightspeed;
+﻿using System.Linq;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static partial class Utility
     {

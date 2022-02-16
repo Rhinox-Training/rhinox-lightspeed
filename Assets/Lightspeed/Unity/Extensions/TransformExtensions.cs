@@ -4,13 +4,10 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Rhinox.Lightspeed;
-using Sirenix.Utilities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class TransformExtensions
     {

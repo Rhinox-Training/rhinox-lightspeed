@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Rhinox.Utilities.Editor
+namespace Rhinox.Lightspeed.Editor
 {
     public static class MeshHelper
     {

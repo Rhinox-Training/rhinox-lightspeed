@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [Serializable]
     public struct TransformState

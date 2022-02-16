@@ -4,10 +4,9 @@ using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
-
 #endif
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     /// <summary>
     /// Some methods that use the editor but can be used at runtime

@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 #pragma warning disable 0618
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class NetworkExtensions
     {

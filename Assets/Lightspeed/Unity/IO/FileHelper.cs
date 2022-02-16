@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using LightFileHelper = Rhinox.Lightspeed.FileHelper;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static partial class FileHelper
     {
