@@ -36,7 +36,7 @@ namespace Rhinox.Lightspeed.Reflection
         {
             bool nonSerializedAttr = propertyInfo.GetCustomAttribute<NonSerializedAttribute>() != null;
 #if ODIN_INSPECTOR
-            bool odinSerializeAttr = fieldInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
+            bool odinSerializeAttr = propertyInfo.GetCustomAttribute<OdinSerializeAttribute>() != null;
 #else
             bool odinSerializeAttr = false;
 #endif
