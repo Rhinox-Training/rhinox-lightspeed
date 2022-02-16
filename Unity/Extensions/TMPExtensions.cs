@@ -1,3 +1,4 @@
+#if TEXTMESHPRO
 using TMPro;
 
 namespace Rhinox.Lightspeed
@@ -19,3 +20,4 @@ namespace Rhinox.Lightspeed
         }
     }
 }
+#endif
