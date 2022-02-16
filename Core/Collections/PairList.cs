@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Collections
 {
     public class PairList<TKey, TValue> : List<KeyValuePair<TKey, TValue>>
     {

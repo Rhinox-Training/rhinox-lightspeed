@@ -1,6 +1,6 @@
 using System;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Reflection
 {
     public interface ICustomTypeResolver
     {

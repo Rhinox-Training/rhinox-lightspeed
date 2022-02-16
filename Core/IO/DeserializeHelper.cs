@@ -1,6 +1,6 @@
 using System;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.IO
 {
     public static class DeserializeHelper
     {

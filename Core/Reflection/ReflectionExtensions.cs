@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Reflection
 {
     public static partial class ReflectionExtensions
     {

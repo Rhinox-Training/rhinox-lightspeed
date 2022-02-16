@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Collections
 {
     public class SortedIntList : IEnumerable<int>
     {

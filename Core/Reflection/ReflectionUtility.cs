@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Reflection
 {
     public static class ReflectionUtility
     {
