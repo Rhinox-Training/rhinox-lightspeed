@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Rhinox.Lightspeed;
 using Rhinox.Lightspeed.Reflection;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ using UnityEngine;
 namespace Rhinox.Utilities
 {
     [Serializable]
+    [RefactoringOldNamespace("Rhinox.Utilities")]
     public class SerializableType
     {
         [SerializeField] private string _assemblyName;
