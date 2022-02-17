@@ -1,5 +1,5 @@
 {
-    "name": "com.rhinox.open.lightspeed.unity.editor",
+    "name": "com.rhinox.open.lightspeed.editor",
     "references": [
         "GUID:7262f4696183b8841b571481b3ac0765",
         "GUID:46ea2aa263450394eb12c7d0dd4b4e96",

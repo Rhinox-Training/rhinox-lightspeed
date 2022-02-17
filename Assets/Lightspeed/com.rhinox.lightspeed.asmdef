@@ -1,8 +1,7 @@
 {
     "name": "com.rhinox.lightspeed",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:d8b63aba1907145bea998dd612889d6b"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -16,11 +15,6 @@
             "name": "com.unity.textmeshpro",
             "expression": "1.0.0",
             "define": "TEXTMESHPRO"
-        },
-        {
-            "name": "com.unity.mathematics",
-            "expression": "1.0.0",
-            "define": "UNITY_MATHEMATICS"
         }
     ],
     "noEngineReferences": false
