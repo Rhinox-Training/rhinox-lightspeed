@@ -34,9 +34,10 @@ namespace Rhinox.Utilities
         private List<GameObject> _searchResults;
         private GameObject _exactMatch;
         private bool _enableFuzzySearch;
+        private readonly List<Scene> _loadedScenes;
+        public IReadOnlyCollection<Scene> LoadedScenes => _loadedScenes.AsReadOnly();
 
         public delegate void FreezeEventHandler(bool frozen);
-
         public static event FreezeEventHandler FreezeStateChanged;
 
         public static GameObject Find(string path, bool fuzzy = false)
@@ -65,19 +66,22 @@ namespace Rhinox.Utilities
             RootTrees = new List<LazyTree<GameObject>>();
             _searchResults = new List<GameObject>();
 
+            _loadedScenes = new List<Scene>();
 #if UNITY_EDITOR
             // Load the active editor scene (only when not in build, otherwise the loop below will contain it)
             var currScene = SceneManager.GetActiveScene();
             if (!Utility.IsSceneInBuild(currScene))
-                TryGetSceneObjectTrees(currScene, RootTrees);
+            {
+                if (TryGetSceneObjectTrees(currScene, RootTrees))
+                    _loadedScenes.Add(currScene);
+            }
 #endif
             
             for (int i = 0; i < SceneManager.sceneCount; ++i)
             {
                 var s = SceneManager.GetSceneAt(i);
-                if (!TryGetSceneObjectTrees(s, RootTrees))
-                    BetterLog.Error<UtilityLogger>($"SceneHierarchy find failed due to scene '{s.name}' not being ready.");
-                    
+                if (TryGetSceneObjectTrees(s, RootTrees))
+                    _loadedScenes.Add(currScene);
             }
 
             _cachedTree = this;

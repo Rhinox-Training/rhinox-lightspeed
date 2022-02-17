@@ -13,8 +13,8 @@
     "versionDefines": [
         {
             "name": "com.unity.mathematics",
-            "expression": "0.1.0",
-            "define": "UNITY_ECS"
+            "expression": "1.0.0",
+            "define": "UNITY_MATHEMATICS"
         }
     ],
     "noEngineReferences": false
