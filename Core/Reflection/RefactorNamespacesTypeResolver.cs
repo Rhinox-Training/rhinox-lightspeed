@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Rhinox.Lightspeed.Reflection
 {
-    public class CheckForRefactoredTypes : ICustomTypeResolver
+    public class RefactorNamespacesTypeResolver : ICustomTypeResolver
     {
         private static Dictionary<string, Type> _refactoredTypesAttributes;
         
