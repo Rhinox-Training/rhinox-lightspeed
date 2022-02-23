@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using Rhinox.Lightspeed.Reflection;
 using UnityEngine.Events;
+#if ODIN_INSPECTOR
+using Sirenix.Serialization;
+#endif
 
 namespace Rhinox.Lightspeed
 {
@@ -15,12 +18,17 @@ namespace Rhinox.Lightspeed
         {
             Type type = typeof(T);
 
+            return GetPublicAndSerializedMembers(type);
+        }
+        
+        public static IReadOnlyCollection<MemberInfo> GetPublicAndSerializedMembers(Type type)
+        {
             var publicMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.Public |
-                            BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
+                                                BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
             publicMembers = publicMembers.Where(x => !(x is MethodInfo)).ToArray();
             
             var serializedMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.NonPublic |
-                                          BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
+                                                    BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
             serializedMembers = serializedMembers.Where(x => !(x is MethodInfo) && x.IsSerialized()).ToArray();
 
             var list = new List<MemberInfo>();
