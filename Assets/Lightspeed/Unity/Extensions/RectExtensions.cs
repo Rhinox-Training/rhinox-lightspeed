@@ -45,6 +45,31 @@ namespace Rhinox.Lightspeed
             rect.width = width;
             return rect;
         }
+        
+        
+        public static Rect SetX(this Rect rect, float x)
+        {
+            rect.x = x;
+            return rect;
+        }
+        
+        public static Rect AddX(this Rect rect, float x)
+        {
+            rect.x += x;
+            return rect;
+        }
+        
+        public static Rect SetY(this Rect rect, float y)
+        {
+            rect.y = y;
+            return rect;
+        }
+        
+        public static Rect AddY(this Rect rect, float y)
+        {
+            rect.y += y;
+            return rect;
+        }
 
         public static Rect VerticalPadding(this Rect rect, float padding)
         {
