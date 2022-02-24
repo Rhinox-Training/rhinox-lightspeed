@@ -143,6 +143,12 @@ namespace Rhinox.Lightspeed.Reflection
 
             return Array.Empty<Type>();
         }
+
+        public static Type GetImplementedGenericType(Type type, Type genericType)
+        {
+            var implementedTypes = GetGenericTypeImplementation(type, genericType);
+            return genericType.MakeGenericType(implementedTypes);
+        }
         
         public static bool IsSimpleType(Type type)
         {
