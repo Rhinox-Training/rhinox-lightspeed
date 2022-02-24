@@ -1,24 +1,22 @@
-﻿#if ODIN_INSPECTOR
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace Rhinox.Lightspeed.Collections
 {
-    [Serializable, HideReferenceObjectPicker, HideLabel]
+    [Serializable]
+    [HideReferenceObjectPicker, HideLabel]
     public class Toggleable<T>
     {
         public event Action<Toggleable<T>> ToggledChanged;
         
         [SerializeField]
         [HorizontalGroup(15), HideLabel]
-        [PreviouslySerializedAs("Toggled")]
         private bool _toggled;
 
         public bool Toggled
@@ -46,6 +44,8 @@ namespace Rhinox.Lightspeed.Collections
         }
     }
 
+    // NOTE: Requires Odin for proper rendering
+    // TODO: Build custom drawer ?
     [Serializable]
     public class ToggleableList<T> : List<Toggleable<T>>
     {
@@ -115,4 +115,3 @@ namespace Rhinox.Lightspeed.Collections
         }
     }
 }
-#endif

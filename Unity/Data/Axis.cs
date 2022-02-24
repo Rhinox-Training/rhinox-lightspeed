@@ -1,15 +1,10 @@
 using System;
 using UnityEngine;
-#if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
-#endif
 
 namespace Rhinox.Lightspeed
 {
-#if ODIN_INSPECTOR
-    [EnumToggleButtons]
-#endif
-    [Flags]
+    [EnumToggleButtons, Flags]
     public enum Axis
     {
         None = 0,
