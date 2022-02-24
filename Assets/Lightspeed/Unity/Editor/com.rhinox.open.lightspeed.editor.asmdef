@@ -1,0 +1,17 @@
+{
+    "name": "com.rhinox.open.lightspeed.editor",
+    "references": [
+        "GUID:fc025ba4ac3997440926e87ec084af89"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

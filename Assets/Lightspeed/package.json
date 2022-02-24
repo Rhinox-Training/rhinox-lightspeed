@@ -1,14 +1,26 @@
 {
-  "name": "com.rhinox.lightspeed",
+  "name": "com.rhinox.open.lightspeed",
   "displayName": "Lightspeed (Rhinox Module)",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "unity": "2019.3",
-  "description": "Utility code for C# project (does not depend on unity).",
+  "description": "Coding extensions library: New basic datatypes, static helper methods and extensions on Unity datatypes ",
   "keywords": [
-    "csharp"
+    "csharp",
+    "unity",
+    "extensions"
   ],
-  "category": "CSharp",
+  "category": "Unity",
   "dependencies": {
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rhinox-Training/rhinox-lightspeed.git"
+  },
+  "author": "Rhinox",
+  "license": "Apache V.2",
+  "bugs": {
+    "url": "https://github.com/Rhinox-Training/rhinox-lightspeed/issues"
+  },
+  "homepage": "https://github.com/Rhinox-Training/rhinox-lightspeed#readme",
   "type": "library"
 }
