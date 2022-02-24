@@ -12,5 +12,15 @@
   "category": "Unity",
   "dependencies": {
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rhinox-Training/rhinox-lightspeed.git"
+  },
+  "author": "Rhinox",
+  "license": "Apache V.2",
+  "bugs": {
+    "url": "https://github.com/Rhinox-Training/rhinox-lightspeed/issues"
+  },
+  "homepage": "https://github.com/Rhinox-Training/rhinox-lightspeed#readme",
   "type": "library"
 }
