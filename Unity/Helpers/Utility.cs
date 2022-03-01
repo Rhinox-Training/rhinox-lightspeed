@@ -52,22 +52,7 @@ namespace Rhinox.Lightspeed
             return gradient;
         }
         
-        public static string GetRelativePath(string path, string relativeTo)
-        {
-            if (path == relativeTo)
-                return "";
-            
-            Uri pathUri = new Uri(path);
-            // Folders must end in a slash
-            if (!relativeTo.EndsWith(Path.DirectorySeparatorChar.ToString()))
-            {
-                relativeTo += Path.DirectorySeparatorChar;
-            }
-
-            Uri folderUri = new Uri(relativeTo);
-            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString()
-                .Replace('/', Path.DirectorySeparatorChar));
-        }
+        
 
         public static void SetLayerRecursively<T>(this T obj, int newLayer) where T : Component
         {
