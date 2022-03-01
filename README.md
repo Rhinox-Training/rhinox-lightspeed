@@ -8,6 +8,7 @@ Coding extensions library: New basic datatypes, static helper methods and extens
 
 - com.unity.mathematics (Native extensions)
 - com.unity.textmeshpro (TMP Extensions)
+- com.unity.addressables (Addressable Extensions)
 
 # License
 
