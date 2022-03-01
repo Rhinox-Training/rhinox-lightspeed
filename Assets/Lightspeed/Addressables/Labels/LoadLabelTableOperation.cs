@@ -17,6 +17,10 @@ namespace Rhinox.Lightspeed.Addressables
         private static string ToForcedRemotePath(string s)
         {
             s = s.ToLowerInvariant();
+            // NOTE:
+            // The remote filepath of addressable assets is prefixed with 'remoteassets_assets_'
+            // (Found through trial and error)
+            // TODO: is this future proof?
             return s.Replace("assets/", "remoteassets_assets_assets/") + ".bundle";
         }
      
