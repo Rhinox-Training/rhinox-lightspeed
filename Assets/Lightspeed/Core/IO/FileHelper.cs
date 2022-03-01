@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Rhinox.Lightspeed.IO
 {
@@ -34,16 +35,47 @@ namespace Rhinox.Lightspeed.IO
             return di.GetFiles().Length == 0 && di.GetDirectories().Length == 0;
         }
         
-        public static string GetRelativePath(string filePath, string parentPath)
+        /// <summary>
+        /// Creates a relative path from one file or folder to another.
+        /// </summary>
+        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
+        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
+        /// <returns>The relative path from the start directory to the end path.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fromPath"/> or <paramref name="toPath"/> is <c>null</c>.</exception>
+        /// <exception cref="UriFormatException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static string GetRelativePath(string fromPath, string toPath)
         {
-            Uri pathUri = new Uri(filePath);
-            // Folders must end in a slash
-            if (!parentPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            if (fromPath == toPath)
+                return "";
+            
+            if (string.IsNullOrEmpty(fromPath))
             {
-                parentPath += Path.DirectorySeparatorChar;
+                throw new ArgumentNullException(nameof(fromPath));
             }
-            Uri folderUri = new Uri(parentPath);
-            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+
+            if (string.IsNullOrEmpty(toPath))
+            {
+                throw new ArgumentNullException(nameof(toPath));
+            }
+
+            Uri fromUri = new Uri(fromPath);
+            Uri toUri = new Uri(AppendDirectorySeparatorChar(toPath));
+
+            if (fromUri.Scheme != toUri.Scheme)
+            {
+                return toPath;
+            }
+
+            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
+            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            return relativePath;
         }
         
         public static bool IsPathRooted(string path)
@@ -127,6 +159,101 @@ namespace Rhinox.Lightspeed.IO
             }
 
             return str;
+        }
+        
+        public static ICollection<string> GetFiles(string path, string searchPattern, SearchOption searchOption)
+        {
+            var di = new DirectoryInfo(path);
+            if (!di.Exists)
+                return Array.Empty<string>();
+            
+            var foldersToProcess = new List<string>() { path };
+            var result = new List<string>();
+            while (foldersToProcess.Count > 0)
+            {
+                string folder = foldersToProcess[0];
+                foldersToProcess.RemoveAt(0);
+        
+                if (searchOption.HasFlag(SearchOption.AllDirectories))
+                {
+                    //get subfolders
+                    try
+                    {
+                        var subfolders = Directory.GetDirectories(folder);
+                        foldersToProcess.AddRange(subfolders);
+                    }
+                    catch (Exception ex)
+                    {
+                        //log if you're interested
+                    }
+                }
+        
+                //get files
+                var files = new List<string>();
+                try
+                {
+                    files = Directory.GetFiles(folder, searchPattern, SearchOption.TopDirectoryOnly).ToList();
+                }
+                catch (Exception ex)
+                {
+                    //log if you're interested
+                }
+        
+                foreach (var file in files)
+                {
+                    if (string.IsNullOrWhiteSpace(file))
+                        continue;
+                    result.Add(file);
+                }
+            }
+
+            return result;
+        }
+        
+        private static string AppendDirectorySeparatorChar(string path)
+        {
+            // Append a slash only if the path is a directory and does not have a slash.
+            if (!Path.HasExtension(path) &&
+                !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                return path + Path.DirectorySeparatorChar;
+            }
+
+            return path;
+        }
+
+        public static IReadOnlyCollection<DirectoryInfo> GetChildFolders(string path)
+        {
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                return Array.Empty<DirectoryInfo>();
+
+            return di.GetDirectories();
+        }
+
+        public static bool HasExtension(this string path, string extension) // ".fbx"
+        {
+            string pathExt = Path.GetExtension(path);
+            if (pathExt == null)
+                return extension == null;
+            return pathExt.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static string StripLastFolder(string s, bool separatorBackSlash = true, bool forceEndWithDirectorySeparator = false)
+        {
+            char targetSeparator = separatorBackSlash ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
+            char otherSeparator = separatorBackSlash ? Path.AltDirectorySeparatorChar : Path.DirectorySeparatorChar;
+            
+            
+            string path = s.Replace(otherSeparator, targetSeparator); // Set all to \\
+            
+            string[] parts = path.Split(targetSeparator).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            parts = parts.Take(parts.Length - 1).ToArray();
+            
+            string result = string.Join(targetSeparator.ToString(), parts);
+            if (forceEndWithDirectorySeparator)
+                result += targetSeparator;
+            return result;
         }
     }
 }

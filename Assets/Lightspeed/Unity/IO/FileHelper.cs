@@ -286,9 +286,44 @@ namespace Rhinox.Lightspeed.IO
             foreach (var dir in directories)
             {
                 currentPath = Path.Combine(currentPath, dir);
+                var fullPath = FileHelper.GetFullPath(currentPath, FileHelper.GetProjectPath());
                 if (!AssetDatabase.IsValidFolder(currentPath))
-                    AssetDatabase.CreateFolder(Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath));
+                {
+                    if (!Directory.Exists(fullPath))
+                        AssetDatabase.CreateFolder(Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath));
+                    else
+                    {
+                        // TODO: inconsistent database -.-
+                    }
+                }
+                else
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
             }
+        }
+        
+        public static bool AssetExists(string assetPath)
+        {
+            if (string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(assetPath)))
+                return false;
+            var fullPath = FileHelper.GetFullPath(assetPath, FileHelper.GetProjectPath());
+            return File.Exists(fullPath);
+        }
+
+        public static void ClearAssetDirectory(string assetPath) // Rooted at >Assets/..
+        {
+            if (!AssetDatabase.IsValidFolder(assetPath))
+                return;
+            
+            // Remove dir (recursively)
+            var fullPath = FileHelper.GetFullPath(assetPath, FileHelper.GetProjectPath());
+            Directory.Delete(fullPath, true);
+
+            // Sync AssetDatabase with the delete operation.
+            AssetDatabase.DeleteAsset(assetPath);
+
+            AssetDatabase.Refresh();
         }
 #endif
 

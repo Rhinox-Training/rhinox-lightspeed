@@ -239,13 +239,13 @@ using System.Collections.Generic;
 public interface ISubGroupProviderAttribute { IList<PropertyGroupAttribute> GetSubGroupAttributes(); string RepathMemberAttribute(PropertyGroupAttribute attr); } 
 
 }
-namespace Rhinox.OdinInspector.Attributes
+namespace Rhinox.GUIUtils.Odin
 {
 using System;using System.Diagnostics;using Sirenix.OdinInspector;using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Rhinox.OdinInspector.Attributes;using System.Collections;using System.Collections.Generic;
+using System.Collections;using System.Collections.Generic;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
