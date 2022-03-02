@@ -1,4 +1,4 @@
-# Lightspeed - Utility Library for Unity
+# Lightspeed - Coding Utility Library for Unity
 
 [![openupm](https://img.shields.io/npm/v/com.rhinox.open.lightspeed?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.rhinox.open.lightspeed/)
 
