@@ -38,33 +38,33 @@ namespace Rhinox.Lightspeed.IO
         /// <summary>
         /// Creates a relative path from one file or folder to another.
         /// </summary>
-        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
-        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
+        /// <param name="path">Contains the path that defines the endpoint of the relative path.</param>
+        /// <param name="parentPath">Contains the directory that defines the start of the relative path.</param>
         /// <returns>The relative path from the start directory to the end path.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="fromPath"/> or <paramref name="toPath"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="parentPath"/> or <paramref name="path"/> is <c>null</c>.</exception>
         /// <exception cref="UriFormatException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public static string GetRelativePath(string fromPath, string toPath)
+        public static string GetRelativePath(string path, string parentPath)
         {
-            if (fromPath == toPath)
+            if (parentPath == path)
                 return "";
             
-            if (string.IsNullOrEmpty(fromPath))
+            if (string.IsNullOrEmpty(parentPath))
             {
-                throw new ArgumentNullException(nameof(fromPath));
+                throw new ArgumentNullException(nameof(parentPath));
             }
 
-            if (string.IsNullOrEmpty(toPath))
+            if (string.IsNullOrEmpty(path))
             {
-                throw new ArgumentNullException(nameof(toPath));
+                throw new ArgumentNullException(nameof(path));
             }
 
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(AppendDirectorySeparatorChar(toPath));
+            Uri fromUri = new Uri(AppendDirectorySeparatorChar(parentPath)); // Should always be a folder
+            Uri toUri = new Uri(path); // Can be a file or folder path
 
             if (fromUri.Scheme != toUri.Scheme)
             {
-                return toPath;
+                return path;
             }
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
@@ -214,7 +214,8 @@ namespace Rhinox.Lightspeed.IO
         {
             // Append a slash only if the path is a directory and does not have a slash.
             if (!Path.HasExtension(path) &&
-                !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                !path.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
+                !path.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
             {
                 return path + Path.DirectorySeparatorChar;
             }
