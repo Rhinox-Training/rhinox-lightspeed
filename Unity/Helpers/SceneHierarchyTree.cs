@@ -81,7 +81,7 @@ namespace Rhinox.Utilities
             {
                 var s = SceneManager.GetSceneAt(i);
                 if (TryGetSceneObjectTrees(s, RootTrees))
-                    _loadedScenes.Add(currScene);
+                    _loadedScenes.Add(s);
             }
 
             _cachedTree = this;
