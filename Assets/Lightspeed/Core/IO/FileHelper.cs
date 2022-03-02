@@ -38,34 +38,32 @@ namespace Rhinox.Lightspeed.IO
         /// <summary>
         /// Creates a relative path from one file or folder to another.
         /// </summary>
-        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
-        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
+        /// <param name="path">Contains the path that defines the endpoint of the relative path.</param>
+        /// <param name="parentPath">Contains the directory that defines the start of the relative path.</param>
         /// <returns>The relative path from the start directory to the end path.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="fromPath"/> or <paramref name="toPath"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="parentPath"/> or <paramref name="path"/> is <c>null</c>.</exception>
         /// <exception cref="UriFormatException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public static string GetRelativePath(string fromPath, string toPath)
+        public static string GetRelativePath(string path, string parentPath)
         {
-            if (fromPath == toPath)
-                return "";
+            if (string.IsNullOrEmpty(parentPath))
+                throw new ArgumentNullException(nameof(parentPath));
+
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            // Normalize path separators to Path.DirectorySeparatorChar
+            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            parentPath = parentPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             
-            if (string.IsNullOrEmpty(fromPath))
-            {
-                throw new ArgumentNullException(nameof(fromPath));
-            }
+            if (IsPathEqual(path, parentPath, false))
+                return string.Empty;
+            
+            Uri fromUri = new Uri(AppendDirectorySeparatorChar(parentPath)); // Should always be a folder
+            Uri toUri = new Uri(path); // Can be a file or folder path
 
-            if (string.IsNullOrEmpty(toPath))
-            {
-                throw new ArgumentNullException(nameof(toPath));
-            }
-
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(AppendDirectorySeparatorChar(toPath));
-
-            if (fromUri.Scheme != toUri.Scheme)
-            {
-                return toPath;
-            }
+            if (fromUri.Scheme != toUri.Scheme) // Does not have same root
+                return path;
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
             string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
@@ -76,6 +74,24 @@ namespace Rhinox.Lightspeed.IO
             }
 
             return relativePath;
+        }
+
+        public static bool IsPathEqual(string path1, string path2, bool convertSlashes = true)
+        {
+            if (path1 == null || path2 == null)
+                return path1 == path2;
+            if (convertSlashes)
+            {
+                // Normalize path separators to Path.DirectorySeparatorChar
+                path1 = path1.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                path2 = path2.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            if (path1.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                path1 = path1.Substring(0, path1.Length - 1);
+            if (path2.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                path2 = path2.Substring(0, path2.Length - 1);
+            return path1.Equals(path2);
         }
         
         public static bool IsPathRooted(string path)
@@ -214,7 +230,8 @@ namespace Rhinox.Lightspeed.IO
         {
             // Append a slash only if the path is a directory and does not have a slash.
             if (!Path.HasExtension(path) &&
-                !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                !path.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
+                !path.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
             {
                 return path + Path.DirectorySeparatorChar;
             }
