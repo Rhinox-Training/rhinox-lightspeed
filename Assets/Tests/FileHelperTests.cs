@@ -1,11 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Rhinox.Lightspeed;
 using Rhinox.Lightspeed.IO;
-using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace Tests
 {
@@ -27,14 +23,43 @@ namespace Tests
         [Test]
         public void FindSubFolderTest()
         {
-            AssertRelativePath("D:/Test/Foobar",   "D:/Test",     "Foobar\\");
+            AssertRelativePath("D:/Test/Foobar",   "D:/Test",     "Foobar");
+            AssertRelativePath("D:/Test/Foobar",   "D:/Test",     "Foobar");
+            AssertRelativePath("D:/Test\\Foobar",  "D:\\Test",    "Foobar");
+            AssertRelativePath("D:/Test/Foobar",   "D:\\Test/",   "Foobar");
+            AssertRelativePath("D:\\Test/Foobar",  "D:\\Test/",   "Foobar");
+            AssertRelativePath("D:\\Test/Foobar",  "D:\\Test\\",  "Foobar");
+            
             AssertRelativePath("D:/Test/Foobar/",  "D:/Test/",    "Foobar\\");
-            AssertRelativePath("D:/Test/Foobar",   "D:/Test",     "Foobar\\");
             AssertRelativePath("D:/Test/Foobar\\", "D:/Test/",    "Foobar\\");
-            AssertRelativePath("D:/Test\\Foobar",  "D:\\Test",    "Foobar\\");
-            AssertRelativePath("D:/Test/Foobar",   "D:\\Test/",   "Foobar\\");
-            AssertRelativePath("D:\\Test/Foobar",  "D:\\Test/",   "Foobar\\");
-            AssertRelativePath("D:\\Test/Foobar",  "D:\\Test\\",  "Foobar\\");
+        }
+        
+        [Test]
+        public void FindSubFolderUpDownTest1()
+        {
+            AssertRelativePath("D:/Test/Bar/Foobar",   "D:/Test/Foo/",     "..\\Bar\\Foobar");
+            AssertRelativePath("D:/Test/Bar/Foobar",   "D:/Test/Foo\\",    "..\\Bar\\Foobar");
+            AssertRelativePath("D:/Test/Bar/Foobar",   "D:\\Test/Foo/",    "..\\Bar\\Foobar");
+            AssertRelativePath("D:\\Test/Bar/Foobar",  "D:\\Test\\Foo\\",  "..\\Bar\\Foobar");
+            AssertRelativePath("D:/Test\\Bar/Foobar",  "D:\\Test/Foo",     "..\\Bar\\Foobar");
+            AssertRelativePath("D:\\Test/Bar/Foobar",  "D:\\Test/Foo",     "..\\Bar\\Foobar");
+            
+            AssertRelativePath("D:/Test/Bar/Foobar/",  "D:/Test/Foo",      "..\\Bar\\Foobar\\");
+            AssertRelativePath("D:/Test/Bar/Foobar\\", "D:/Test/Foo",      "..\\Bar\\Foobar\\");
+        }
+        
+        [Test]
+        public void FindSubFolderUpDownTest2()
+        {
+            AssertRelativePath("D:/Test/Foo",      "D:/Test/Bar/Foobar/",  "..\\..\\Foo");
+            AssertRelativePath("D:/Test/Foo",      "D:/Test/Bar/Foobar\\", "..\\..\\Foo");
+            AssertRelativePath("D:\\Test/Foo",     "D:/Test\\Bar/Foobar",  "..\\..\\Foo");
+            AssertRelativePath("D:\\Test/Foo",     "D:\\Test/Bar/Foobar",  "..\\..\\Foo");
+            
+            AssertRelativePath("D:/Test/Foo/",     "D:/Test/Bar/Foobar",   "..\\..\\Foo\\");
+            AssertRelativePath("D:\\Test/Foo/",    "D:/Test/Bar/Foobar",   "..\\..\\Foo\\");
+            AssertRelativePath("D:/Test/Foo\\",    "D:/Test/Bar/Foobar",   "..\\..\\Foo\\");
+            AssertRelativePath("D:\\Test\\Foo\\",  "D:\\Test/Bar/Foobar",  "..\\..\\Foo\\");
         }
 
         [Test]

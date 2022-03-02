@@ -46,26 +46,24 @@ namespace Rhinox.Lightspeed.IO
         /// <exception cref="InvalidOperationException"></exception>
         public static string GetRelativePath(string path, string parentPath)
         {
-            if (parentPath == path)
-                return "";
-            
             if (string.IsNullOrEmpty(parentPath))
-            {
                 throw new ArgumentNullException(nameof(parentPath));
-            }
 
             if (string.IsNullOrEmpty(path))
-            {
                 throw new ArgumentNullException(nameof(path));
-            }
 
+            // Normalize path separators to Path.DirectorySeparatorChar
+            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            parentPath = parentPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            
+            if (IsPathEqual(path, parentPath, false))
+                return string.Empty;
+            
             Uri fromUri = new Uri(AppendDirectorySeparatorChar(parentPath)); // Should always be a folder
             Uri toUri = new Uri(path); // Can be a file or folder path
 
-            if (fromUri.Scheme != toUri.Scheme)
-            {
+            if (fromUri.Scheme != toUri.Scheme) // Does not have same root
                 return path;
-            }
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
             string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
@@ -76,6 +74,24 @@ namespace Rhinox.Lightspeed.IO
             }
 
             return relativePath;
+        }
+
+        public static bool IsPathEqual(string path1, string path2, bool convertSlashes = true)
+        {
+            if (path1 == null || path2 == null)
+                return path1 == path2;
+            if (convertSlashes)
+            {
+                // Normalize path separators to Path.DirectorySeparatorChar
+                path1 = path1.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                path2 = path2.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            if (path1.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                path1 = path1.Substring(0, path1.Length - 1);
+            if (path2.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                path2 = path2.Substring(0, path2.Length - 1);
+            return path1.Equals(path2);
         }
         
         public static bool IsPathRooted(string path)
