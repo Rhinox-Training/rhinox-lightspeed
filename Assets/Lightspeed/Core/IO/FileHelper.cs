@@ -127,7 +127,7 @@ namespace Rhinox.Lightspeed.IO
             return new FileInfo(path).FullName;
         }
         
-        public static void CopyDirectory(string source, string target)
+        public static void CopyDirectory(string source, string target, bool overwrite = false)
         {
             var stack = new Stack<Folders>();
             stack.Push(new Folders(source, target));
@@ -138,7 +138,8 @@ namespace Rhinox.Lightspeed.IO
                 Directory.CreateDirectory(folders.Target);
                 foreach (var file in Directory.GetFiles(folders.Source, "*.*"))
                 {
-                    File.Copy(file, Path.Combine(folders.Target, Path.GetFileName(file)));
+                    string destFileName = Path.Combine(folders.Target, Path.GetFileName(file));
+                    File.Copy(file, destFileName, overwrite);
                 }
 
                 foreach (var folder in Directory.GetDirectories(folders.Source))
