@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+#if UNITY_EDITOR
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
+#endif
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -64,5 +69,28 @@ namespace Rhinox.Lightspeed
             
             return isPackage;
         }
+        
+#if UNITY_EDITOR
+        public static ICollection<PackageInfo> ListPackages(bool includeUnityPackages = false)
+        {
+            string STANDARD_UNITY_PACKAGE_PREFIX = "com.unity.";
+            ListRequest lr = Client.List(true, false);
+            while (!lr.IsCompleted)
+            {
+                // Wait
+            }
+
+            List<PackageInfo> packages = new List<PackageInfo>();
+            foreach (PackageInfo package in lr.Result)
+            {
+                string packageName = package.name;
+                if (!includeUnityPackages && packageName.StartsWith(STANDARD_UNITY_PACKAGE_PREFIX))
+                    continue;
+                packages.Add(package);
+            }
+
+            return packages;
+        }
+#endif
     }
 }

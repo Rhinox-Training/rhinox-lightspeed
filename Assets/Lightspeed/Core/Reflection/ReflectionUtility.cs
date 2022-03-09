@@ -395,6 +395,45 @@ namespace Rhinox.Lightspeed.Reflection
 
             return Delegate.CreateDelegate(getType(types.ToArray()), target, methodInfo.Name);
         }
+        
+        public static string MethodsOfObject(System.Object obj, bool includeInfo = false)
+        {
+            string methods = "";
+            MethodInfo[] methodInfos = obj.GetType().GetMethods();
+            for (int i = 0; i < methodInfos.Length; i++)
+            {
+                if (includeInfo)
+                {
+                    methods += methodInfos[i] + "\n";
+                }
 
+                else
+                {
+                    methods += methodInfos[i].Name + "\n";
+                }
+            }
+
+            return (methods);
+        }
+
+        public static string MethodsOfType(System.Type type, bool includeInfo = false)
+        {
+            string methods = "";
+            MethodInfo[] methodInfos = type.GetMethods();
+            for (var i = 0; i < methodInfos.Length; i++)
+            {
+                if (includeInfo)
+                {
+                    methods += methodInfos[i] + "\n";
+                }
+
+                else
+                {
+                    methods += methodInfos[i].Name + "\n";
+                }
+            }
+
+            return (methods);
+        }
     }
 }
