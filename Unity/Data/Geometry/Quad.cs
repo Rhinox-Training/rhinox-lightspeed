@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [DebuggerDisplay("{V1} -> {V2} -> {V3} -> {V4}")]
     public class Quad

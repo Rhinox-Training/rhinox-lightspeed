@@ -9,7 +9,7 @@ using UnityEngine;
 // nice to see people using your stuff!)
 //
 // Written by Bryan Keiren (http://www.bryankeiren.com)
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [Serializable]
     [RefactoringOldNamespace("Rhinox.Utilities")]

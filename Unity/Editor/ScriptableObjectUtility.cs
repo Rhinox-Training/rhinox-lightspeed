@@ -7,7 +7,7 @@ using System.Reflection;
 using Rhinox.Lightspeed.IO;
 using Rhinox.Lightspeed.Reflection;
 
-namespace Rhinox.Utilities.Editor
+namespace Rhinox.Lightspeed.Editor
 {
 	public static class ScriptableObjectUtility
 	{

@@ -1,7 +1,7 @@
 using System;
 using Sirenix.OdinInspector;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [EnumToggleButtons, Flags]
     public enum WindDirection
