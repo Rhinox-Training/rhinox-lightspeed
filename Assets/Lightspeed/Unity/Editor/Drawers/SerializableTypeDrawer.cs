@@ -3,9 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Rhinox.Lightspeed.Reflection;
-using Rhinox.GUIUtils.Odin;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
@@ -23,12 +21,12 @@ namespace Rhinox.Lightspeed.Editor
         {
         }
 
-        private string _typeMethod;
-        private string _title;
-        private string _error;
-        private Type _baseType;
+        protected string _typeMethod;
+        protected string _title;
+        protected string _error;
+        protected Type _baseType;
 
-        private InspectorPropertyValueGetter<object> _rawGetter;
+        protected InspectorPropertyValueGetter<object> _rawGetter;
 
         protected override void Initialize()
         {
@@ -41,10 +39,6 @@ namespace Rhinox.Lightspeed.Editor
                 _rawGetter = new InspectorPropertyValueGetter<object>(this.Property, _typeMethod);
                 _error = _rawGetter.ErrorMessage;
             }
-
-            var assignableTypeFilter = Property.Attributes.OfType<AssignableTypeFilterAttribute>().FirstOrDefault();
-            if (assignableTypeFilter != null)
-                _baseType = assignableTypeFilter.BaseType;
         }
 
         private IEnumerable<Type> ResolveRawGetter()
