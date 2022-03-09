@@ -8,31 +8,29 @@ using UnityEditor.SceneManagement;
 
 #endif
 
-// Author: JohannesMP (2018-08-12)
 // MIT License
-// A wrapper that provides the means to safely serialize Scene Asset References.
 //
-// Internally we serialize an Object to the SceneAsset which only exists at editor time.
-// Any time the object is serialized, we store the path provided by this Asset (assuming it was valid).
+// Copyright (c) 2018 JohannesMP
 //
-// This means that, come build time, the string path of the scene asset is always already stored, which if 
-// the scene was added to the build settings means it can be loaded.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// It is up to the user to ensure the scene exists in the build settings so it is loadable at runtime.
-// To help with this, a custom PropertyDrawer displays the scene build settings state.
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 //
-//  Known issues:
-// - When reverting back to a prefab which has the asset stored as null, Unity will show the property 
-// as modified despite having just reverted. This only happens on the fist time, and reverting again fix it. 
-// Under the hood the state is still always valid and serialized correctly regardless.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-/// <summary>
-/// A wrapper that provides the means to safely serialize Scene Asset References.
-/// Main difference with SceneReferenceData: Serializes an Object and is thus unfit for a data layer
-/// Due to that it has an extra reference point (the Scene Object) and is slightly more reliable
-/// Note: works on MonoBehaviours/Objects but not in a data layer
-/// TODO: This does show up as an option when creating a 'SceneReferenceData' object which can cause confusion
-/// </summary>
+// Modified by Rhinox (extracted new base class)
 
 namespace Rhinox.Lightspeed
 {
