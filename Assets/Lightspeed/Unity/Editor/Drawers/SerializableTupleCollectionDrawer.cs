@@ -4,17 +4,16 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
-// TODO: migrate to lightspeed
 [CustomPropertyDrawer(typeof(SerializableTupleCollection), true)]
-public class SerializableTupleCollectionDrawer : PropertyDrawer {
-
-    private ReorderableList list;
+public class SerializableTupleCollectionDrawer : PropertyDrawer 
+{
+    private ReorderableList _list;
 
     public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
-        if (list == null) {
+        if (_list == null) {
             var listProp = property.FindPropertyRelative("list");
-            list = new ReorderableList(property.serializedObject, listProp, true, false, true, true);
-            list.drawElementCallback = DrawListItems;
+            _list = new ReorderableList(property.serializedObject, listProp, true, false, true, true);
+            _list.drawElementCallback = DrawListItems;
         }
 
         var firstLine = position;
@@ -27,14 +26,14 @@ public class SerializableTupleCollectionDrawer : PropertyDrawer {
             var prevLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 80;
 
-            list.DoList(position);
+            _list.DoList(position);
 
             EditorGUIUtility.labelWidth = prevLabelWidth;
         }
     }
 
     void DrawListItems(Rect rect, int index, bool isActive, bool isFocused) {
-        SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index); // The element in the list
+        SerializedProperty element = _list.serializedProperty.GetArrayElementAtIndex(index); // The element in the list
 
         var keyProp  = element.FindPropertyRelative("Item1");
         var contents = new GUIContent[] {GUIContent.none, new GUIContent (" => ")};
