@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 #endif
 
 // Author: JohannesMP (2018-08-12)
-//
+// MIT License
 // A wrapper that provides the means to safely serialize Scene Asset References.
 //
 // Internally we serialize an Object to the SceneAsset which only exists at editor time.
@@ -33,62 +33,72 @@ using UnityEditor.SceneManagement;
 /// Note: works on MonoBehaviours/Objects but not in a data layer
 /// TODO: This does show up as an option when creating a 'SceneReferenceData' object which can cause confusion
 /// </summary>
-[Serializable]
-public class SceneReference : SceneReferenceData
+
+namespace Rhinox.Lightspeed
 {
-#if UNITY_EDITOR
-    // What we use in editor to select the scene
-    [SerializeField] private Object sceneAsset;
-
-    public override Object SceneAsset
+    [Serializable, RefactoringOldNamespace("")]
+    public class SceneReference : SceneReferenceData
     {
-        get => sceneAsset;
-        protected set => sceneAsset = value;
-    }
+#if UNITY_EDITOR
+        // What we use in editor to select the scene
+        [SerializeField] private Object sceneAsset;
+
+        public override Object SceneAsset
+        {
+            get => sceneAsset;
+            protected set => sceneAsset = value;
+        }
 #endif
 
-    public SceneReference() { }
-    
-    public SceneReference(string path) : base(path) { }
+        public SceneReference()
+        {
+        }
 
-    public SceneReference(Scene scene) : base(scene) { }
+        public SceneReference(string path) : base(path)
+        {
+        }
+
+        public SceneReference(Scene scene) : base(scene)
+        {
+        }
 
 
 #if UNITY_EDITOR
-    public SceneReference(SceneAsset scene) : base(scene)
-    {
-        sceneAsset = scene;
-    }
-    
-    protected override void HandleBeforeSerialize()
-    {
-        // Asset is invalid but have Path to try and recover from
-        if (IsValidSceneAsset == false && !string.IsNullOrEmpty(scenePath))
+        public SceneReference(SceneAsset scene) : base(scene)
         {
-            sceneAsset = GetSceneAssetFromPath();
-            sceneGuid = GetGuidFromAssetPath();
-            if (sceneAsset == null) scenePath = string.Empty;
-
-            EditorSceneManager.MarkAllScenesDirty();
+            sceneAsset = scene;
         }
-        // Asset takes precedence and overwrites Path
-        else
+
+        protected override void HandleBeforeSerialize()
         {
-            scenePath = GetScenePathFromAsset();
-            sceneGuid = GetGuidFromAssetPath();
+            // Asset is invalid but have Path to try and recover from
+            if (IsValidSceneAsset == false && !string.IsNullOrEmpty(scenePath))
+            {
+                sceneAsset = GetSceneAssetFromPath();
+                sceneGuid = GetGuidFromAssetPath();
+                if (sceneAsset == null) scenePath = string.Empty;
+
+                EditorSceneManager.MarkAllScenesDirty();
+            }
+            // Asset takes precedence and overwrites Path
+            else
+            {
+                scenePath = GetScenePathFromAsset();
+                sceneGuid = GetGuidFromAssetPath();
+            }
         }
-    }
 
-    protected override void HandleAfterDeserialize()
-    {
-        EditorApplication.update -= HandleAfterDeserialize;
-        // Asset is valid, don't do anything - Path will always be set based on it when it matters
-        if (IsValidSceneAsset) return;
-        
-        // Try to recover the SceneAsset from the data
-        base.HandleAfterDeserialize();
+        protected override void HandleAfterDeserialize()
+        {
+            EditorApplication.update -= HandleAfterDeserialize;
+            // Asset is valid, don't do anything - Path will always be set based on it when it matters
+            if (IsValidSceneAsset) return;
 
-        if (!Application.isPlaying) EditorSceneManager.MarkAllScenesDirty();
-    }
+            // Try to recover the SceneAsset from the data
+            base.HandleAfterDeserialize();
+
+            if (!Application.isPlaying) EditorSceneManager.MarkAllScenesDirty();
+        }
 #endif
+    }
 }
