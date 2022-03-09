@@ -5,7 +5,7 @@ using System.Reflection;
 using Rhinox.Lightspeed.Reflection;
 using UnityEngine.Events;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public static class UnityEventHelper
     {

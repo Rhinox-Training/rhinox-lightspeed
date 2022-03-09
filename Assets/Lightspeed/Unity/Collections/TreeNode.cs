@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public class TreeNode<T>
     {

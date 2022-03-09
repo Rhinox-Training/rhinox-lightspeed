@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     /// <summary>
     /// A struct used to keep track of something you only wish to execute every X ticks

@@ -4,7 +4,7 @@ using Rhinox.Lightspeed;
 using Rhinox.Lightspeed.Reflection;
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     [Serializable]
     public class SerializablePropertyInfo : SerializableMemberInfo

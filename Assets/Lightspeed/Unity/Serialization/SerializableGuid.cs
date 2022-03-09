@@ -3,7 +3,7 @@ using System.IO;
 using Rhinox.Lightspeed;
 using UnityEditor;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public interface IIdentifiable
     {

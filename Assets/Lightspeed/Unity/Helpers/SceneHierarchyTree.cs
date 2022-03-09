@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Rhinox.Lightspeed;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public class SceneHierarchyTree
     {
