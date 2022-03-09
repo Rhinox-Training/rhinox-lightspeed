@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public class RangeFloat
     {

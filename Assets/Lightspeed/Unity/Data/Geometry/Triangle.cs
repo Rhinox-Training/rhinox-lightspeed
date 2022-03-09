@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public class Triangle
     {

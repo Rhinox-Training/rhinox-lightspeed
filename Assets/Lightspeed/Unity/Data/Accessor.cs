@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
     public class Accessor<T>
     {

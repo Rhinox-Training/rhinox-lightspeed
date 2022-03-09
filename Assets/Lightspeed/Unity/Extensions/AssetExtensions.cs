@@ -1,4 +1,4 @@
-namespace Rhinox.Utilities
+namespace Rhinox.Lightspeed
 {
 #if UNITY_EDITOR
     using System;
