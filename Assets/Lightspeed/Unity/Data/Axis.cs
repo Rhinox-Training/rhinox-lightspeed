@@ -79,5 +79,19 @@ namespace Rhinox.Lightspeed
             else v.z = fillValue;
             return v;
         }*/
+        
+        public static Vector3 ToVector(this Axis axis, float value)
+        {
+            if (axis.HasFlag(Axis.X)) return new Vector3(value, 0, 0);
+            if (axis.HasFlag(Axis.Y)) return new Vector3(0, value, 0);
+            if (axis.HasFlag(Axis.Z)) return new Vector3(0, 0, value);
+            return Vector3.zero;
+        }
+        
+        public static Quaternion ToQuaternion(this Axis axis, float value)
+        {
+            return Quaternion.Euler(axis.ToVector(value));
+        }
+
     }
 }

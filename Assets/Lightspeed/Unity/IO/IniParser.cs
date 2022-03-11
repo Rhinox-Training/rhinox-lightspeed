@@ -7,13 +7,13 @@ using UnityEngine;
 
 namespace Rhinox.Lightspeed.IO
 {
-    public interface IniReader
+    public interface IIniReader
     {
         string GetSetting(string sectionName, string settingName);
         string[] EnumSection(string sectionName);
     }
     
-    public class IniParser : IniReader
+    public class IniParser : IIniReader
     {
         private Hashtable keyPairs = new Hashtable();
         private string iniFilePath;
@@ -24,7 +24,7 @@ namespace Rhinox.Lightspeed.IO
             public string Key;
         }
 
-        public static IEnumerator ReadAsync(string iniPath, Action<IniReader> callback)
+        public static IEnumerator ReadAsync(string iniPath, Action<IIniReader> callback)
         {
             return (FileHelper.ReadAllLinesAsync(iniPath,(p, data) =>
             {
