@@ -2,7 +2,7 @@
 
 namespace Rhinox.Lightspeed
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Enum)]
     public sealed class RefactoringOldNamespaceAttribute : Attribute
     {
         public string PreviousNamespace { get; }

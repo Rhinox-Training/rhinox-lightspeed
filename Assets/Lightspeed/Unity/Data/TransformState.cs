@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Rhinox.Lightspeed
 {
+    [RefactoringOldNamespace("Rhinox.Utilities")]
     [Serializable]
     public struct TransformState
     {
