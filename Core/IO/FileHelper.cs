@@ -199,7 +199,7 @@ namespace Rhinox.Lightspeed.IO
                         var subfolders = Directory.GetDirectories(folder);
                         foldersToProcess.AddRange(subfolders);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //log if you're interested
                     }
@@ -211,7 +211,7 @@ namespace Rhinox.Lightspeed.IO
                 {
                     files = Directory.GetFiles(folder, searchPattern, SearchOption.TopDirectoryOnly).ToList();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //log if you're interested
                 }
