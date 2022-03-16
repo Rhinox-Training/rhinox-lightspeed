@@ -10,6 +10,7 @@ namespace Rhinox.Lightspeed
         SerializableGuid ID { get; }
     }
     
+    [RefactoringOldNamespace("Rhinox.Utilities")]
     [Serializable]
     public class SerializableGuid : IEquatable<SerializableGuid>
     {

@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Rhinox.Lightspeed
 {
+    [RefactoringOldNamespace("Rhinox.Utilities")]
     public class RangeFloat
     {
         public float Start;
