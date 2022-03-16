@@ -4,6 +4,7 @@ using Sirenix.OdinInspector;
 
 namespace Rhinox.Lightspeed
 {
+    [RefactoringOldNamespace("Rhinox.Utilities")]
     [EnumToggleButtons, Flags]
     public enum Axis
     {
