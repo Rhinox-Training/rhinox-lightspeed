@@ -11,6 +11,16 @@ namespace Rhinox.Lightspeed
 {
     public static class TransformExtensions
     {
+        public static void Reset(this Transform t, bool resetPosition = true, bool resetRotation = true, bool resetScale = true)
+        {
+            if (resetPosition)
+                t.localPosition = Vector3.zero;
+            if (resetRotation)
+                t.localRotation = Quaternion.identity;
+            if (resetScale)
+                t.localScale = Vector3.one;
+        }
+        
         public static Quaternion TransformQuaternion(this Transform t, Quaternion quaternion)
         {
             return t.rotation * quaternion;

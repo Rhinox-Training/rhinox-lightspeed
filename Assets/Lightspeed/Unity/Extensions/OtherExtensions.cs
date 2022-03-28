@@ -16,18 +16,7 @@ namespace Rhinox.Lightspeed
 		{
 			return (col.r * 0.2126f + col.g * 0.7152f + col.b * 0.0722f) > (179f / 255);
 		}
-
-		public static Bounds Combine(this ICollection<Bounds> bounds)
-		{
-			if (bounds.Count <= 1) return bounds.FirstOrDefault();
-
-			return bounds.Aggregate((a, b) =>
-			{
-				a.Encapsulate(b);
-				return a;
-			});
-		}
-
+		
 		public static Color With(this Color color, float? r = null, float? g = null, float? b = null, float? a = null)
 		{
 			return new Color(r ?? color.r, g ?? color.g, b ?? color.b, a ?? color.a);
