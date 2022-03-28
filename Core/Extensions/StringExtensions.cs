@@ -186,5 +186,12 @@ namespace Rhinox.Lightspeed
             
             return string.Join(separator, _camelCaseSplitRegex.Split(input));
         }
+        
+        public static bool CaseInvariantEquals(this string s1, string s2)
+        {
+            if (s1 == null)
+                return s2 == null;
+            return s1.Equals(s2, StringComparison.InvariantCultureIgnoreCase);
+        }
     }
 }

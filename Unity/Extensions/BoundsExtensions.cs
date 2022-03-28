@@ -88,9 +88,9 @@ namespace Rhinox.Lightspeed
 				return bounds;
 			}
 
-			return default;
+			return default(Bounds);
 		}
-
+		
 		public static Bounds GetCombinedBounds(this IEnumerable<Collider> colliders)
 		{
 			return colliders.Select(x => x.bounds).ToArray().Combine();
@@ -159,6 +159,38 @@ namespace Rhinox.Lightspeed
 			}
 			return b;
 		}
+		
+		public static Bounds GetObjectLocalBounds(this GameObject go)
+		{
+			var colliders = go.GetComponentsInChildren<Collider>();
+			if (colliders.Any())
+			{
+				var bounds = colliders.GetCombinedLocalBounds(go.transform);
+				return bounds;
+			}
+			
+			var renderers = go.GetComponentsInChildren<Renderer>();
+			if (renderers.Any())
+			{
+				var bounds = renderers.GetCombinedLocalBounds(go.transform);
+				return bounds;
+			}
+
+			return default;
+		}
+		
+		public static Bounds GetCombinedLocalBounds(this ICollection<Collider> colliders, Transform axis)
+		{
+			if (colliders.Count == 0) return default(Bounds);
+			
+			var b = colliders.ElementAt(0).GetLocalBounds(axis);
+
+			for (int i = 1; i < colliders.Count; ++i)
+			{
+				b.Encapsulate(colliders.ElementAt(i).GetLocalBounds(axis));
+			}
+			return b;
+		}
 
 		public static Bounds GetLocalBounds(this Renderer renderer, Transform axis)
 		{
@@ -203,6 +235,27 @@ namespace Rhinox.Lightspeed
 			var overlap = new Bounds();
 			overlap.SetMinMax(min, max);
 			return overlap;
+		}
+		
+		public static Bounds GetLocalBounds(this Collider collider, Transform axis)
+		{
+			var matrix = axis.worldToLocalMatrix;
+			var b = collider.bounds;
+			
+			var center = matrix.MultiplyPoint(b.center);
+			var size = matrix.MultiplyVector(b.size);
+			return new Bounds(center, size);
+		}
+		
+		public static Bounds Combine(this ICollection<Bounds> bounds)
+		{
+			if (bounds.Count <= 1) return bounds.FirstOrDefault();
+
+			return bounds.Aggregate((a, b) =>
+			{
+				a.Encapsulate(b);
+				return a;
+			});
 		}
     }
 }

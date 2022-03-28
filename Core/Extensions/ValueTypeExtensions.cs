@@ -49,6 +49,11 @@ namespace Rhinox.Lightspeed
         {
             return Math.Abs(val1 - val2) < epsilon;
         }
+        
+        public static bool IsBetweenIncl(this float f, float minValue, float maxValue)
+        {
+            return f > (minValue - float.Epsilon) && f < (maxValue + float.Epsilon);
+        }
 
         public static bool IsDefault<T>(this T value)
         {
