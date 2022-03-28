@@ -21,7 +21,6 @@ namespace Rhinox.Lightspeed
             return viewPos.x.IsBetween(0, 1) && viewPos.y.IsBetween(0, 1) && viewPos.z > 0;
         }
 
-        // TODO: migrate to Lightspeed
         public static bool IsBetween(this float number, float min, float max)
         {
             if (min > max)

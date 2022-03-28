@@ -1,24 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Rhinox.Lightspeed;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
 {
     public static class VectorExtensions
     {
-        public static void Reset(this Transform t, bool resetPosition = true, bool resetRotation = true,
-            bool resetScale = true)
-        {
-            if (resetPosition)
-                t.localPosition = Vector3.zero;
-            if (resetRotation)
-                t.localRotation = Quaternion.identity;
-            if (resetScale)
-                t.localScale = Vector3.one;
-        }
-
         public static Vector2 With(this Vector2 vec, float? x = null, float? y = null)
         {
             return new Vector2(x ?? vec.x, y ?? vec.y);
@@ -236,6 +224,87 @@ namespace Rhinox.Lightspeed
         public static float Min(this Vector3 vec)
         {
             return Mathf.Min(vec.x, vec.y, vec.z);
+        }
+        
+        /// <summary>
+        /// Gets the center of a vector3 collection
+        /// </summary>
+        /// <param name="vectors"></param>
+        /// <returns></returns>
+        public static Vector3 GetAverage(this Vector3[] vectors)    
+        {
+            Vector3 sum = Vector3.zero;
+            foreach (var v in vectors)
+                sum += v;
+            sum = sum / vectors.Length;
+            return sum;
+        }
+        
+        /// <summary>
+        /// Gets the center of a vector3 collection
+        /// </summary>
+        /// <param name="vectors"></param>
+        /// <returns></returns>
+        public static Vector2 GetAverage(this Vector2[] vectors)    
+        {
+            Vector2 sum = Vector2.zero;
+            foreach (var v in vectors)
+                sum += v;
+            sum = sum / vectors.Length;
+            return sum;
+        }
+
+        /// <summary>
+        /// Checks if two vectors are at (nearly) the same position.
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="maxOffset"></param>
+        /// <returns></returns>
+        public static bool IsNearlySamePoint(this Vector3 v1, Vector3 v2, float maxOffset)
+        {
+            var maxOffsetSqr = maxOffset * maxOffset;
+            var sqrOffset = (v1 - v2).sqrMagnitude;
+            return sqrOffset <= maxOffsetSqr;
+        }
+
+        /// <summary>
+        /// Checks if a collection of Vectors contains a different point at (nearly) the same position.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="check"></param>
+        /// <param name="maxOffset"></param>
+        /// <returns></returns>
+        public static bool ContainsWithOffset(this List<Vector3> collection, Vector3 check, float maxOffset)
+        {
+            foreach (var vector in collection)
+            {
+                if(vector.IsNearlySamePoint(check, maxOffset))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes (near-) duplicates of vector3's from a collection.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="maxOffset"></param>
+        /// <returns></returns>
+        public static List<Vector3> RemoveDuplicates(this List<Vector3> collection, float maxOffset)
+        {
+            List<Vector3> newCollection = new List<Vector3>();
+            for (int i = 0; i < collection.Count; i++)
+            {
+                var v = collection[i];
+                if(i==0 || !collection.ContainsWithOffset(v, maxOffset))
+                {
+                    newCollection.Add(v);
+                }
+            }
+            return newCollection;
         }
         
         /// <summary>
