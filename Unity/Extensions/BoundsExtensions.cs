@@ -33,19 +33,16 @@ namespace Rhinox.Lightspeed
 			return bounds.size.x * bounds.size.y * bounds.size.z;
 		}
         
-        // TODO: should we keep this method, unnecessarily restricts?
         public static float GetVolume(this IEnumerable<Collider> colliders)
         {
 	        return colliders.GetCombinedBounds().GetVolume();
         }
         
-        // TODO: should we keep this method, unnecessarily restricts?
         public static float GetVolume(this IEnumerable<MeshFilter> meshes)
         {
 	        return meshes.GetCombinedBounds().GetVolume();
         }
         
-        // TODO: should we keep this method, unnecessarily restricts?
         public static float GetVolume(this IEnumerable<Mesh> meshes)
         {
 	        return meshes.GetCombinedBounds().GetVolume();
@@ -77,7 +74,15 @@ namespace Rhinox.Lightspeed
 				collisionPoint.z = -extents.z + center.z;
 
 			return collisionPoint;
-		} 
+		}
+		
+		public static Bounds EncapsulateFull(this Bounds b, Bounds otherB)
+		{
+			var corners = otherB.GetCorners();
+			foreach (var corner in corners)
+				b.Encapsulate(corner);
+			return b;
+		}
 		
 		public static BoundingSphere Encapsulate(this BoundingSphere bounds, Vector3 pos, float rad = 0f)
 		{
@@ -152,7 +157,7 @@ namespace Rhinox.Lightspeed
 			return default(Bounds);
 		}
 
-		public static Bounds GetLocalBounds(this Renderer renderer, Transform axis, bool calculateUsingVerts = false)
+		public static Vector3[] GetLocalBounds(this Renderer renderer, Transform axis, bool calculateUsingVerts = false)
 		{
 			var matrix = axis.worldToLocalMatrix;
 			var b = renderer.bounds; // World space
@@ -164,7 +169,7 @@ namespace Rhinox.Lightspeed
 				{
 					matrix = matrix * renderer.localToWorldMatrix; // Adjust matrix to compensate for object space
 					Mesh sharedMesh = filter.sharedMesh;
-					if (calculateUsingVerts)
+					if (calculateUsingVerts && sharedMesh.isReadable)
 					{
 						var list = new List<Vector3>();
 						sharedMesh.GetVertices(list);
@@ -186,21 +191,14 @@ namespace Rhinox.Lightspeed
 				}
 			}
 			
-			var center = matrix.MultiplyPoint(b.center);
-			var size = matrix.MultiplyVector(b.size);
-			size = size.Abs();
-			return new Bounds(center, size);
+			return b.GetCorners().Select(x => matrix.MultiplyPoint(x)).ToArray();
 		}
 
-		public static Bounds GetLocalBounds(this Collider collider, Transform axis)
+		public static Vector3[]  GetLocalBounds(this Collider collider, Transform axis)
 		{
 			var matrix = axis.worldToLocalMatrix;
 			var b = collider.bounds; // World space
-			
-			var center = matrix.MultiplyPoint(b.center);
-			var size = matrix.MultiplyVector(b.size);
-			size = size.Abs();
-			return new Bounds(center, size);
+			return b.GetCorners().Select(x => matrix.MultiplyPoint(x)).ToArray();
 		}
 		
 		public static Bounds GetCombinedBounds(this IEnumerable<Collider> colliders)
@@ -230,13 +228,11 @@ namespace Rhinox.Lightspeed
 			
 			var meshFilter = meshFilters.ElementAt(0);
 			Bounds bounds = meshFilter.sharedMesh.bounds;
-			// bounds.center += meshFilter.transform.localPosition;
 
 			for (int i = 1; i < meshFilters.Count; ++i)
 			{
 				meshFilter = meshFilters.ElementAt(i);
 				var b = meshFilter.sharedMesh.bounds;
-				// b.center += meshFilter.transform.localPosition;
 				bounds.Encapsulate(b);
 			}
 			
@@ -263,11 +259,16 @@ namespace Rhinox.Lightspeed
 		{
 			if (renderers.Count == 0) return default(Bounds);
 			
-			var b = renderers.ElementAt(0).GetLocalBounds(axis, calculateUsingVerts);
+			var corners = renderers.ElementAt(0).GetLocalBounds(axis, calculateUsingVerts);
+			var b = new Bounds(corners[0], Vector3.zero);
+			foreach (var corner in corners)
+				b.Encapsulate(corner);
 
 			for (int i = 1; i < renderers.Count; ++i)
 			{
-				b.Encapsulate(renderers.ElementAt(i).GetLocalBounds(axis, calculateUsingVerts));
+				corners = renderers.ElementAt(i).GetLocalBounds(axis, calculateUsingVerts);
+				foreach (var corner in corners)
+					b.Encapsulate(corner);
 			}
 			return b;
 		}
@@ -276,11 +277,16 @@ namespace Rhinox.Lightspeed
 		{
 			if (colliders.Count == 0) return default(Bounds);
 			
-			var b = colliders.ElementAt(0).GetLocalBounds(axis);
+			var corners = colliders.ElementAt(0).GetLocalBounds(axis);
+			var b = new Bounds(corners[0], Vector3.zero);
+			foreach (var corner in corners)
+				b.Encapsulate(corner);
 
 			for (int i = 1; i < colliders.Count; ++i)
 			{
-				b.Encapsulate(colliders.ElementAt(i).GetLocalBounds(axis));
+				corners = colliders.ElementAt(i).GetLocalBounds(axis);
+				foreach (var corner in corners)
+					b.Encapsulate(corner);
 			}
 			return b;
 		}
