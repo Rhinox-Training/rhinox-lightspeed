@@ -32,6 +32,14 @@ namespace Rhinox.Lightspeed.Reflection
         
         public static IEnumerable<Type> GetDefinedTypesOfType<T>(this AppDomain domain, bool includeGeneric = false)
         {
+            return GetDefinedTypesOfType(domain, typeof(T), includeGeneric);
+        }
+        
+        public static IEnumerable<Type> GetDefinedTypesOfType(this AppDomain domain, Type baseType, bool includeGeneric = false)
+        {
+            if (baseType == null)
+                yield break;
+            
             foreach (var assembly in domain.GetAssemblies())
             {
                 foreach (var type in assembly.GetTypes())
@@ -39,7 +47,7 @@ namespace Rhinox.Lightspeed.Reflection
                     if (!type.IsClass || type.IsAbstract || (!includeGeneric && type.ContainsGenericParameters))
                         continue;
                     
-                    if (!typeof(T).IsAssignableFrom(type))
+                    if (!baseType.IsAssignableFrom(type))
                         continue;
                     yield return type;
                 }
@@ -61,6 +69,25 @@ namespace Rhinox.Lightspeed.Reflection
                 }
             }
         }
+        
+        public static IEnumerable<Type> GetDefinedTypesWithAttribute(this AppDomain domain, Type baseAttributeType)
+        {
+            if (baseAttributeType == null || !typeof(Attribute).IsAssignableFrom(baseAttributeType))
+                yield break;
+            
+            foreach (var assembly in domain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
+                        continue;
+                    var attr = type.GetCustomAttribute(baseAttributeType);
+                    if (attr == null)
+                        continue;
+                    yield return type;
+                }
+            }
+        }
 
         public static IEnumerable<EventInfo> GetEventsWithAttribute<T>(this Type t, bool publicMethods = true,
             bool instanceMethods = true) where T : Attribute
@@ -72,6 +99,26 @@ namespace Rhinox.Lightspeed.Reflection
             foreach (EventInfo evt in eventInfos)
             {
                 var javaScriptAttr = evt.GetCustomAttribute<T>();
+                if (javaScriptAttr == null)
+                    continue;
+
+                yield return evt;
+            }
+        }
+        
+        public static IEnumerable<EventInfo> GetEventsWithAttribute(this Type t, Type attributeType, bool publicMethods = true,
+            bool instanceMethods = true)
+        {
+            if (attributeType == null || !typeof(Attribute).IsAssignableFrom(attributeType))
+                yield break;
+            
+            BindingFlags access = publicMethods ? BindingFlags.Public : BindingFlags.NonPublic;
+            BindingFlags instance = instanceMethods ? BindingFlags.Instance : BindingFlags.Static;
+
+            var eventInfos = t.GetEvents(access | instance);
+            foreach (EventInfo evt in eventInfos)
+            {
+                var javaScriptAttr = evt.GetCustomAttribute(attributeType);
                 if (javaScriptAttr == null)
                     continue;
 
