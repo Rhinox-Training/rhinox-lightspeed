@@ -54,6 +54,22 @@ namespace Rhinox.Lightspeed.Reflection
             }
         }
         
+        public static IEnumerable<Type> GetDefinedTypesWithAttribute<T>(this AppDomain domain) where T : Attribute
+        {
+            foreach (var assembly in domain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
+                        continue;
+                    var attr = type.GetCustomAttribute<T>();
+                    if (attr == null)
+                        continue;
+                    yield return type;
+                }
+            }
+        }
+        
         public static IEnumerable<Type> GetDefinedTypesWithAttribute(this AppDomain domain, Type baseAttributeType)
         {
             if (baseAttributeType == null || !typeof(Attribute).IsAssignableFrom(baseAttributeType))
@@ -66,22 +82,6 @@ namespace Rhinox.Lightspeed.Reflection
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
                     var attr = type.GetCustomAttribute(baseAttributeType);
-                    if (attr == null)
-                        continue;
-                    yield return type;
-                }
-            }
-        }
-        
-        public static IEnumerable<Type> GetDefinedTypesWithAttribute<T>(this AppDomain domain) where T : Attribute
-        {
-            foreach (var assembly in domain.GetAssemblies())
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
-                        continue;
-                    var attr = type.GetCustomAttribute<T>();
                     if (attr == null)
                         continue;
                     yield return type;
