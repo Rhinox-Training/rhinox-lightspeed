@@ -9,6 +9,7 @@ namespace Rhinox.Lightspeed.IO
 {
     public interface IIniReader
     {
+        bool HasSetting(string sectionName, string settingName);
         string GetSetting(string sectionName, string settingName);
         string[] EnumSection(string sectionName);
     }
@@ -126,6 +127,15 @@ namespace Rhinox.Lightspeed.IO
             return relevantKeys.ToDictionary(k => k.Key, k => keyPairs[k]);
         }
 
+        public bool HasSetting(string sectionName, string settingName)
+        {
+            SectionPair sectionPair;
+            sectionPair.Section = sectionName.ToUpper();
+            sectionPair.Key = settingName.ToUpper();
+
+            return keyPairs.ContainsKey(sectionPair);
+        }
+
         /// <summary>
         /// Returns the value for the given section, key pair.
         /// </summary>
@@ -138,6 +148,22 @@ namespace Rhinox.Lightspeed.IO
             sectionPair.Key = settingName.ToUpper();
 
             return (string) keyPairs[sectionPair];
+        }
+        
+        public bool TryGetSetting(string sectionName, string settingName, out string result)
+        {
+            SectionPair sectionPair;
+            sectionPair.Section = sectionName.ToUpper();
+            sectionPair.Key = settingName.ToUpper();
+
+            if (keyPairs.ContainsKey(sectionPair))
+            {
+                result = (string) keyPairs[sectionPair];
+                return true;
+            }
+
+            result = null;
+            return false;
         }
 
         /// <summary>
