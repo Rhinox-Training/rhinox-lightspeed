@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Rhinox.Lightspeed.Collections
 {
     [Serializable]
-    public class CustomCollection<T> : ICollection<T>
+    public abstract class CustomCollection<T> : ICollection<T>
     {
         [SerializeField]
         protected T[] _array;
