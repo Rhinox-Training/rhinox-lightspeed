@@ -30,6 +30,8 @@ namespace Rhinox.Lightspeed.Collections
         [SerializeField]
         private List<SerializableTuple<TKey, TValue>> list = new List<SerializableTuple<TKey, TValue>>();
 
+        public int Count => list?.Count ?? 0;
+
         public IEnumerator<SerializableTuple<TKey, TValue>> GetEnumerator()
         {
             return list.GetEnumerator();

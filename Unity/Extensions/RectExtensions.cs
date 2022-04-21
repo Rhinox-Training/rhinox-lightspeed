@@ -46,6 +46,18 @@ namespace Rhinox.Lightspeed
             return rect;
         }
         
+        public static Rect AlignTop(this Rect rect, float height)
+        {
+            rect.height = height;
+            return rect;
+        }
+        
+        public static Rect AlignBottom(this Rect rect, float height)
+        {
+            rect.y = rect.y + rect.height - height;
+            rect.height = height;
+            return rect;
+        }
         
         public static Rect SetX(this Rect rect, float x)
         {
@@ -119,12 +131,12 @@ namespace Rhinox.Lightspeed
         
         public static Rect PadLeft(this Rect r, float padding)
         {
-            return r.VerticalPadding(padding, 0);
+            return r.HorizontalPadding(padding, 0);
         }
 
         public static Rect PadRight(this Rect r, float padding)
         {
-            return r.VerticalPadding(0, padding);
+            return r.HorizontalPadding(0, padding);
         }
 
         public static Vector2 GetTopLeft(this Rect r) => new Vector2(r.xMin, r.yMax);

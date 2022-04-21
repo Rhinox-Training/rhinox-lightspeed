@@ -9,14 +9,13 @@ using Sirenix.OdinInspector;
 
 namespace Rhinox.Lightspeed.Collections
 {
-    [Serializable]
     [HideReferenceObjectPicker, HideLabel]
+    [Serializable]
     public class Toggleable<T>
     {
         public event Action<Toggleable<T>> ToggledChanged;
         
-        [SerializeField]
-        [HorizontalGroup(15), HideLabel]
+        [SerializeField, HorizontalGroup(15), HideLabel]
         private bool _toggled;
 
         public bool Toggled
@@ -32,29 +31,34 @@ namespace Rhinox.Lightspeed.Collections
         [HorizontalGroup, EnableIf(nameof(Toggled)), HideLabel]
         public T Item;
 
+        public Toggleable()
+        {
+            _toggled = true;
+        }
+        
         public Toggleable(T item, bool toggled = true)
         {
             Item = item;
-            Toggled = toggled;
+            _toggled = toggled;
+            ToggledChanged = null;
         }
     
         public static implicit operator T(Toggleable<T> toggleable)
         {
-            return toggleable == null ? default(T) : toggleable.Item;
+            return toggleable.Item;
         }
     }
 
-    // NOTE: Requires Odin for proper rendering
-    // TODO: Build custom drawer ?
-    [Serializable]
-    public class ToggleableList<T> : List<Toggleable<T>>
+    [Serializable, HideReferenceObjectPicker]
+    public class ToggleableList<T> : CustomCollection<Toggleable<T>>
     {
         public delegate void ItemHandler(Toggleable<T> item);
-
+        
         public event ItemHandler Toggled;
-        
-        public ToggleableList() { }
-        
+
+        public ToggleableList()
+        { }
+
         public ToggleableList(ICollection<T> collection)
         {
             foreach (var item in collection)
@@ -65,46 +69,64 @@ namespace Rhinox.Lightspeed.Collections
         {
             var toggleable = Find(item);
             toggleable.Toggled ^= true;
+            // Toggled Is hooked onto Toggleable's event; Do not call it here
         }
 
         public Toggleable<T> Find(T item)
         {
             var i = IndexOf(item);
-            return i < 0 ? null : this[i];
+            return i < 0 ? default : _array[i];
         }
 
         public int IndexOf(T item)
         {
             for (int i = 0; i < Count; ++i)
             {
-                if (this[i] != null && this[i].Item.Equals(item))
+                if (_array[i].Item.Equals(item))
                     return i;
             }
             
             return -1;
         }
 
-        public virtual void Add(T item)
+        public void Add(T item)
         {
             var toggleable = new Toggleable<T>(item);
-            toggleable.ToggledChanged += OnToggled;
             base.Add(toggleable);
         }
 
-        public virtual void Remove(T item)
+        public override void Add(Toggleable<T> t)
         {
-            var i = IndexOf(item);
+            if (t == null)
+                t = new Toggleable<T>(default);
+            t.ToggledChanged += OnToggled;
             
-            var toggleable = this[i];
-            toggleable.ToggledChanged -= OnToggled;
-            
-            base.RemoveAt(i);
+            base.Add(t);
         }
-        
-        protected void OnToggled(Toggleable<T> item)
+
+        public bool Remove(T item)
+        {
+            var index = IndexOf(item);
+
+            if (index < 0)
+                return false;
+
+            RemoveAt(index);
+            return true;
+        }
+
+        protected override void OnItemRemoved(Toggleable<T> item)
+        {
+            if (item != null)
+                item.ToggledChanged -= OnToggled;
+        }
+
+        private void OnToggled(Toggleable<T> item)
         {
             Toggled?.Invoke(item);
         }
+
+        public bool Contains(T item) => IndexOf(item) >= 0;
     }
 
     public static class ToggleableExtensions
