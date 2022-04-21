@@ -1,48 +1,68 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace Rhinox.Lightspeed.Collections
 {
-    public class PairList<TKey, TValue> : List<KeyValuePair<TKey, TValue>>
+    [Serializable]
+    public struct SimplePair<T1, T2>
     {
-        public IEnumerable<TKey> Keys => this.Select(x => x.Key);
+        [HideLabel, HorizontalGroup] public T1 V1;
+        [HideLabel, HorizontalGroup] public T2 V2;
 
-        public IEnumerable<TValue> Values => this.Select(x => x.Value);
-
-        public void Add(TKey key, TValue value)
+        public SimplePair(T1 v1, T2 v2)
         {
-            Add(new KeyValuePair<TKey, TValue>(key, value));
+            V1 = v1;
+            V2 = v2;
+        }
+    }
+    
+    [Serializable]
+    public class PairList<T1, T2> : CustomCollection<SimplePair<T1, T2>>
+    {
+        public IEnumerable<T1> Keys => _array.Select(x => x.V1);
+
+        public IEnumerable<T2> Values => _array.Select(x => x.V2);
+
+        public PairList()
+        { }
+
+        public void Add(T1 key, T2 value)
+        {
+            Add(new SimplePair<T1, T2>(key, value));
         }
 
-        public void Add(TKey key, IEnumerable<TValue> values)
+        public void Add(T1 key, IEnumerable<T2> values)
         {
             foreach (var value in values)
-                Add(new KeyValuePair<TKey, TValue>(key, value));
+                Add(new SimplePair<T1, T2>(key, value));
         }
 
-        public IEnumerable<TValue> GetValuesWithKey(TKey key)
+        public IEnumerable<T2> GetValuesWithKey(T1 key)
         {
-            return this.Where(x => x.Key.Equals(key)).Select(x => x.Value);
+            return _array.Where(x => x.V1.Equals(key)).Select(x => x.V2);
         }
 
-        public bool ContainsKey(TKey key)
+        public bool ContainsKey(T1 key)
         {
-            for (var i = 0; i < this.Count; i++)
+            for (var i = 0; i < Count; i++)
             {
-                if (Equals(this[i].Key, key)) return true;
+                if (Equals(_array[i].V1, key)) return true;
             }
 
             return false;
         }
 
-        public bool Get(TKey key, out TValue value)
+        public bool Get(T1 key, out T2 value)
         {
-            for (var i = 0; i < this.Count; i++)
+            for (var i = 0; i < Count; i++)
             {
-                if (!Equals(this[i].Key, key)) continue;
+                if (!Equals(_array[i].V1, key)) continue;
 
-                value = this[i].Value;
+                value = _array[i].V2;
                 return true;
             }
 
@@ -50,9 +70,9 @@ namespace Rhinox.Lightspeed.Collections
             return false;
         }
 
-        public ILookup<TKey, TValue> ToLookup()
+        public ILookup<T1, T2> ToLookup()
         {
-            return this.ToLookup(x => x.Key, x => x.Value);
+            return _array.ToLookup(x => x.V1, x => x.V2);
         }
     }
 }

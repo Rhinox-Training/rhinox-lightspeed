@@ -324,6 +324,28 @@ namespace Rhinox.Lightspeed.Reflection
         {
             return typeof(ReflectionUtility).GetMethod(nameof(GetDefaultGeneric)).MakeGenericMethod(t).Invoke(null, null);
         }
+        
+        private static bool HasDefaultConstructor(this Type type)
+        {
+            foreach (var constr in type.GetConstructors())
+            {
+                if (constr.GetParameters().Length == 0)
+                    return true;
+            }
+            return false;
+        }
+        
+        public static T CreateInstance<T>()
+        {
+            return (T) CreateInstance(typeof(T));
+        }
+
+        public static object CreateInstance(this Type t)
+        {
+            if (t.IsValueType || !t.HasDefaultConstructor())
+                return t.GetDefault();
+            return Activator.CreateInstance(t);
+        }
 
         public static T GetDefaultGeneric<T>()
         {
