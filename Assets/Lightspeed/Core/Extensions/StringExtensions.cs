@@ -16,6 +16,14 @@ namespace Rhinox.Lightspeed
         {
             return others.Any(second => first.Contains(second));
         }
+        
+        /// <summary>
+        /// [ExtensionMethod] Contains string with given comparisonType
+        /// </summary>
+        public static bool Contains(this string str, string toCheck, StringComparison comparisonType)
+        {
+            return str.IndexOf(toCheck, comparisonType) >= 0;
+        }
 
         /// <summary>
         /// [ExtensionMethod] Equals method but with any of the given
