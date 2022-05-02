@@ -74,5 +74,19 @@ namespace Rhinox.Lightspeed.Collections
         {
             return _array.ToLookup(x => x.V1, x => x.V2);
         }
+
+        public int FindIndex(Func<SimplePair<T1, T2>, bool> func)
+        {
+            if (func == null)
+                return -1;
+            
+            for (int i = 0; i < _array.Length; ++i)
+            {
+                SimplePair<T1, T2> item = _array[i];
+                if (func.Invoke(item))
+                    return i;
+            }
+            return -1;
+        }
     }
 }
