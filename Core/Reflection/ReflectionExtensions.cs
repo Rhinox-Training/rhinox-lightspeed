@@ -200,6 +200,23 @@ namespace Rhinox.Lightspeed.Reflection
             }
         }
         
+        public static object GetValue(this MemberInfo memberInfo, object obj, params object[] parameters)
+        {
+            if (memberInfo == null) return null;
+            
+            switch (memberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    return fieldInfo.GetValue(obj);
+                case PropertyInfo propertyInfo:
+                    return propertyInfo.GetValue(obj);
+                case MethodInfo methodInfo:
+                    return methodInfo.Invoke(obj, parameters);
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+        
         public static bool HasParameters(this MethodInfo methodInfo, IList<Type> paramTypes, bool inherit = true)
         {
             var parameters = methodInfo.GetParameters();
