@@ -342,6 +342,7 @@ namespace Rhinox.Lightspeed.Reflection
 
         public static object CreateInstance(this Type t)
         {
+            if (t == null) return null;
             if (t.IsValueType || !t.HasDefaultConstructor())
                 return t.GetDefault();
             return Activator.CreateInstance(t);

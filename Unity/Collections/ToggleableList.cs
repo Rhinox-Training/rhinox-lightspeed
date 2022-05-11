@@ -64,6 +64,12 @@ namespace Rhinox.Lightspeed.Collections
             foreach (var item in collection)
                 Add(item);
         }
+        
+        public ToggleableList(ICollection<Toggleable<T>> collection)
+        {
+            foreach (var item in collection)
+                Add(item.Item, item.Toggled);
+        }
 
         public virtual void Toggle(T item)
         {
@@ -89,9 +95,9 @@ namespace Rhinox.Lightspeed.Collections
             return -1;
         }
 
-        public void Add(T item)
+        public void Add(T item, bool toggled = true)
         {
-            var toggleable = new Toggleable<T>(item);
+            var toggleable = new Toggleable<T>(item, toggled);
             base.Add(toggleable);
         }
 
