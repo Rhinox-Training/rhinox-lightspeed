@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Rhinox.GUIUtils
@@ -16,9 +18,17 @@ namespace Rhinox.GUIUtils
     
     public static class ShaderUtility
     {
-        public static string[] GetShaderPropertyList(Shader shader, ShaderParameterType type) => GetShaderPropertyList(shader, GetValidTypes(type));
-
-        public static string[] GetShaderPropertyList(Shader shader, IList<ShaderUtil.ShaderPropertyType> filterTypes = null)
+        public static string[] GetShaderPropertyList(Shader shader, ShaderParameterType type = ShaderParameterType.None)
+        {
+#if UNITY_EDITOR
+            return GetShaderPropertyList(shader, GetValidTypes(type));
+#endif
+            // TODO add warning about runtime use?
+            return Array.Empty<string>();
+        }
+        
+#if UNITY_EDITOR
+        private static string[] GetShaderPropertyList(Shader shader, IList<ShaderUtil.ShaderPropertyType> filterTypes = null)
         {
             if (shader == null) return Array.Empty<string>();
             
@@ -42,7 +52,7 @@ namespace Rhinox.GUIUtils
             results.Sort();
             return results.ToArray();
         }
-        
+
         public static ShaderUtil.ShaderPropertyType[] GetValidTypes(ShaderParameterType type)
         {
             switch (type)
@@ -72,5 +82,7 @@ namespace Rhinox.GUIUtils
 
             return null;
         }
+#endif
+
     }
 }
