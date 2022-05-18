@@ -14,6 +14,7 @@ namespace Rhinox.Lightspeed
     [Serializable]
     public class SerializableGuid : IEquatable<SerializableGuid>
     {
+        private const int BytesLength = 16;
         public byte[] SerializedBytes;
         
         public string GuidAsString => SerializedBytes.IsNullOrEmpty() ? "<EMPTY>" : AsSystemGuid().ToString();
@@ -34,6 +35,15 @@ namespace Rhinox.Lightspeed
             _guidRef = guid;
             SerializedBytes = _guidRef.ToByteArray();
         }
+        
+        public SerializableGuid(byte[] bytes)
+        {
+            if (bytes.Length != BytesLength)
+                throw new FormatException($"Guid expects {BytesLength} bytes.");
+            
+            SerializedBytes = bytes;
+            _guidRef = new Guid(bytes);
+        }
 
         public static SerializableGuid CreateNew() => new SerializableGuid(Guid.NewGuid());
 
@@ -45,10 +55,10 @@ namespace Rhinox.Lightspeed
             if (SerializedBytes.IsNullOrEmpty())
                 return Guid.Empty;
                 
-            if (SerializedBytes.Length != 16)
+            if (SerializedBytes.Length != BytesLength)
             {
                 throw new FormatException(
-                    $"Cannot convert to System.Guid, SerializedBytes is of incorrect length (length: {SerializedBytes.Length} - expected: 16)");
+                    $"Cannot convert to System.Guid, SerializedBytes is of incorrect length (length: {SerializedBytes.Length} - expected: {BytesLength})");
             }
                 
             _guidRef = new Guid(SerializedBytes);
@@ -57,6 +67,25 @@ namespace Rhinox.Lightspeed
         }
         
         public static implicit operator Guid(SerializableGuid @this) => @this.AsSystemGuid();
+
+        public static SerializableGuid operator ^(SerializableGuid a, SerializableGuid b)
+        {
+            byte[] crossedArr = new byte[BytesLength];
+            for (int i = 0; i < BytesLength; ++i)
+                crossedArr[i] = (byte) (a.SerializedBytes[i] ^ b.SerializedBytes[i]);
+            
+            return new SerializableGuid(crossedArr);
+        }
+        
+        public static SerializableGuid operator ^(SerializableGuid a, Guid b)
+        {
+            var bBytes = b.ToByteArray();
+            byte[] crossedArr = new byte[BytesLength];
+            for (int i = 0; i < BytesLength; ++i)
+                crossedArr[i] = (byte) (a.SerializedBytes[i] ^ bBytes[i]);
+            
+            return new SerializableGuid(crossedArr);
+        }
         
         public static bool operator ==(SerializableGuid a, SerializableGuid b)
         {
