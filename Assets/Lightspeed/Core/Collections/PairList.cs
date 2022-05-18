@@ -89,4 +89,13 @@ namespace Rhinox.Lightspeed.Collections
             return -1;
         }
     }
+
+    public static class PairListExtensions
+    {
+        public static void Deconstruct<TKey, TValue>(this SimplePair<TKey, TValue> kvp, out TKey k, out TValue v)
+        {
+            k = kvp.V1;
+            v = kvp.V2;
+        }
+    }
 }

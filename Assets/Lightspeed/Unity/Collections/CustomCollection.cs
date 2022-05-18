@@ -25,7 +25,7 @@ namespace Rhinox.Lightspeed.Collections
             set => _array[index] = value;
         }
 
-        public IEnumerator<T> GetEnumerator() => new InternalEnumerator(_array);
+        public IEnumerator<T> GetEnumerator() => new InternalEnumerator(_array, _count);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -108,11 +108,13 @@ namespace Rhinox.Lightspeed.Collections
             private const int FINISHED = -1;
             private readonly T[] array;
             private int idx;
+            private int length;
 
-            internal InternalEnumerator(T[] array)
+            internal InternalEnumerator(T[] array, int length)
             {
                 this.array = array;
                 this.idx = NOT_STARTED;
+                this.length = length;
             }
 
             public void Dispose()
@@ -122,7 +124,7 @@ namespace Rhinox.Lightspeed.Collections
             public bool MoveNext()
             {
                 if (this.idx == NOT_STARTED)
-                    this.idx = this.array.Length;
+                    this.idx = length;
                 return this.idx != -1 && --this.idx != FINISHED;
             }
 
@@ -134,7 +136,7 @@ namespace Rhinox.Lightspeed.Collections
                         throw new InvalidOperationException("Enumeration has not started. Call MoveNext");
                     if (this.idx == FINISHED)
                         throw new InvalidOperationException("Enumeration already finished");
-                    return this.array[this.array.Length - 1 - this.idx];
+                    return this.array[length - 1 - this.idx];
                 }
             }
 
