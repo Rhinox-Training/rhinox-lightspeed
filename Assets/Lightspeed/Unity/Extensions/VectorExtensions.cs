@@ -385,6 +385,15 @@ namespace Rhinox.Lightspeed
             return (value - from.x) / (from.y - from.x) * (to.y - to.x) + to.x;
         }
         
+        public static bool LossyEquals(this Vector2 val1, Vector2 val2) => LossyEquals(val1, val2, float.Epsilon);
+        
+        public static bool LossyEquals(this Vector2 val1, Vector2 val2, float epsilon)
+        {
+            return val1.x.LossyEquals(val2.x, epsilon) &&
+                   val1.y.LossyEquals(val2.y, epsilon);
+
+        }
+        
         public static bool LossyEquals(this Vector3 val1, Vector3 val2) => LossyEquals(val1, val2, float.Epsilon);
         
         public static bool LossyEquals(this Vector3 val1, Vector3 val2, float epsilon)
@@ -392,6 +401,17 @@ namespace Rhinox.Lightspeed
             return val1.x.LossyEquals(val2.x, epsilon) &&
                    val1.y.LossyEquals(val2.y, epsilon) &&
                    val1.z.LossyEquals(val2.z, epsilon);
+
+        }
+        
+        public static bool LossyEquals(this Vector4 val1, Vector4 val2) => LossyEquals(val1, val2, float.Epsilon);
+        
+        public static bool LossyEquals(this Vector4 val1, Vector4 val2, float epsilon)
+        {
+            return val1.x.LossyEquals(val2.x, epsilon) &&
+                   val1.y.LossyEquals(val2.y, epsilon) &&
+                   val1.z.LossyEquals(val2.z, epsilon) &&
+                   val1.w.LossyEquals(val2.w, epsilon);
 
         }
     }
