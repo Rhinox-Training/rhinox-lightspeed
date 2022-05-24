@@ -52,7 +52,7 @@ namespace Rhinox.Lightspeed
         
         public static bool IsBetweenIncl(this float f, float minValue, float maxValue)
         {
-            return f > (minValue - float.Epsilon) && f < (maxValue + float.Epsilon);
+            return (f - minValue) > -float.Epsilon && (f - maxValue) < float.Epsilon;
         }
 
         public static bool IsDefault<T>(this T value)
