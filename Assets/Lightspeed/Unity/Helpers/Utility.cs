@@ -182,7 +182,7 @@ namespace Rhinox.Lightspeed
         
         /// Use this method to get all loaded scene objects of some type, including inactive objects. 
         /// <para>This is an alternative to Resources.FindObjectsOfTypeAll (returns project assets, including prefabs), and GameObject.FindObjectsOfTypeAll (deprecated).</para>
-        public static void FindSceneObjectsOfTypeAll<T>(ICollection<T> results)
+        public static void FindSceneObjectsOfTypeAll<T>(IList<T> results)
         {
             if (results == null)
                 throw new ArgumentException("Given list must be initialized.");
@@ -200,7 +200,7 @@ namespace Rhinox.Lightspeed
             }
         }
 
-        private static void FindObjectsInScene<T>(Scene s, ref ICollection<T> results)
+        private static void FindObjectsInScene<T>(Scene s, ref IList<T> results)
         {
             if (!s.isLoaded) return;
             
@@ -208,7 +208,7 @@ namespace Rhinox.Lightspeed
             for (int j = 0; j < rootObjects.Length; j++)
             {
                 var go = rootObjects[j];
-                if (results is ICollection<GameObject> typedResults)
+                if (results is IList<GameObject> typedResults)
                     go.GetAllChildren(typedResults, true);
                 else
                 {
