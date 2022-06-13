@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+// TODO: what version no longer uses namespace Experimental for: TextureCreationFlags
 using UnityEngine.Experimental.Rendering;
 
 namespace Rhinox.Lightspeed
