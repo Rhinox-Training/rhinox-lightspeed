@@ -32,7 +32,7 @@ namespace Rhinox.Lightspeed
             return arr;
         }
         
-        public static void GetAllChildren(this GameObject obj, ICollection<GameObject> gameObjects, bool includeInactive = false)
+        public static void GetAllChildren(this GameObject obj, IList<GameObject> gameObjects, bool includeInactive = false)
         {
             foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
                 gameObjects.Add(t.gameObject);
