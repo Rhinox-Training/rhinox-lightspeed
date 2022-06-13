@@ -132,7 +132,7 @@ namespace Rhinox.Lightspeed
             return arr;
         }
         
-        public static void GetAllChildren(this Transform obj, ICollection<Transform> transforms, bool includeInactive = false)
+        public static void GetAllChildren(this Transform obj, IList<Transform> transforms, bool includeInactive = false)
         {
             foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
                 transforms.Add(t);
