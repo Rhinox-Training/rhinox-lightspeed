@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace Rhinox.Lightspeed
 {
@@ -16,7 +17,7 @@ namespace Rhinox.Lightspeed
         
         public static void CopyTexture(Texture2D tex, out Texture2D outputTexture)
         {
-            var rt = new RenderTexture(tex.width, tex.height, 0);
+            var rt = new RenderTexture(tex.width, tex.height, 0, tex.graphicsFormat);
             Graphics.Blit(tex, rt);
 
             RenderTextureToTexture2D(rt, out outputTexture);
@@ -48,7 +49,7 @@ namespace Rhinox.Lightspeed
 
             try
             {
-                var tex = new Texture2D(rt.width, rt.height);
+                var tex = new Texture2D(rt.width, rt.height, rt.graphicsFormat, TextureCreationFlags.None);
                 RenderTexture.active = rt;
                 tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
                 tex.Apply();
