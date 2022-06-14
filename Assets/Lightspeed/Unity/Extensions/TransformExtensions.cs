@@ -112,7 +112,7 @@ namespace Rhinox.Lightspeed
                 t.parent = other.parent;
         }
         
-        public static List<Transform> GetDirectChildren(this Transform obj)
+        public static ICollection<Transform> GetDirectChildren(this Transform obj)
         {
             var list = new List<Transform>();
             foreach (Transform child in obj)
@@ -123,7 +123,7 @@ namespace Rhinox.Lightspeed
             return list;
         }
         
-        public static Transform[] GetAllChildren(this Transform obj, bool includeInactive = false)
+        public static ICollection<Transform> GetAllChildren(this Transform obj, bool includeInactive = false)
         {
             var transforms = obj.GetComponentsInChildren<Transform>(includeInactive);
             var arr = new Transform[transforms.Length];
