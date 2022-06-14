@@ -37,6 +37,12 @@ namespace Rhinox.Lightspeed
             foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
                 gameObjects.Add(t.gameObject);
         }
+        
+        public static void GetAllChildren(this GameObject obj, ISet<GameObject> gameObjects, bool includeInactive = false)
+        {
+            foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
+                gameObjects.Add(t.gameObject);
+        }
 
         public static void CopyObjectSettingsFrom(this GameObject to, GameObject from)
         {

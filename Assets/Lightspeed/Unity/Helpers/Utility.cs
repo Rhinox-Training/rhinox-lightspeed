@@ -199,6 +199,24 @@ namespace Rhinox.Lightspeed
                 FindObjectsInScene(s, ref results);
             }
         }
+        
+        public static void FindSceneObjectsOfTypeAll<T>(ISet<T> results)
+        {
+            if (results == null)
+                throw new ArgumentException("Given list must be initialized.");
+
+#if UNITY_EDITOR
+            // Load the active editor scene (only when not in build, otherwise the below will contain it)
+            var currScene = SceneManager.GetActiveScene();
+            if (!IsSceneInBuild(currScene))
+                FindObjectsInScene(currScene, ref results);
+#endif
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var s = SceneManager.GetSceneAt(i);
+                FindObjectsInScene(s, ref results);
+            }
+        }
 
         private static void FindObjectsInScene<T>(Scene s, ref IList<T> results)
         {
@@ -209,6 +227,24 @@ namespace Rhinox.Lightspeed
             {
                 var go = rootObjects[j];
                 if (results is IList<GameObject> typedResults)
+                    go.GetAllChildren(typedResults, true);
+                else
+                {
+                    foreach (var child in go.GetComponentsInChildren<T>(true))
+                        results.Add(child);
+                }
+            }
+        }
+        
+        private static void FindObjectsInScene<T>(Scene s, ref ISet<T> results)
+        {
+            if (!s.isLoaded) return;
+            
+            GameObject[] rootObjects = s.GetRootGameObjects();
+            for (int j = 0; j < rootObjects.Length; j++)
+            {
+                var go = rootObjects[j];
+                if (results is ISet<GameObject> typedResults)
                     go.GetAllChildren(typedResults, true);
                 else
                 {
