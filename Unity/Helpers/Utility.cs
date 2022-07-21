@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Component = UnityEngine.Component;
 
@@ -36,6 +37,37 @@ namespace Rhinox.Lightspeed
             var renderer = obj.AddComponent<MeshRenderer>();
             renderer.materials = materials;
             return renderer;
+        }
+
+        public static Material GetDefaultMaterial(MaterialType type = MaterialType.Metal)
+        {
+            // Handle build-in pipeline
+            if (GraphicsSettings.currentRenderPipeline == null)
+            {
+                switch (type)
+                {
+                    default:
+                        // TODO
+                        var shader = Shader.Find("Standard");
+                        return new Material(shader);
+                }
+            }
+
+            // Handle SRP
+            switch (type)
+            {
+                case MaterialType.Default:
+                    return GraphicsSettings.currentRenderPipeline.defaultMaterial;
+                case MaterialType.Metal:
+                    // TODO set metallic value to 1
+                    return GraphicsSettings.currentRenderPipeline.defaultMaterial;
+                case MaterialType.UI:
+                    return GraphicsSettings.currentRenderPipeline.defaultUIMaterial;
+
+                // TODO
+                default:
+                    return GraphicsSettings.currentRenderPipeline.defaultMaterial;
+            }
         }
 
         public static Gradient MakeGradient(Color start, Color end, params (float alpha, float time)[] alphaKeys)
