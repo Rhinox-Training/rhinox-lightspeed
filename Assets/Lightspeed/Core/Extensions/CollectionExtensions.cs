@@ -236,6 +236,17 @@ namespace Rhinox.Lightspeed
             k = kvp.Key;
             v = kvp.Value;
         }
+        
+        /// <summary>
+        /// Returns the default value of type U if the key does not exist in the dictionary
+        /// </summary>
+        public static T GetOrDefault<T>(this IList<T> list, int index, T onMissing = default(T))
+        {
+            if (list == null || !list.HasIndex(index))
+                return onMissing;
+                
+            return list[index];
+        }
 
         /// <summary>
         /// Returns the default value of type U if the key does not exist in the dictionary

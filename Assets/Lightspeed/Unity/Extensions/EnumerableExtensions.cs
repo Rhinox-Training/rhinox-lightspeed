@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Rhinox.Lightspeed
 {
@@ -44,5 +45,16 @@ namespace Rhinox.Lightspeed
             var comparison = new Comparison<T>((x, y) => sortFunc(y).CompareTo(sortFunc(x)));
             list.Sort(comparison);
         }
+        
+        public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> source, int chunksize)
+        {
+            var pos = 0; 
+            while (source.Skip(pos).Any())
+            {
+                yield return source.Skip(pos).Take(chunksize);
+                pos += chunksize;
+            }
+        }
+
     }
 }

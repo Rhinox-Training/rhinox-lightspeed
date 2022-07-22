@@ -22,9 +22,11 @@ namespace Rhinox.GUIUtils
         {
 #if UNITY_EDITOR
             return GetShaderPropertyList(shader, GetValidTypes(type));
-#endif
+#else
             // TODO add warning about runtime use?
             return Array.Empty<string>();
+#endif
+            
         }
         
 #if UNITY_EDITOR
