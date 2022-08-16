@@ -35,7 +35,9 @@ namespace Rhinox.Lightspeed
                 return tex;
             
             Texture2D paddedTex = new Texture2D(1, 1, tex.format, tex.mipmapCount > 0) {
+#if UNITY_EDITOR
                 alphaIsTransparency = tex.alphaIsTransparency,
+#endif
             };
 
             var color = Color.clear;
