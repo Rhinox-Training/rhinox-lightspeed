@@ -27,7 +27,12 @@ namespace Rhinox.Lightspeed
         public static void Destroy(Object o, bool immediate = false)
         {
             if (o == null) return;
-            if (immediate) Object.DestroyImmediate(o);
+            if (immediate)
+            {
+                Object.DestroyImmediate(o);
+                return;
+            }
+            
 #if UNITY_EDITOR
             if (!Application.isPlaying)
                 Object.DestroyImmediate(o);
