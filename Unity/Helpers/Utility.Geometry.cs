@@ -97,6 +97,7 @@ namespace Rhinox.Lightspeed
         
         public static bool IsClockWise(IList<Vector2> vertices)
         {
+            // Calculate the signed Area of the polygon according to: https://en.wikipedia.org/wiki/Shoelace_formula
             float total = 0;
             for (int i = 0; i < vertices.Count; ++i)
             {
