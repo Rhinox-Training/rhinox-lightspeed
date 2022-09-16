@@ -290,5 +290,57 @@ namespace Rhinox.Lightspeed
 			}
 			return b;
 		}
+		
+		public static bool TrySliceBounds(this Bounds bounds, Axis axis, Vector3 pointOnSlicePlane, out Bounds halfBounds1, out Bounds halfBounds2, float offset = 0.02f)
+		{
+			if (!axis.IsSingleFlag())
+			{
+				halfBounds1 = default;
+				halfBounds2 = default;
+				return false;
+			}
+
+			var firstCorners = new List<Vector3>();
+			var secondCorners = new List<Vector3>();
+			Vector3 normal = axis.ToVector(1.0f);
+			var plane = new Plane(normal, pointOnSlicePlane);
+			foreach (var corner in bounds.GetCorners())
+			{
+				float distanceToPlane = plane.GetDistanceToPoint(corner);
+				if (Mathf.Abs(distanceToPlane) < offset)
+					continue;
+
+				if (distanceToPlane > 0.0f)
+					firstCorners.Add(corner);
+				else
+					secondCorners.Add(corner);
+			}
+
+			if (firstCorners.Count != 4 || secondCorners.Count != 4)
+			{
+				halfBounds1 = default;
+				halfBounds2 = default;
+				return false;
+			}
+
+
+			halfBounds1 = CreateBoundsFromCornersToPlane(firstCorners, plane);
+			halfBounds2 = CreateBoundsFromCornersToPlane(secondCorners, plane);
+			return true;
+		}
+
+		private static Bounds CreateBoundsFromCornersToPlane(List<Vector3> halfCorners, Plane plane)
+		{
+			Bounds b = new Bounds(halfCorners[0], Vector3.zero);
+			for (int i = 1; i < 4; ++i)
+				b.Encapsulate(halfCorners[i]);
+			foreach (var corner in halfCorners)
+			{
+				Vector3 otherPoint = plane.ClosestPointOnPlane(corner);
+				b.Encapsulate(otherPoint);
+			}
+
+			return b;
+		}
 	}
 }

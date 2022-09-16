@@ -414,5 +414,37 @@ namespace Rhinox.Lightspeed
                    val1.w.LossyEquals(val2.w, epsilon);
 
         }
+        
+        public static bool IsCardinal(this Vector3 normal)
+        {
+            normal.Normalize();
+            return (1.0f - Mathf.Abs(Vector3.Dot(Vector3.up, normal))) < float.Epsilon ||
+                   (1.0f - Mathf.Abs(Vector3.Dot(Vector3.forward, normal))) < float.Epsilon ||
+                   (1.0f - Mathf.Abs(Vector3.Dot(Vector3.right, normal))) < float.Epsilon;
+        }
+
+        public static bool TryGetCardinalAxis(this Vector3 axis, out Axis result)
+        {
+            axis.Normalize();
+
+            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.right, axis))) < float.Epsilon)
+            {
+                result = Axis.X;
+                return true;
+            }
+            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.up, axis))) < float.Epsilon)
+            {
+                result = Axis.Y;
+                return true;
+            }
+            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.forward, axis))) < float.Epsilon)
+            {
+                result = Axis.Z;
+                return true;
+            }
+
+            result = Axis.None;
+            return false;
+        }
     }
 }
