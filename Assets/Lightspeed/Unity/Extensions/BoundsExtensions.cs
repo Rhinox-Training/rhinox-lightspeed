@@ -292,7 +292,17 @@ namespace Rhinox.Lightspeed
 			return b;
 		}
 		
-		public static bool TrySliceBounds(this Bounds bounds, Axis axis, Vector3 pointOnSlicePlane, out Bounds halfBounds1, out Bounds halfBounds2, float offset = 0.02f)
+		/// <summary>
+		/// Slice a Axisaligned bounds according to one of the cardinal axes
+		/// </summary>
+		/// <param name="bounds"></param>
+		/// <param name="axis"></param>
+		/// <param name="pointOnSlicePlane">Point on the slice plane</param>
+		/// <param name="halfBounds1"></param>
+		/// <param name="halfBounds2"></param>
+		/// <param name="discardMargin"></param>
+		/// <returns></returns>
+		public static bool TrySliceBounds(this Bounds bounds, Axis axis, Vector3 pointOnSlicePlane, out Bounds halfBounds1, out Bounds halfBounds2, float discardMargin = 0.02f)
 		{
 			if (!axis.IsSingleFlag())
 			{
@@ -303,20 +313,24 @@ namespace Rhinox.Lightspeed
 
 			var firstCorners = new List<Vector3>();
 			var secondCorners = new List<Vector3>();
+			// Create slicing plane
 			Vector3 normal = axis.ToVector(1.0f);
 			var plane = new Plane(normal, pointOnSlicePlane);
 			foreach (var corner in bounds.GetCorners())
 			{
 				float distanceToPlane = plane.GetDistanceToPoint(corner);
-				if (Mathf.Abs(distanceToPlane) < offset)
+				// If the point is too close to the side of the bounds, ignore it
+				if (Mathf.Abs(distanceToPlane) < discardMargin)
 					continue;
 
+				// Check on which side of the slicing plane the corner is
 				if (distanceToPlane > 0.0f)
 					firstCorners.Add(corner);
 				else
 					secondCorners.Add(corner);
 			}
 
+			// If not all corners were categorized / were not split symmetrically
 			if (firstCorners.Count != 4 || secondCorners.Count != 4)
 			{
 				halfBounds1 = default;
@@ -330,6 +344,13 @@ namespace Rhinox.Lightspeed
 			return true;
 		}
 
+		/// <summary>
+		/// Extrude 4 corner points against a plane
+		/// </summary>
+		/// <param name="halfCorners"></param>
+		/// <param name="plane">Plane perpendicular to the half corner set</param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
 		private static Bounds CreateBoundsFromCornersToPlane(List<Vector3> halfCorners, Plane plane)
 		{
 			if (halfCorners == null || halfCorners.Count != 4)
@@ -339,6 +360,7 @@ namespace Rhinox.Lightspeed
 				b.Encapsulate(halfCorners[i]);
 			foreach (var corner in halfCorners)
 			{
+				// Project corner point on (slicing) plane
 				Vector3 otherPoint = plane.ClosestPointOnPlane(corner);
 				b.Encapsulate(otherPoint);
 			}
