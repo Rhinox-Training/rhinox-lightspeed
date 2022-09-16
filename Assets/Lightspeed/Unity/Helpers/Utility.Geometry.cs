@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -68,6 +69,49 @@ namespace Rhinox.Lightspeed
             var segment = (start - end).sqrMagnitude;
             if (toStart > segment || toEnd > segment) return toStart > toEnd ? end : start;
             return point;
+        }
+        
+        /// <summary>
+        /// Determines if the given point is inside the polygon
+        /// </summary>
+        /// <param name="polygon">the vertices of polygon</param>
+        /// <param name="testPoint">the given point</param>
+        /// <returns>true if the point is inside the polygon; otherwise, false</returns>
+        public static bool IsPointInPolygon(Vector2[] polygon, Vector2 testPoint)
+        {
+            bool result = false;
+            int j = polygon.Length - 1;
+            for (int i = 0; i < polygon.Length; i++)
+            {
+                if (polygon[i].y < testPoint.y && polygon[j].y >= testPoint.y || polygon[j].y < testPoint.y && polygon[i].y >= testPoint.y)
+                {
+                    if (polygon[i].x + (testPoint.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < testPoint.x)
+                    {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
+        }
+        
+        public static bool IsClockWise(IList<Vector2> vertices)
+        {
+            // Calculate the signed Area of the polygon according to: https://en.wikipedia.org/wiki/Shoelace_formula
+            float total = 0;
+            for (int i = 0; i < vertices.Count; ++i)
+            {
+                var p1 = vertices[i];
+                var p2 = (i + 1 >= vertices.Count) ? vertices[0] : vertices[i + 1];
+                total += SumOverEdge(p1, p2);
+            }
+
+            return total > 0;
+        }
+
+        private static float SumOverEdge(Vector2 p1, Vector2 p2)
+        {
+            return (p2.x - p1.x) * (p2.y + p1.y);
         }
     }
 }
