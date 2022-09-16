@@ -417,27 +417,24 @@ namespace Rhinox.Lightspeed
         
         public static bool IsCardinal(this Vector3 normal)
         {
-            normal.Normalize();
-            return (1.0f - Mathf.Abs(Vector3.Dot(Vector3.up, normal))) < float.Epsilon ||
-                   (1.0f - Mathf.Abs(Vector3.Dot(Vector3.forward, normal))) < float.Epsilon ||
-                   (1.0f - Mathf.Abs(Vector3.Dot(Vector3.right, normal))) < float.Epsilon;
+            return TryGetCardinalAxis(normal, out Axis result);
         }
 
         public static bool TryGetCardinalAxis(this Vector3 axis, out Axis result)
         {
             axis.Normalize();
 
-            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.right, axis))) < float.Epsilon)
+            if (Vector3.right.IsColinear(axis))
             {
                 result = Axis.X;
                 return true;
             }
-            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.up, axis))) < float.Epsilon)
+            if (Vector3.up.IsColinear(axis))
             {
                 result = Axis.Y;
                 return true;
             }
-            if ((1.0f - Mathf.Abs(Vector3.Dot(Vector3.forward, axis))) < float.Epsilon)
+            if (Vector3.forward.IsColinear(axis))
             {
                 result = Axis.Z;
                 return true;
@@ -445,6 +442,11 @@ namespace Rhinox.Lightspeed
 
             result = Axis.None;
             return false;
+        }
+
+        public static bool IsColinear(this Vector3 direction, Vector3 otherDirection)
+        {
+            return (1.0f - Mathf.Abs(Vector3.Dot(direction.normalized, otherDirection.normalized))) < float.Epsilon;
         }
     }
 }
