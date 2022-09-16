@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -331,6 +332,8 @@ namespace Rhinox.Lightspeed
 
 		private static Bounds CreateBoundsFromCornersToPlane(List<Vector3> halfCorners, Plane plane)
 		{
+			if (halfCorners == null || halfCorners.Count != 4)
+				throw new ArgumentException($"{nameof(halfCorners)} needs to have a length of 4.");
 			Bounds b = new Bounds(halfCorners[0], Vector3.zero);
 			for (int i = 1; i < 4; ++i)
 				b.Encapsulate(halfCorners[i]);
