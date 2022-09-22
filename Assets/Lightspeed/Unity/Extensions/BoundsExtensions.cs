@@ -9,17 +9,37 @@ namespace Rhinox.Lightspeed
     {
 	    public static Vector3[] GetCorners(this Bounds bounds)
 	    {
+		    var min = bounds.min;
+		    var max = bounds.max;
 		    return new[]
 		    {
-			    bounds.min,
-			    new Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
-			    new Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
-			    new Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
+			    min,
+			    new Vector3(min.x, min.y, max.z),
+			    new Vector3(min.x, max.y, min.z),
+			    new Vector3(min.x, max.y, max.z),
 				
-			    new Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
-			    new Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
-			    new Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
-			    bounds.max,
+			    new Vector3(max.x, min.y, min.z),
+			    new Vector3(max.x, min.y, max.z),
+			    new Vector3(max.x, max.y, min.z),
+			    max,
+		    };
+	    }
+	    
+	    public static Vector3[] GetCornersTransformed(this Bounds bounds, Matrix4x4 matrix)
+	    {
+		    var min = bounds.min;
+		    var max = bounds.max;
+		    return new[]
+		    {
+			    matrix.MultiplyPoint(min),
+			    matrix.MultiplyPoint(new Vector3(min.x, min.y, max.z)),
+			    matrix.MultiplyPoint(new Vector3(min.x, max.y, min.z)),
+			    matrix.MultiplyPoint(new Vector3(min.x, max.y, max.z)),
+                
+			    matrix.MultiplyPoint(new Vector3(max.x, min.y, min.z)),
+			    matrix.MultiplyPoint(new Vector3(max.x, min.y, max.z)),
+			    matrix.MultiplyPoint(new Vector3(max.x, max.y, min.z)),
+			    matrix.MultiplyPoint(max),
 		    };
 	    }
 	    
@@ -172,17 +192,21 @@ namespace Rhinox.Lightspeed
 					Mesh sharedMesh = filter.sharedMesh;
 					if (calculateUsingVerts && sharedMesh.isReadable)
 					{
-						var list = new List<Vector3>();
-						sharedMesh.GetVertices(list);
-						if (list.Count == 0)
+						var verts = sharedMesh.vertices;
+						if (verts.Length == 0)
 						{
 							b = sharedMesh.bounds; // Object space
 						}
 						else
 						{
-							b = new Bounds(list[0], Vector3.zero);
-							foreach (var vert in list)
+							b = new Bounds(verts[0], Vector3.zero);
+							for (int i = 0; i < verts.Length; ++i)
+							{
+								var vert = verts[i];
+								if (b.Contains(vert))
+									continue;
 								b.Encapsulate(vert);
+							}
 						}
 					}
 					else
@@ -191,15 +215,15 @@ namespace Rhinox.Lightspeed
 					}
 				}
 			}
-			
-			return b.GetCorners().Select(x => matrix.MultiplyPoint(x)).ToArray();
+
+			return b.GetCornersTransformed(matrix);
 		}
 
 		public static Vector3[]  GetLocalBounds(this Collider collider, Transform axis)
 		{
 			var matrix = axis.worldToLocalMatrix;
 			var b = collider.bounds; // World space
-			return b.GetCorners().Select(x => matrix.MultiplyPoint(x)).ToArray();
+			return b.GetCornersTransformed(matrix);
 		}
 		
 		public static Bounds GetCombinedBounds(this IEnumerable<Collider> colliders)
