@@ -16,6 +16,13 @@ namespace Rhinox.Lightspeed
             rect.width = width;
             return rect;
         }
+        
+        public static Rect AlignCenterVertical(this Rect rect, float height)
+        {
+            rect.y = (float)(rect.y + rect.height * 0.5 - height * 0.5);
+            rect.height = height;
+            return rect;
+        }
 
         public static Rect AlignCenter(this Rect rect, float width, float height)
         {
@@ -80,6 +87,18 @@ namespace Rhinox.Lightspeed
         public static Rect AddY(this Rect rect, float y)
         {
             rect.y += y;
+            return rect;
+        }
+        
+        public static Rect SetWidth(this Rect rect, float width)
+        {
+            rect.width = width;
+            return rect;
+        }
+        
+        public static Rect SetHeight(this Rect rect, float height)
+        {
+            rect.height = height;
             return rect;
         }
 
