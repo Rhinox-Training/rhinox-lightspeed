@@ -32,12 +32,14 @@ namespace Rhinox.Lightspeed
 
         public static string GetPathRelativeToProject(string path)
         {
+            if (!Path.IsPathRooted(path))
+                path = Path.GetFullPath(path);
             var pathUri = new Uri(path);
             return ApplicationFolderUri.MakeRelativeUri(pathUri).ToString();
         }
 
         /// <summary>
-        /// Get a valid Asset path from a 'Libarary/PackageCache/' path
+        /// Get a valid Asset path from a 'Library/PackageCache/' path
         /// </summary>
         public static string ParsePackagePath(string absolutePath)
         {
