@@ -391,5 +391,20 @@ namespace Rhinox.Lightspeed
 
 			return b;
 		}
+
+		public static void CenterObjectBoundsOnPosition(this GameObject go, Vector3 position, Quaternion? rotation = null)
+		{
+			var localBounds = go.GetObjectLocalBounds();
+			Vector3 localPositionOfCenter = localBounds.center;
+
+			Vector3 globalPositionOfCenter = go.transform.TransformPoint(localPositionOfCenter);
+			Vector3 offset = go.transform.position - globalPositionOfCenter;
+
+			Vector3 rotatedOffset = (rotation ?? Quaternion.identity) * offset;
+			
+			if (rotation != null)
+				TransformExtensions.RotateAround(go.transform, globalPositionOfCenter, rotation.Value);
+			go.transform.position = position + rotatedOffset;
+		}
 	}
 }
