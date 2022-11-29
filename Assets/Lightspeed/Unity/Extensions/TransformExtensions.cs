@@ -482,5 +482,20 @@ namespace Rhinox.Lightspeed
             go.transform.localPosition = Vector3.zero;
             return go.transform;
         }
+
+        public static Vector3 GetAxisWorld(this Transform t, Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.X:
+                    return t.right;
+                case Axis.Y:
+                    return t.up;
+                case Axis.Z:
+                    return t.forward;
+                default:
+                    throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
+            }
+        }
     }
 }
