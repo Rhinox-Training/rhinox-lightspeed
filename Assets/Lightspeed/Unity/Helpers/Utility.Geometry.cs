@@ -113,5 +113,35 @@ namespace Rhinox.Lightspeed
         {
             return (p2.x - p1.x) * (p2.y + p1.y);
         }
+
+        /// <summary>
+        /// Projects a point (shortest distance) onto a line described by an originPoint and axis (onNormal)
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="lineAxis"></param>
+        /// <param name="lineOrigin"></param>
+        /// <returns></returns>
+        public static Vector3 ProjectOnLine(Vector3 point, Vector3 lineAxis, Vector3 lineOrigin)
+        {
+            Vector3 diffVec = point - lineOrigin;
+            Vector3 projectedDiffVec = Vector3.Project(diffVec, lineAxis);
+            Vector3 projectedPoint = projectedDiffVec + lineOrigin;
+            return projectedPoint;
+        }
+
+        /// <summary>
+        /// Rotates a point onto a line, around the lineOrigin
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="lineAxis"></param>
+        /// <param name="lineOrigin"></param>
+        /// <returns></returns>
+        public static Vector3 RotateOnLine(Vector3 point, Vector3 lineAxis, Vector3 lineOrigin)
+        {
+            Vector3 diffVec = point - lineOrigin;
+            float length = diffVec.magnitude;
+            Vector3 projectedPoint = lineAxis.normalized * length + lineOrigin;
+            return projectedPoint;
+        }
     }
 }
