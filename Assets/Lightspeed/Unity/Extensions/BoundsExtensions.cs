@@ -406,5 +406,56 @@ namespace Rhinox.Lightspeed
 				TransformExtensions.RotateAround(go.transform, globalPositionOfCenter, rotation.Value);
 			go.transform.position = position + rotatedOffset;
 		}
+		
+		public static Axis GetDominantAxis(this Bounds b)
+		{
+			if (b.size.z > b.size.x && b.size.z > b.size.y)
+				return Axis.Z;
+			if (b.size.y > b.size.x)
+				return Axis.Y;
+			return Axis.X;
+		}
+
+		public static float GetExtents(this Bounds bounds, Axis axis)
+		{
+			float offset = 0.0f;
+			switch (axis)
+			{
+				case Axis.X:
+					offset = bounds.extents.x;
+					break;
+				case Axis.Y:
+					offset = bounds.extents.y;
+					break;
+				case Axis.Z:
+					offset = bounds.extents.z;
+					break;
+				default:
+					throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
+			}
+
+			return offset;
+		}
+
+		public static float GetSize(this Bounds bounds, Axis axis)
+		{
+			float offset = 0.0f;
+			switch (axis)
+			{
+				case Axis.X:
+					offset = bounds.size.x;
+					break;
+				case Axis.Y:
+					offset = bounds.size.y;
+					break;
+				case Axis.Z:
+					offset = bounds.size.z;
+					break;
+				default:
+					throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
+			}
+
+			return offset;
+		}
 	}
 }
