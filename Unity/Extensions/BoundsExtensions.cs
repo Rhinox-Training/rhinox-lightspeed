@@ -159,16 +159,16 @@ namespace Rhinox.Lightspeed
 			return default(Bounds);
 		}
 		
-		public static Bounds GetObjectLocalBounds(this GameObject go, bool calculateUsingVerts = false)
+		public static Bounds GetObjectLocalBounds(this GameObject go, bool calculateUsingVerts = false, Renderer[] renderers = null, Collider[] colliders = null)
 		{
-			var colliders = go.GetComponentsInChildren<Collider>();
+			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
 			if (colliders.Any())
 			{
 				var bounds = colliders.GetCombinedLocalBounds(go.transform);
 				return bounds;
 			}
 			
-			var renderers = go.GetComponentsInChildren<Renderer>();
+			if (renderers == null) renderers = go.GetComponentsInChildren<Renderer>();
 			if (renderers.Any())
 			{
 				var bounds = renderers.GetCombinedLocalBounds(go.transform, calculateUsingVerts);
