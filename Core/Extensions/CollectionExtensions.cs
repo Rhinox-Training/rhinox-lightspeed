@@ -365,6 +365,23 @@ namespace Rhinox.Lightspeed
             return entriesFound == set1.Count;
         }
         
+        public static bool ContainEqual<T>(this IReadOnlyCollection<T> set1, IEnumerable<T> set2)
+        {
+            if (set2 == null)
+                return set1 == null || set1.Count == 0;
+            
+            int entriesFound = 0;
+            foreach (var entry in set2)
+            {
+                if (!set1.Contains(entry))
+                    return false;
+
+                ++entriesFound;
+            }
+
+            return entriesFound == set1.Count;
+        }
+        
         public static bool ContainsAny<T>(this ICollection<T> set1, ICollection<T> set2)
         {
             foreach (var entry in set1)
