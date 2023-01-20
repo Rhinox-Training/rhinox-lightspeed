@@ -12,12 +12,12 @@ namespace Rhinox.Lightspeed.Reflection
                 return GetNameWithNesting(type.DeclaringType) + "." + type.Name;
             return type.Name;
         }
-        
+
         public static bool IsDelegateType(this Type type)
         {
             return typeof(Delegate).IsAssignableFrom(type);
         }
-        
+
         public static bool IsDefined<T>(this Type type, bool inherit) where T : Attribute
         {
             return type != null && type.IsDefined(typeof(T), inherit);
@@ -29,7 +29,7 @@ namespace Rhinox.Lightspeed.Reflection
                 return default(T);
             return Attribute.GetCustomAttribute(type, typeof(T)) as T;
         }
-        
+
         public static object GetCustomAttribute(this Type type, Type attributeType)
         {
             if (!HasCustomAttribute(type, attributeType))
@@ -43,14 +43,14 @@ namespace Rhinox.Lightspeed.Reflection
                 return Array.Empty<Attribute>();
             return Attribute.GetCustomAttributes(type);
         }
-        
+
         public static T[] GetCustomAttributes<T>(this Type type) where T : Attribute
         {
             if (type == null)
                 return Array.Empty<T>();
             return Attribute.GetCustomAttributes(type).OfType<T>().ToArray();
         }
-        
+
         public static Attribute[] GetCustomAttributes(this Type type, Type attributeType)
         {
             if (type == null)
@@ -63,6 +63,7 @@ namespace Rhinox.Lightspeed.Reflection
                 if (attributeType.IsInstanceOfType(attribute))
                     result.Add(attribute);
             }
+
             return result.ToArray();
         }
 
@@ -74,9 +75,45 @@ namespace Rhinox.Lightspeed.Reflection
             return typeof(Attribute).IsAssignableFrom(attributeType) && Attribute.IsDefined(type, attributeType);
         }
 
-        public static bool InheritsFrom(this Type t, Type otherType)
+        public static bool InheritsFrom(this Type t, Type possibleBaseType)
         {
-            return otherType != null && otherType.IsAssignableFrom(t);
+            if (possibleBaseType == null)
+                return false;
+            
+            if (t == possibleBaseType || possibleBaseType.IsAssignableFrom(t))
+                return true;
+            
+            // Interface cannot implement a class
+            if (t.IsInterface && !possibleBaseType.IsInterface)
+                return false;
+            
+            if (possibleBaseType.IsInterface)
+                return t.HasInterfaceType(possibleBaseType);
+            
+            // Handle generics
+            if (possibleBaseType.IsGenericTypeDefinition)
+            {
+                for (Type baseType = t; baseType != null; baseType = baseType.BaseType)
+                {
+                    if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == possibleBaseType)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool HasInterfaceType(this Type t, Type interfaceType)
+        {
+            if (interfaceType == null || !interfaceType.IsInterface)
+                return false;
+            
+            return t.GetInterfaces().Contains(interfaceType);
+        }
+        
+        public static bool HasInterfaceType<T>(this Type t)
+        {
+            return HasInterfaceType(t, typeof(T));
         }
 
         public static bool InheritsFrom<T>(this Type t)
@@ -91,13 +128,15 @@ namespace Rhinox.Lightspeed.Reflection
             Type baseType = type.BaseType;
             return baseType != null && baseType.ImplementsOpenGenericClass(openGenericType);
         }
-        
+
         public static Type[] GetArgumentsOfInheritedOpenGenericClass(this Type type, Type openGenericType)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == openGenericType)
                 return type.GetGenericArguments();
             Type baseType = type.BaseType;
-            return baseType != null ? baseType.GetArgumentsOfInheritedOpenGenericClass(openGenericType) : Array.Empty<Type>();
+            return baseType != null
+                ? baseType.GetArgumentsOfInheritedOpenGenericClass(openGenericType)
+                : Array.Empty<Type>();
         }
     }
 }
