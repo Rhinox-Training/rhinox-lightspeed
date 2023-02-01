@@ -123,7 +123,20 @@ namespace Rhinox.Lightspeed.Reflection
 
         public static bool ImplementsOpenGenericClass(this Type type, Type openGenericType)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == openGenericType)
+            if (!openGenericType.IsGenericType)
+                return false;
+                
+            if (openGenericType.IsInterface)
+            {
+                var interfaceImplSet = type.GetInterfaces();
+                if (interfaceImplSet.Length > 0)
+                {
+                    var matchingInterface = interfaceImplSet.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == openGenericType);
+                    if (matchingInterface != null)
+                        return true;
+                }
+            }
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == openGenericType)
                 return true;
             Type baseType = type.BaseType;
             return baseType != null && baseType.ImplementsOpenGenericClass(openGenericType);
@@ -131,7 +144,20 @@ namespace Rhinox.Lightspeed.Reflection
 
         public static Type[] GetArgumentsOfInheritedOpenGenericClass(this Type type, Type openGenericType)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == openGenericType)
+            if (!openGenericType.IsGenericType)
+                return Array.Empty<Type>();
+                
+            if (openGenericType.IsInterface)
+            {
+                var interfaceImplSet = type.GetInterfaces();
+                if (interfaceImplSet.Length > 0)
+                {
+                    var matchingInterface = interfaceImplSet.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == openGenericType);
+                    if (matchingInterface != null)
+                        return matchingInterface.GetGenericArguments();
+                }
+            }
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == openGenericType)
                 return type.GetGenericArguments();
             Type baseType = type.BaseType;
             return baseType != null
