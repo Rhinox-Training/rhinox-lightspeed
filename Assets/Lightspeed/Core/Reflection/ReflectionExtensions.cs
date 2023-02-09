@@ -217,6 +217,46 @@ namespace Rhinox.Lightspeed.Reflection
             }
         }
         
+        public static bool TrySetValue(this MemberInfo memberInfo, object obj, object val)
+        {
+            if (memberInfo == null) return false;
+            
+            switch (memberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    fieldInfo.SetValue(obj, val);
+                    return true;
+                case PropertyInfo propertyInfo:
+                    propertyInfo.SetValue(obj, val);
+                    return true;
+                case MethodInfo methodInfo:
+                    methodInfo.Invoke(obj, new[] {val});
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        
+        public static void SetValue(this MemberInfo memberInfo, object obj, object val)
+        {
+            if (memberInfo == null) return;
+            
+            switch (memberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    fieldInfo.SetValue(obj, val);
+                    break;
+                case PropertyInfo propertyInfo:
+                    propertyInfo.SetValue(obj, val);
+                    break;
+                case MethodInfo methodInfo:
+                    methodInfo.Invoke(obj, new[] {val});
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+        
         public static bool HasParameters(this MethodInfo methodInfo, IList<Type> paramTypes, bool inherit = true)
         {
             var parameters = methodInfo.GetParameters();
