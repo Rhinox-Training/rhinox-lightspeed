@@ -14,13 +14,15 @@ namespace Rhinox.Lightspeed
         /// </summary>
         public static Texture2D CopyTextureCPU(Texture tex, TextureCreationFlags flags = TextureCreationFlags.None)
         {
+            var oldRt = RenderTexture.active;
+            
             var rt = RenderTexture.GetTemporary(tex.width, tex.height, 0, tex.graphicsFormat);
             var copy = new Texture2D(tex.width, tex.height, tex.graphicsFormat, flags);
+            
             Graphics.Blit(tex, rt);
-
-            var oldRt = RenderTexture.active;
             RenderTexture.active = rt;
             copy.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
+            
             RenderTexture.active = oldRt;
             RenderTexture.ReleaseTemporary(rt);
 
