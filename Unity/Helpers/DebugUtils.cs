@@ -32,7 +32,6 @@ namespace Rhinox.Lightspeed
             
             RenderTexture.active = oldRt;
             RenderTexture.ReleaseTemporary(rt);
-
         }
 
         public static void RenderTextureToPng(RenderTexture rt, out string b64)
