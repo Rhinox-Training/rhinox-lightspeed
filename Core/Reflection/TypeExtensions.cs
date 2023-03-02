@@ -165,7 +165,7 @@ namespace Rhinox.Lightspeed.Reflection
                 : Array.Empty<Type>();
         }
         
-        public static Type GetElementType(this Type collectionType)
+        public static Type GetCollectionElementType(this Type collectionType)
         {
             if (collectionType.IsArray)
                 return collectionType.GetElementType();
