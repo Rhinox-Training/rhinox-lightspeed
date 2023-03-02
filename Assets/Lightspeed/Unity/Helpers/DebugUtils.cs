@@ -12,25 +12,26 @@ namespace Rhinox.Lightspeed
         {
             var oldRt = RenderTexture.active;
 
-            var rt = new RenderTexture(tex.width, tex.height, 0);
+            var rt = RenderTexture.GetTemporary(tex.width, tex.height, 0);
             Graphics.Blit(tex, rt);
 
             RenderTextureToPng(rt, out b64);
             
             RenderTexture.active = oldRt;
+            RenderTexture.ReleaseTemporary(rt);
         }
         
         public static void CopyTexture(Texture2D tex, out Texture2D outputTexture)
         {
             var oldRt = RenderTexture.active;
 
-            var rt = new RenderTexture(tex.width, tex.height, 0, tex.graphicsFormat);
+            var rt = RenderTexture.GetTemporary(tex.width, tex.height, 0, tex.graphicsFormat);
             Graphics.Blit(tex, rt);
 
             RenderTextureToTexture2D(rt, out outputTexture);
             
             RenderTexture.active = oldRt;
-
+            RenderTexture.ReleaseTemporary(rt);
         }
 
         public static void RenderTextureToPng(RenderTexture rt, out string b64)
