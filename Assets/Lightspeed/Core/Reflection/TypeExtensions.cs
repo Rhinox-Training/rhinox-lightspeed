@@ -164,5 +164,24 @@ namespace Rhinox.Lightspeed.Reflection
                 ? baseType.GetArgumentsOfInheritedOpenGenericClass(openGenericType)
                 : Array.Empty<Type>();
         }
+        
+        public static Type GetElementType(this Type collectionType)
+        {
+            if (collectionType.IsArray)
+                return collectionType.GetElementType();
+
+            Type baseGenericType = typeof(IEnumerable<>);
+            Type[] genericImplementations;
+        
+            if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == baseGenericType)
+                genericImplementations = collectionType.GetGenericArguments();
+            else
+                genericImplementations = collectionType.GetArgumentsOfInheritedOpenGenericClass(baseGenericType);
+
+            if (genericImplementations.Length > 0)
+                return genericImplementations[0];
+
+            throw new ArgumentException("Not a collection type", nameof(collectionType));
+        }
     }
 }
