@@ -60,6 +60,12 @@ namespace Rhinox.Lightspeed
 #if UNITY_EDITOR
                 alphaIsTransparency = tex.alphaIsTransparency,
 #endif
+                wrapMode = tex.wrapMode,
+                wrapModeU = tex.wrapModeU,
+                wrapModeV = tex.wrapModeV,
+                wrapModeW = tex.wrapModeW,
+                filterMode = tex.filterMode,
+                anisoLevel = tex.anisoLevel
             };
 
             var color = Color.clear;
@@ -83,13 +89,13 @@ namespace Rhinox.Lightspeed
         {
             for (int x = 0; x < border.left; ++x)
             {
-                for (int y = 0; y < tex.width; ++y)
+                for (int y = 0; y < tex.height; ++y)
                     tex.SetPixel(x, y, color);
             }
 
             for (int x = 0; x < border.right; ++x)
             {
-                for (int y = 0; y < tex.width; ++y)
+                for (int y = 0; y < tex.height; ++y)
                     tex.SetPixel(tex.width - 1 - x, y, color);
             }
 
