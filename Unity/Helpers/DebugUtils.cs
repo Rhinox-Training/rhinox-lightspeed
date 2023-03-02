@@ -10,18 +10,27 @@ namespace Rhinox.Lightspeed
         // Only useful for textures that are not readable
         public static void RenderTextureToPng(Texture2D tex, out string b64)
         {
+            var oldRt = RenderTexture.active;
+
             var rt = new RenderTexture(tex.width, tex.height, 0);
             Graphics.Blit(tex, rt);
 
             RenderTextureToPng(rt, out b64);
+            
+            RenderTexture.active = oldRt;
         }
         
         public static void CopyTexture(Texture2D tex, out Texture2D outputTexture)
         {
+            var oldRt = RenderTexture.active;
+
             var rt = new RenderTexture(tex.width, tex.height, 0, tex.graphicsFormat);
             Graphics.Blit(tex, rt);
 
             RenderTextureToTexture2D(rt, out outputTexture);
+            
+            RenderTexture.active = oldRt;
+
         }
 
         public static void RenderTextureToPng(RenderTexture rt, out string b64)
