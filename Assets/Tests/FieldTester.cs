@@ -12,6 +12,4 @@ public class FieldTester : MonoBehaviour
 
     [SerializeReference]
     public SceneReference Scene;
-    
-    
 }
