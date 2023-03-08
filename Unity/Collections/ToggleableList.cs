@@ -11,6 +11,7 @@ namespace Rhinox.Lightspeed.Collections
 {
     [HideReferenceObjectPicker, HideLabel]
     [Serializable]
+    [UnitySupportWarning(2020)] // Generic serialization with [SerializeReference] is only supported from 2020+
     public class Toggleable<T>
     {
         public event Action<Toggleable<T>> ToggledChanged;
