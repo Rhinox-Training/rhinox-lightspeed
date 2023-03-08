@@ -4,12 +4,12 @@ namespace Rhinox.Lightspeed.Collections
 {
 	public class LimitedQueue<T> : Queue<T>
 	{
-		private int limit = -1;
+		private int _limit = -1;
 
 		public int Limit
 		{
-			get { return limit; }
-			set { limit = value; }
+			get => _limit;
+			set => _limit = value;
 		}
 
 		public LimitedQueue(int limit)
