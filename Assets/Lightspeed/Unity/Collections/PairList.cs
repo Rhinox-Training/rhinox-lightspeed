@@ -8,6 +8,7 @@ using UnityEngine;
 namespace Rhinox.Lightspeed.Collections
 {
     [Serializable]
+    [UnitySupportWarning(2020)] // Generic serialization with [SerializeReference] is only supported from 2020+
     public struct SimplePair<T1, T2>
     {
         [HideLabel, HorizontalGroup] public T1 V1;
