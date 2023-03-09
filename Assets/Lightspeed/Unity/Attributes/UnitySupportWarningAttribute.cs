@@ -16,4 +16,6 @@ public class UnitySupportWarningAttribute : PropertyAttribute
         Major = major;
         Minor = minor;
     }
+
+    public string VersionString => $"{Major}.{Minor}";
 }
