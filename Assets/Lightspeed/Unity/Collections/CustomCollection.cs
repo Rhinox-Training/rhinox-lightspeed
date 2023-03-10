@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Rhinox.Lightspeed.Collections
 {
     [Serializable]
+    [UnitySupportWarning(2020)] // Generic serialization with [SerializeReference] is only supported from 2020+
     public abstract class CustomCollection<T> : ICollection<T>
     {
         [SerializeField]
