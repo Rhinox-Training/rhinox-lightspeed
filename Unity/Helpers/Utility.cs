@@ -367,5 +367,20 @@ namespace Rhinox.Lightspeed
             a = b;
             b = tmp;
         }
+
+        private static Version _runtimeVersion;
+        public static Version GetCurrentUnityRuntime()
+        {
+            if (_runtimeVersion == null)
+            {
+                string unityVersionStr = Application.unityVersion;
+                int index = unityVersionStr.IndexOf("f", StringComparison.InvariantCultureIgnoreCase);
+                if (index != -1)
+                    unityVersionStr = unityVersionStr.Substring(0, index);
+
+                _runtimeVersion = new Version(unityVersionStr);
+            }
+            return _runtimeVersion;
+        }
     }
 }

@@ -8,14 +8,17 @@ using UnityEngine;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true)]
 public class UnitySupportWarningAttribute : PropertyAttribute
 {
-    public int Major;
-    public int Minor;
+    public int Major { get; }
+    public int Minor { get; }
+    
+    public Version Version { get; }
+    public string VersionString { get; }
 
     public UnitySupportWarningAttribute(int major, int minor = 0)
     {
         Major = major;
         Minor = minor;
+        Version = new Version(major, minor);
+        VersionString = $"{Major}.{Minor}";
     }
-
-    public string VersionString => $"{Major}.{Minor}";
 }
