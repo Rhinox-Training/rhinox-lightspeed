@@ -4,6 +4,12 @@ namespace Rhinox.Lightspeed
 {
     public static class RectExtensions
     {
+        // If in an event where rects aren't computed, they will all be 1 width, 1 height.
+        public static bool IsValid(this Rect rect)
+        {
+            return rect.height > 1 || rect.width > 1;
+        }
+        
         public static Rect AlignLeft(this Rect rect, float width)
         {
             rect.width = width;
