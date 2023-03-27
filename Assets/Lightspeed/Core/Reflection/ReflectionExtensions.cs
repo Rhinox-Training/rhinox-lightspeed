@@ -8,6 +8,7 @@ namespace Rhinox.Lightspeed.Reflection
 {
     public static partial class ReflectionExtensions
     {
+        // TODO: add flatten?
         public static MethodInfo[] GetMethodsWithAttribute<T>(this Type t, bool publicMethods = true,
             bool instanceMethods = true) where T : Attribute
         {
