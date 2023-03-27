@@ -182,11 +182,26 @@ namespace Rhinox.Lightspeed
         {
             return float.IsNaN(vec.x) || float.IsNaN(vec.y) || float.IsNaN(vec.z);
         }
-
-        public static string Print(this Vector3 _vector)
+        
+        public static bool AnyIsNegativeInfinity(this Vector3 vec)
         {
-            return ("(" + _vector.x.ToString("0.0#######") + ", " + _vector.y.ToString("0.0#######") + ", " +
-                    _vector.z.ToString("0.0#######") + ")");
+            return float.IsNegativeInfinity(vec.x) || float.IsNegativeInfinity(vec.y) || float.IsNegativeInfinity(vec.z);
+        }
+        
+        public static bool AnyIsPositiveInfinity(this Vector3 vec)
+        {
+            return float.IsPositiveInfinity(vec.x) || float.IsPositiveInfinity(vec.y) || float.IsPositiveInfinity(vec.z);
+        }
+        
+        public static bool AnyIsInfinity(this Vector3 vec)
+        {
+            return float.IsInfinity(vec.x) || float.IsInfinity(vec.y) || float.IsInfinity(vec.z);
+        }
+
+        public static string Print(this Vector3 vec)
+        {
+            return ("(" + vec.x.ToString("0.0#######") + ", " + vec.y.ToString("0.0#######") + ", " +
+                    vec.z.ToString("0.0#######") + ")");
         }
         
         public static Vector3 RoundAllValues(this Vector3 vec)

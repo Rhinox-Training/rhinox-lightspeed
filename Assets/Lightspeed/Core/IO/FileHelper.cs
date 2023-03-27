@@ -162,6 +162,7 @@ namespace Rhinox.Lightspeed.IO
         }
         
         //Combine multiple paths using Path.Combine
+        // TODO: Is obsolete with current C#?
         public static string Combine(params string[] components)
         {
             if (components.Length < 1)
