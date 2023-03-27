@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using Rhinox.Lightspeed;
+using Sirenix.OdinInspector;
 using UnityEditor;
+using UnityEngine;
 
 namespace Rhinox.Lightspeed
 {
@@ -15,8 +17,10 @@ namespace Rhinox.Lightspeed
     public class SerializableGuid : IEquatable<SerializableGuid>
     {
         private const int BytesLength = 16;
+        [HideInInspector]
         public byte[] SerializedBytes;
         
+        [ShowInInspector, ReadOnly, HideLabel]
         public string GuidAsString => SerializedBytes.IsNullOrEmpty() ? "<EMPTY>" : AsSystemGuid().ToString();
         public Guid SystemGuid => AsSystemGuid();
         

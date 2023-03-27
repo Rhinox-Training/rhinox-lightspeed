@@ -78,7 +78,6 @@ namespace Rhinox.Lightspeed.Reflection
         /// This does not include: Generics Definitions & Abstract classes
         /// </summary>
         public static List<Type> GetTypesInheritingFrom(Type t)
-            // TODO move to TypeCache
             => GetTypesInheritingFrom(t, AppDomain.CurrentDomain.GetAssemblies());
         
         /// <summary>

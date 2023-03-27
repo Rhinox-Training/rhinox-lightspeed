@@ -95,7 +95,7 @@ namespace Rhinox.Lightspeed
             rect.y += y;
             return rect;
         }
-        
+
         public static Rect SetWidth(this Rect rect, float width)
         {
             rect.width = width;
