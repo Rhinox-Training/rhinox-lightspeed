@@ -25,17 +25,26 @@ namespace Rhinox.Lightspeed
         {
             var publicMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.Public |
                                                 BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
-            publicMembers = publicMembers.Where(x => !(x is MethodInfo)).ToArray();
+            publicMembers = publicMembers.Where(x => !(x is MethodBase)).ToArray();
             
             var serializedMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.NonPublic |
                                                     BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
-            serializedMembers = serializedMembers.Where(x => !(x is MethodInfo) && x.IsSerialized()).ToArray();
+            serializedMembers = serializedMembers.Where(x => !(x is MethodBase) && x.IsSerialized()).ToArray();
 
             var list = new List<MemberInfo>();
             list.AddRange(publicMembers);
             list.AddRange(serializedMembers);
 
             return list.Distinct().ToArray();
+        }
+        
+        
+        public static IReadOnlyCollection<MemberInfo> GetSerializedMembers(Type type)
+        {
+            var serializedMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic |
+                                                    BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
+            serializedMembers = serializedMembers.Where(x => !(x is MethodBase) && x.IsSerialized()).ToArray(); 
+            return serializedMembers;
         }
         
         public static bool IsSerialized(this FieldInfo fieldInfo)

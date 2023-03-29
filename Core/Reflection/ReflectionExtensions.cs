@@ -228,6 +228,8 @@ namespace Rhinox.Lightspeed.Reflection
                     fieldInfo.SetValue(obj, val);
                     return true;
                 case PropertyInfo propertyInfo:
+                    if (propertyInfo.SetMethod == null)
+                        return false;
                     propertyInfo.SetValue(obj, val);
                     return true;
                 case MethodInfo methodInfo:
