@@ -9,7 +9,7 @@ namespace Rhinox.Lightspeed
     public static partial class Utility
     {
 #if UNITY_EDITOR
-        public static T FindApproximately<T>(params string[] possibleNames) where T : UnityEngine.Object
+        public static T FindAssetApproximately<T>(params string[] possibleNames) where T : UnityEngine.Object
         {
             foreach (var name in possibleNames)
             {
