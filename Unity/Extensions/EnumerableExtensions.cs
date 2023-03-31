@@ -55,6 +55,28 @@ namespace Rhinox.Lightspeed
                 pos += chunksize;
             }
         }
+        
+        public static IEnumerable<T> Flatten<T, TKey, TValue>(this IDictionary<TKey, TValue> source, Func<KeyValuePair<TKey, TValue>, IEnumerable<T>> flattenFunc)
+        {
+            foreach (var pair in source)
+            {
+                IEnumerable<T> resultCollection = flattenFunc.Invoke(pair);
+                
+                foreach (var result in resultCollection)
+                    yield return result;
+            }
+        }
+
+        public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source, Func<IEnumerable<T>, IEnumerable<T>> flattenFunc = null)
+        {
+            foreach (var collection in source)
+            {
+                IEnumerable<T> resultCollection = flattenFunc != null ? flattenFunc.Invoke(collection) : collection;
+                
+                foreach (var result in resultCollection)
+                    yield return result;
+            }
+        }
 
     }
 }
