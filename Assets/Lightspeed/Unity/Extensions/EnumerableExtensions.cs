@@ -78,5 +78,16 @@ namespace Rhinox.Lightspeed
             }
         }
 
+        public static ArraySegment<T> TakeSegment<T>(this T[] array, int offset)
+            => TakeSegment(array, offset, array.Length - offset);
+
+        public static ArraySegment<T> TakeSegment<T>(this T[] array, int offset, int count)
+            => new ArraySegment<T>(array, offset, count);
+
+        public static ArraySegment<T> TakeSegment<T>(this ArraySegment<T> segment, int offset)
+            => TakeSegment(segment.Array, segment.Offset + offset, segment.Count - offset);
+        
+        public static ArraySegment<T> TakeSegment<T>(this ArraySegment<T> segment, int offset, int count)
+            => TakeSegment(segment.Array, segment.Offset + offset, count);
     }
 }
