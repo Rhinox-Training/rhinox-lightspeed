@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -23,6 +24,18 @@ namespace Rhinox.Lightspeed
         public static bool Contains(this string str, string toCheck, StringComparison comparisonType)
         {
             return str.IndexOf(toCheck, comparisonType) >= 0;
+        }
+        
+        public static bool TryGetIndexOf(this string str, string toFind, out int index)
+        {
+            index = str.IndexOf(toFind, StringComparison.InvariantCulture);
+            return index >= 0;
+        }
+
+        public static bool TryGetIndexOf(this string str, string toFind, StringComparison comparison, out int index)
+        {
+            index = str.IndexOf(toFind, comparison);
+            return index >= 0;
         }
 
         /// <summary>
@@ -147,6 +160,9 @@ namespace Rhinox.Lightspeed
             if (string.IsNullOrWhiteSpace(str))
                 return false;
 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && str.Contains("?"))
+                return false;
+                
             var invalidChars = Path.GetInvalidPathChars();
             return !str.Any(x => invalidChars.Contains(x));
         }
