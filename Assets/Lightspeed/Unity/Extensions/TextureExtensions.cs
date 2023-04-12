@@ -16,20 +16,31 @@ namespace Rhinox.Lightspeed
             if (tex == null)
                 return tex;
             
+            var paddedTex = tex.CreatePadded(padding);
+
+            // Not sure WHY this is needed but unfortunately the color does not properly scale (?)
+            InsetBorder(paddedTex, padding, Color.clear);
+
+            paddedTex.Apply(true);
+            return paddedTex;
+        }
+
+        public static Texture2D CreatePadded(this Texture2D tex, RectOffset padding)
+        {
             var paddedTex = CreateTextureBasedOn(tex);
-            
+
+#if UNITY_2021_2_OR_NEWER
+            paddedTex.Reinitialize(tex.width + padding.left + padding.right, tex.height + padding.top + padding.bottom);
+#else
             paddedTex.Resize(tex.width + padding.left + padding.right, tex.height + padding.top + padding.bottom);
+#endif
             paddedTex.Apply();
             
             Graphics.CopyTexture(
                 tex, 0, 0, 0, 0, tex.width, tex.height,
                 paddedTex, 0, 0, padding.left, padding.top
             );
-
-            // Not sure WHY this is needed but unfortunately the color does not properly scale (?)
-            InsetBorder(paddedTex, padding, Color.clear);
-
-            paddedTex.Apply(true);
+            
             return paddedTex;
         }
 
@@ -69,7 +80,11 @@ namespace Rhinox.Lightspeed
         public static Texture2D MakeSquare(this Texture2D tex, int size)
         {
             var newTex = tex.MakeSquare();
+#if UNITY_2021_2_OR_NEWER
+            newTex.Reinitialize(size, size);
+#else
             newTex.Resize(size, size);
+#endif
             return newTex;
         }
 

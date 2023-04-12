@@ -162,7 +162,7 @@ namespace Rhinox.Lightspeed
 
         public static void SetLocalPosition(this Transform t, float? x = null, float? y = null, float? z = null)
         {
-            t.localPosition = t.position.With(x, y, z);
+            t.localPosition = t.localPosition.With(x, y, z);
         }
         
         public static void SetXPosition(this Transform transform, float xPos)

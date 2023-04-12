@@ -24,6 +24,27 @@ namespace Rhinox.Lightspeed
 
         public IReadOnlyCollection<TreeNode<T>> Children => _children.AsReadOnly();
 
+        public bool HasNode(T value)
+        {
+            return GetNode(value) != null;
+        }
+        
+        public TreeNode<T> GetNode(T value)
+        {
+            foreach (var child in _children)
+                if (child.Value.Equals(value))
+                    return child;
+            return null;
+        }
+
+        public TreeNode<T> GetOrAddNode(T value)
+        {
+            foreach (var child in _children)
+                if (child.Value.Equals(value))
+                    return child;
+            return AddChild(value);
+        }
+
         public TreeNode<T> AddChild(T value)
         {
             var node = new TreeNode<T>(value) {Parent = this};
