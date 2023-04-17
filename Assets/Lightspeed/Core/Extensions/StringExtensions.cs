@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -209,6 +210,26 @@ namespace Rhinox.Lightspeed
                 _camelCaseSplitRegex = new Regex(_camelCaseSplitPattern, RegexOptions.IgnorePatternWhitespace);
             
             return string.Join(separator, _camelCaseSplitRegex.Split(input));
+        }
+        
+        public static string ToTitleCase(this string input)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int index = 0; index < input.Length; ++index)
+            {
+                char ch = input[index];
+                if (ch == '_' && index + 1 < input.Length)
+                {
+                    char upper = input[index + 1];
+                    if (char.IsLower(upper))
+                        upper = char.ToUpper(upper, CultureInfo.InvariantCulture);
+                    stringBuilder.Append(upper);
+                    ++index;
+                }
+                else
+                    stringBuilder.Append(ch);
+            }
+            return stringBuilder.ToString();
         }
         
         public static bool CaseInvariantEquals(this string s1, string s2)
