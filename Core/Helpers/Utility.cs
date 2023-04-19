@@ -7,13 +7,25 @@ namespace Rhinox.Lightspeed
     {
         public static string GetCommandLineArg(string name, string defaultValue = null)
         {
-            var args = System.Environment.GetCommandLineArgs().ToList();
-            int index = args.IndexOf(name);
-            if (index >= 0 && index < args.Count - 1)
-            {
-                return args[index + 1];
-            }
+            if (TryGetCommandLineArg(name, out string value))
+                return value;
             return defaultValue;
+        }
+        
+        public static bool TryGetCommandLineArg(string name, out string value)
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            if (!name.StartsWith("-"))
+                name = "-" + name;
+            int index = args.IndexOf(name);
+            if (index >= 0 && index < args.Length - 1)
+            {
+                value = args[index + 1];
+                return true;
+            }
+
+            value = null;
+            return false;
         }
 
         public static string[] SplitLines(this string input)
