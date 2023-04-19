@@ -145,6 +145,11 @@ namespace Rhinox.Lightspeed.Reflection
                 .Where(x => x.Name == name)
                 .FirstOrDefault(x => x.IsGenericMethod);
         }
+
+        public static string GetNiceName(this MemberInfo info)
+        {
+            return info?.Name.ToTitleCase().SplitCamelCase();
+        }
         
         public static bool IsStatic(this MemberInfo member)
         {
