@@ -11,21 +11,106 @@ namespace Rhinox.Lightspeed.Reflection
     {
         private static IReadOnlyCollection<ICustomTypeResolver> _customTypeResolvers;
         
-        private const BindingFlags ALL_MEMBERS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
-        
-        public static bool TryGetMember(Type t, string name, out MemberInfo member, BindingFlags bindingAttr = ALL_MEMBERS)
+        private const BindingFlags ALL_FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags ALL_FLAGS_WITH_INHERITED = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+        private const MemberTypes ALL_MEMBERS = MemberTypes.Field | MemberTypes.Method | MemberTypes.Property;
+
+
+        public static bool TryGetField(Type t, string name, out FieldInfo member, BindingFlags bindingAttr = ALL_FLAGS)
         {
-            var fInfo = t.GetField(name, bindingAttr);
-            if (fInfo != null)
+            member = t.GetField(name, bindingAttr);
+            bool memberFound = member != null;
+            if (memberFound || !bindingAttr.HasFlag(BindingFlags.NonPublic))
+                return memberFound;
+
+            // Inherited privates are not returned (even with FlattenHierarchy), so search for it.
+            return TryGetFieldRecursive(t.BaseType, name, out member, bindingAttr.Without(BindingFlags.FlattenHierarchy | BindingFlags.Public));
+        }
+
+        private static bool TryGetFieldRecursive(Type t, string name, out FieldInfo member, BindingFlags flags)
+        {
+            while (t != null)
             {
-                member = fInfo;
+                member = t.GetField(name, flags);
+                if (member != null)
+                    return true;
+                t = t.BaseType;
+            }
+
+            member = null;
+            return false;
+        }
+
+        public static bool TryGetProperty(Type t, string name, out PropertyInfo member, BindingFlags bindingAttr = ALL_FLAGS_WITH_INHERITED)
+        {
+            member = t.GetProperty(name, bindingAttr);
+            bool memberFound = member != null;
+            if (memberFound || !bindingAttr.HasFlag(BindingFlags.NonPublic))
+                return memberFound;
+
+            // Inherited privates are not returned (even with FlattenHierarchy), so search for it.
+            return TryGetPropertyRecursive(t.BaseType, name, out member, bindingAttr.Without(BindingFlags.FlattenHierarchy | BindingFlags.Public));
+        }
+        
+        private static bool TryGetPropertyRecursive(Type t, string name, out PropertyInfo member, BindingFlags flags)
+        {
+            while (t != null)
+            {
+                member = t.GetProperty(name, flags);
+                if (member != null)
+                    return true;
+                t = t.BaseType;
+            }
+
+            member = null;
+            return false;
+        }
+        
+        public static bool TryGetMethod(Type t, string name, out MethodInfo member, BindingFlags bindingAttr = ALL_FLAGS_WITH_INHERITED)
+        {
+            member = t.GetMethod(name, bindingAttr);
+            bool memberFound = member != null;
+            if (memberFound || !bindingAttr.HasFlag(BindingFlags.NonPublic))
+                return memberFound;
+
+            // Inherited privates are not returned (even with FlattenHierarchy), so search for it.
+            return TryGetMethodRecursive(t.BaseType, name, out member, bindingAttr.Without(BindingFlags.FlattenHierarchy | BindingFlags.Public));
+        }
+        
+        public static bool TryGetMethodRecursive(Type t, string name, out MethodInfo member, BindingFlags flags = ALL_FLAGS_WITH_INHERITED)
+        {
+            while (t != null)
+            {
+                member = t.GetMethod(name, flags);
+                if (member != null)
+                    return true;
+                t = t.BaseType;
+            }
+
+            member = null;
+            return false;
+        }
+
+        public static bool TryGetMember(Type t, string name, out MemberInfo member, BindingFlags bindingAttr = ALL_FLAGS_WITH_INHERITED)
+            => TryGetMember(t, ALL_MEMBERS, name, out member, bindingAttr);
+        
+        public static bool TryGetMember(Type t, MemberTypes allowedTypes, string name, out MemberInfo member, BindingFlags bindingAttr = ALL_FLAGS_WITH_INHERITED)
+        {
+            if (allowedTypes.HasFlag(MemberTypes.Field) && TryGetField(t, name, out FieldInfo fieldInfo, bindingAttr))
+            {
+                member = fieldInfo;
                 return true;
             }
 
-            var pInfo = t.GetProperty(name, bindingAttr);
-            if (pInfo != null)
+            if (allowedTypes.HasFlag(MemberTypes.Property) && TryGetProperty(t, name, out PropertyInfo propInfo, bindingAttr))
             {
-                member = pInfo;
+                member = propInfo;
+                return true;
+            }
+            
+            if (allowedTypes.HasFlag(MemberTypes.Method) && TryGetMethod(t, name, out MethodInfo methodInfo, bindingAttr))
+            {
+                member = methodInfo;
                 return true;
             }
 
@@ -46,6 +131,22 @@ namespace Rhinox.Lightspeed.Reflection
             }
 
             return false;
+        }
+        
+        
+        public static IEnumerable<FieldInfo> GetAllFields(Type type, Type lowestBase = null)
+        {
+            if (lowestBase == null)
+                lowestBase = typeof(object);
+            
+            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            while (type != null && type != lowestBase)
+            {
+                var fields = type.GetFields(flags);
+                foreach (var field in fields)
+                    yield return field;
+                type = type.BaseType;
+            }
         }
         
         /// <summary>
@@ -317,6 +418,35 @@ namespace Rhinox.Lightspeed.Reflection
 
             // Did not find
             return memberType.GetDefault();
+        }
+        
+        /// <summary>
+        /// Check whether MethodInfo is compatible with type.
+        /// In the case of a MethodInfo with as DeclaringType a generic type, it will alter the MethodInfo to the implemented given type
+        /// </summary>
+        public static bool IsMethodOfType(Type type, ref MethodInfo mi)
+        {
+            if (type == mi.DeclaringType) 
+                return true;
+            
+            // If we're not generic. just check assignable
+            if (!mi.ContainsGenericParameters)
+            {
+                // TODO: InheritsFrom is more expensive but is it necessary here?
+                return type.IsAssignableFrom(mi.DeclaringType);
+            }
+
+            // TypeCache can return methods from a generic class (i.e. <T>)
+            // If our type is not implementing it, then it's definitely not compatible
+            // ContainsGenericParameters is used to make sure it's our type that's generic
+            // If the actual method is generic, nothing we can do about it
+            if (!mi.DeclaringType.ContainsGenericParameters || !type.ImplementsOpenGenericClass(mi.DeclaringType))
+                return false;
+            
+            // If so, try to get the typed version of this MethodInfo
+            var implementedTypes = type.GetArgumentsOfInheritedOpenGenericClass(mi.DeclaringType);
+            var typedBaseType = mi.DeclaringType.MakeGenericType(implementedTypes);
+            return ReflectionUtility.TryGetMethod(typedBaseType, mi.Name, out mi);
         }
         
         public static object GetDefault(this Type t)

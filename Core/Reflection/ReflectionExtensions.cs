@@ -8,9 +8,15 @@ namespace Rhinox.Lightspeed.Reflection
 {
     public static partial class ReflectionExtensions
     {
+        public static BindingFlags Without(this BindingFlags flags, BindingFlags other)
+        {
+            // AND NOT, same as XOR (^)
+            return flags & ~other;
+        }
+        
         // TODO: add flatten?
-        public static MethodInfo[] GetMethodsWithAttribute<T>(this Type t, bool publicMethods = true,
-            bool instanceMethods = true) where T : Attribute
+        public static MethodInfo[] GetMethodsWithAttribute<T>(this Type t, bool publicMethods = true, bool instanceMethods = true)
+            where T : Attribute
         {
             BindingFlags access = publicMethods ? BindingFlags.Public : BindingFlags.NonPublic;
             BindingFlags instance = instanceMethods ? BindingFlags.Instance : BindingFlags.Static;
@@ -145,10 +151,15 @@ namespace Rhinox.Lightspeed.Reflection
                 .Where(x => x.Name == name)
                 .FirstOrDefault(x => x.IsGenericMethod);
         }
+        
+        public static string GetNiceName(this ParameterInfo info)
+        {
+            return info.Name.ToTitleCase().SplitCamelCase();
+        }
 
         public static string GetNiceName(this MemberInfo info)
         {
-            return info?.Name.ToTitleCase().SplitCamelCase();
+            return info.Name.ToTitleCase().SplitCamelCase();
         }
         
         public static bool IsStatic(this MemberInfo member)
