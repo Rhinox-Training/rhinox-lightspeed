@@ -444,7 +444,7 @@ namespace Rhinox.Lightspeed.Reflection
             if (!mi.ContainsGenericParameters)
             {
                 // TODO: InheritsFrom is more expensive but is it necessary here?
-                return type.IsAssignableFrom(mi.DeclaringType);
+                return mi.DeclaringType.IsAssignableFrom(type);
             }
 
             // TypeCache can return methods from a generic class (i.e. <T>)
@@ -597,6 +597,33 @@ namespace Rhinox.Lightspeed.Reflection
             }
 
             return (methods);
+        }
+
+        public static bool TryGetAncestryDistance(this Type parent, Type baseType, out int ancestry)
+        {
+            if (parent == null || baseType == null || !parent.InheritsFrom(baseType))
+            {
+                ancestry = -1;
+                return false;
+            }
+
+            var current = parent;
+            ancestry = 0;
+            while (current != null)
+            {
+                if (current == baseType)
+                    break;
+                current = current.BaseType;
+                ++ancestry;
+            }
+
+            return true;
+        }
+
+        public static int GetAncestryDistance(this Type parent, Type baseType)
+        {
+            TryGetAncestryDistance(parent, baseType, out int ancestry);
+            return ancestry;
         }
     }
 }
