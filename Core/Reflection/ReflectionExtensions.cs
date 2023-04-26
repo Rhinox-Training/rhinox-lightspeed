@@ -132,6 +132,20 @@ namespace Rhinox.Lightspeed.Reflection
                 yield return evt;
             }
         }
+
+        public static bool TryGetAttribute<T>(this MemberInfo info, out T attribute)
+            where T : Attribute
+        {
+            attribute = info.GetCustomAttribute<T>();
+            return attribute != null;
+        }
+        
+        public static bool TryGetAttribute<T>(this Type t, out T attribute)
+            where T : Attribute
+        {
+            attribute = t.GetCustomAttribute<T>();
+            return attribute != null;
+        }
         
         public static FieldInfo[] GetFieldOptions(this Type t)
         {
