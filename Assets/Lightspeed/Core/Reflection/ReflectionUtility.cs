@@ -137,16 +137,25 @@ namespace Rhinox.Lightspeed.Reflection
         {
             if (lowestBase == null)
                 lowestBase = typeof(object);
-            
-            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-                yield return field;
 
-            var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (var field in type.GetFields(flags))
+            {
+                if (field.DeclaringType != type)
+                    continue;
+                yield return field;
+            }
+
             type = type.BaseType;
             while (type != null && type != lowestBase)
             {
                 foreach (var field in type.GetFields(flags))
+                {
+                    if (field.DeclaringType != type)
+                        continue;
                     yield return field;
+                }
+
                 type = type.BaseType;
             }
         }
