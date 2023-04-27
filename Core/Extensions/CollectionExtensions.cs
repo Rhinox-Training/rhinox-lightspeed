@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Rhinox.Lightspeed
@@ -513,6 +514,30 @@ namespace Rhinox.Lightspeed
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> coll)
         {
             return coll == null || !coll.Any();
+        }
+        
+        
+        public static Array RemoveAtGeneric(this Array arr, int index)
+        {
+            var type = arr.GetType();
+            var elemType = type.GetElementType();
+            var resizeMethod = typeof(CollectionExtensions).GetMethod(nameof(RemoveAt), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            var properRemoveMethod = resizeMethod.MakeGenericMethod(elemType);
+            var parameters = new object[] { arr, index };
+            var array = (Array)properRemoveMethod.Invoke(null, parameters);
+            return array;
+        }
+        
+        public static T[] RemoveAt<T>(this T[] source, int index)
+        {
+            T[] dest = new T[source.Length - 1];
+            if( index > 0 )
+                Array.Copy(source, 0, dest, 0, index);
+
+            if( index < source.Length - 1 )
+                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+
+            return dest;
         }
     }
 }
