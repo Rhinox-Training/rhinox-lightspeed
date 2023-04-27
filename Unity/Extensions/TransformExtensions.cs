@@ -497,5 +497,10 @@ namespace Rhinox.Lightspeed
                     throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
             }
         }
+
+        public static Pose GetWorldPose(this Transform t)
+        {
+            return new Pose(t.position, t.rotation);
+        }
     }
 }
