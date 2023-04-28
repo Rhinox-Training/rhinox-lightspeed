@@ -228,6 +228,10 @@ namespace Rhinox.Lightspeed
             for (int i = 0; i < SceneManager.sceneCount; i++)
             {
                 var s = SceneManager.GetSceneAt(i);
+#if UNITY_EDITOR
+                if (object.Equals(s, currScene))
+                    continue;
+#endif
                 FindObjectsInScene(s, ref results);
             }
         }
