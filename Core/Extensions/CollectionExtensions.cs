@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -538,6 +539,20 @@ namespace Rhinox.Lightspeed
                 Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
 
             return dest;
+        }
+        
+        public static IEnumerable Enumerate(this IEnumerator enumerator)
+        {
+            yield return enumerator.Current;
+            while (enumerator.MoveNext())
+                yield return enumerator.Current;
+        }
+        
+        public static IEnumerable<T> Enumerate<T>(this IEnumerator<T> enumerator)
+        {
+            yield return enumerator.Current;
+            while (enumerator.MoveNext())
+                yield return enumerator.Current;
         }
     }
 }
