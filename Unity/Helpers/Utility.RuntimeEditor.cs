@@ -18,12 +18,6 @@ namespace Rhinox.Lightspeed
     /// </summary>
     public static partial class Utility
     {
-        public static void DestroyObject(Component t)
-        {
-            if (t == null) return;
-            Destroy(t.gameObject);
-        }
-        
         public static void Destroy(Object o, bool immediate = false)
         {
             if (o == null) return;
@@ -42,6 +36,16 @@ namespace Rhinox.Lightspeed
             Object.Destroy(o);
 #endif
         }
+        
+        public static void DestroyObject(Component t)
+        {
+            if (t == null) return;
+            Destroy(t.gameObject);
+        }
+
+        // This function only exist to ensure that the object is destroyed; mostly to prevent errors during refactors
+        public static void DestroyObject(GameObject o, bool immediate = false)
+            => Destroy(o, immediate);
     
         public static bool IsEditTime()
         {
