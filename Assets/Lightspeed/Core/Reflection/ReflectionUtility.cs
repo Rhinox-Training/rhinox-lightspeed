@@ -479,10 +479,12 @@ namespace Rhinox.Lightspeed.Reflection
         {
             return (T) CreateInstance(typeof(T));
         }
-
+        
         public static object CreateInstance(this Type t)
         {
             if (t == null) return null;
+            if (t.IsArray)
+                return Array.CreateInstance(t.GetElementType(), 0);
             if (t.IsValueType || !t.HasDefaultConstructor())
                 return t.GetDefault();
             return Activator.CreateInstance(t);

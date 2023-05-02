@@ -15,6 +15,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "1.0.0",
             "define": "TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "1.0.0",
+            "define": "NEWTONSOFT"
         }
     ],
     "noEngineReferences": false

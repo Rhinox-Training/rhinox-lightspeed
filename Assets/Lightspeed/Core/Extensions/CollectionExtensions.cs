@@ -516,16 +516,17 @@ namespace Rhinox.Lightspeed
         {
             return coll == null || !coll.Any();
         }
-        
-        
+
+        private static MethodInfo _removeAtMethod;
         public static Array RemoveAtGeneric(this Array arr, int index)
         {
             var type = arr.GetType();
             var elemType = type.GetElementType();
-            var resizeMethod = typeof(CollectionExtensions).GetMethod(nameof(RemoveAt), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
-            var properRemoveMethod = resizeMethod.MakeGenericMethod(elemType);
+            if (_removeAtMethod == null)
+                _removeAtMethod = typeof(CollectionExtensions).GetMethod(nameof(RemoveAt), BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+            var properRemoveMethod = _removeAtMethod.MakeGenericMethod(elemType);
             var parameters = new object[] { arr, index };
-            var array = (Array)properRemoveMethod.Invoke(null, parameters);
+            var array = (Array) properRemoveMethod.Invoke(null, parameters);
             return array;
         }
         
