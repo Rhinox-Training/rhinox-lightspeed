@@ -8,6 +8,7 @@ namespace Rhinox.Lightspeed
     {
         private static MethodInfo _arrayResizeStaticMethod;
         private static object[] _resizeArrayParameters;
+        
         public static object ResizeArrayGeneric(object array, int newSize)
         {
             var type = array.GetType();
