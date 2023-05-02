@@ -143,5 +143,23 @@ namespace Rhinox.Lightspeed
             Vector3 projectedPoint = lineAxis.normalized * length + lineOrigin;
             return projectedPoint;
         }
+
+        public static Pose Lerp(Pose start, Pose end, float t)
+        {
+            return new Pose()
+            {
+                position = Vector3.Lerp(start.position, end.position, t),
+                rotation = Quaternion.Lerp(start.rotation, end.rotation, t)
+            };
+        }
+
+        public static Pose Slerp(Pose start, Pose end, float t)
+        {
+            return new Pose()
+            {
+                position = Vector3.Slerp(start.position, end.position, t),
+                rotation = Quaternion.Slerp(start.rotation, end.rotation, t)
+            };
+        }
     }
 }
