@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Rhinox.Lightspeed.Reflection
 {
@@ -166,14 +168,52 @@ namespace Rhinox.Lightspeed.Reflection
                 .FirstOrDefault(x => x.IsGenericMethod);
         }
         
-        public static string GetNiceName(this ParameterInfo info)
+        public static string GetNiceName(this ParameterInfo info, bool splitCamelCase = true)
         {
-            return info.Name.ToTitleCase().SplitCamelCase();
+            string titleCase = info.Name.ToTitleCase();
+            if (splitCamelCase)
+                return titleCase.SplitCamelCase();
+            return titleCase;
         }
 
-        public static string GetNiceName(this MemberInfo info)
+        public static string GetNiceName(this MemberInfo info, bool splitCamelCase = true)
         {
-            return info.Name.ToTitleCase().SplitCamelCase();
+            string titleCase = info.Name.ToTitleCase();
+            if (splitCamelCase)
+                return titleCase.SplitCamelCase();
+            return titleCase;
+        }
+
+        public static string GetNiceName(this Type type, bool splitCamelCase = true)
+        {
+            if (!type.IsGenericTypeDefinition && type.IsGenericType)
+            {
+                string argStr = string.Join(", ", type.GetGenericArguments().Select(x => x.GetNiceName()));
+                var regex = new Regex(@"\`([0-9]+)");
+                string newName = regex.Replace(GetProgrammerFriendlyName(type), $"<{argStr}>");
+                string titleCaseReplaced = newName.ToTitleCase();
+                if (splitCamelCase)
+                    return titleCaseReplaced.SplitCamelCase();
+                return titleCaseReplaced;
+            }
+
+            string titleCase = GetProgrammerFriendlyName(type).ToTitleCase();
+            if (splitCamelCase)
+                return titleCase.SplitCamelCase();
+            return titleCase;
+        }
+        
+        public static string GetFullNiceName(this Type type, bool splitCamelCase = true)
+        {
+            string separator = splitCamelCase ? "/" : ".";
+            return type.Namespace + separator + GetNiceName(type, splitCamelCase);
+        }
+
+        private static string GetProgrammerFriendlyName(Type t)
+        {
+            if (t == typeof(float) || t == typeof(Single))
+                return "float";
+            return t.Name;
         }
         
         public static bool IsStatic(this MemberInfo member)

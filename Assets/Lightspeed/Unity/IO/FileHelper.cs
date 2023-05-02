@@ -122,13 +122,13 @@ namespace Rhinox.Lightspeed.IO
                 www.timeout = 10;
                 yield return www.SendWebRequest();
 
-                if (www.isNetworkError || www.isHttpError)
+                if (www.IsRequestValid(out string error))
+                    data = www.downloadHandler.data;
+                else
                 {
-                    Debug.LogError($"Network error: {filePath} - {www.error}");
+                    Debug.LogError(error);
                     data = null;
                 }
-                else
-                    data = www.downloadHandler.data;
             }
             else
             {
@@ -154,12 +154,7 @@ namespace Rhinox.Lightspeed.IO
                 www.timeout = 10;
                 yield return www.SendWebRequest();
 
-                if (www.isNetworkError || www.isHttpError)
-                {
-                    Debug.LogError($"Network error: {filePath} - {www.error}");
-                    data = null;
-                }
-                else
+                if (www.IsRequestValid(out string error))
                 {
                     var reader = new StringReader(www.downloadHandler.text);
                     var list = new List<string>();
@@ -168,6 +163,11 @@ namespace Rhinox.Lightspeed.IO
                         list.Add(reader.ReadLine());
                     }
                     data = list.ToArray();
+                }
+                else
+                {
+                    Debug.LogError($"Network error: {filePath} - {www.error}");
+                    data = null;
                 }
             }
             else
@@ -193,15 +193,14 @@ namespace Rhinox.Lightspeed.IO
             www.SendWebRequest();
             
             while (!www.isDone) { }
-            
-            if (www.isNetworkError || www.isHttpError)
-            {
-                if (!suppressLog)
-                    Debug.LogError($"Network error: {path} - {www.error}");
-                return null;
-            }
 
-            return www.downloadHandler;
+            if (www.IsRequestValid(out string error))
+                return www.downloadHandler;
+            
+            if (!suppressLog)
+                Debug.LogError(error);
+            return null;
+
         }
         
         public static void CreateOrCleanDirectory(string dir)

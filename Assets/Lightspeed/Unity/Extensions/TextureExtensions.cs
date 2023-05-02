@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -81,7 +82,7 @@ namespace Rhinox.Lightspeed
         {
             var newTex = tex.MakeSquare();
 #if UNITY_2021_2_OR_NEWER
-            newTex.Reinitialize(size, size);
+            TextureScale.Bilinear(newTex, size, size);
 #else
             newTex.Resize(size, size);
 #endif

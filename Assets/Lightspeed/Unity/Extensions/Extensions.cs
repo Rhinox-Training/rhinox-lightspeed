@@ -12,6 +12,12 @@ namespace Rhinox.Lightspeed
             var frustumPlanes = GeometryUtility.CalculateFrustumPlanes(camera);
             return GeometryUtility.TestPlanesAABB(frustumPlanes, mesh.bounds);
         }
+        
+        public static bool IsWithinFrustum(this Renderer renderer, Camera camera)
+        {
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+        }
 
         public static bool IsWithinFrustum(this Vector3 position, Camera camera)
         {

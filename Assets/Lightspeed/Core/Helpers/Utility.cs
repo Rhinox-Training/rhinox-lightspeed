@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using Rhinox.Lightspeed.Reflection;
 
 namespace Rhinox.Lightspeed
 {
