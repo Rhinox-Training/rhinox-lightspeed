@@ -89,5 +89,65 @@ namespace Rhinox.Lightspeed
         
         public static ArraySegment<T> TakeSegment<T>(this ArraySegment<T> segment, int offset, int count)
             => TakeSegment(segment.Array, segment.Offset + offset, count);
+
+        public static float StdDev(this IEnumerable<float> values)
+        {
+            //Compute the Average
+            float avg = values.Average();
+
+            //Perform the Sum of (value-avg)^2
+            double sum = 0.0;
+            int count = 0;
+            foreach (float val in values)
+            {
+                sum += ((val - avg) * (val - avg));
+                ++count;
+            }
+
+            if (count == 0)
+                return 0.0f;
+            
+            //Put it all together
+            float stdDev = (float)Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        public static double StdDev(this IEnumerable<double> values)
+        {
+            //Compute the Average
+            double avg = values.Average();
+
+            //Perform the Sum of (value-avg)^2
+            double sum = 0.0;
+            int count = 0;
+            foreach (var val in values)
+            {
+                sum += ((val - avg) * (val - avg));
+                ++count;
+            }
+
+            if (count == 0)
+                return 0.0;
+            
+            //Put it all together
+            var stdDev = Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        public static IOrderedEnumerable<T> Order<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> selector, bool ascending)
+        {
+            if (ascending)
+                return enumerable.OrderBy(selector);
+            else
+                return enumerable.OrderByDescending(selector);
+        }
+        
+        public static IOrderedEnumerable<T> ThenBy<T, TKey>(this IOrderedEnumerable<T> enumerable, Func<T, TKey> selector, bool ascending)
+        {
+            if (ascending)
+                return enumerable.ThenBy(selector);
+            else
+                return enumerable.ThenByDescending(selector);
+        }
     }
 }
