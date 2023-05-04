@@ -96,11 +96,35 @@ namespace Rhinox.Lightspeed
             float avg = values.Average();
 
             //Perform the Sum of (value-avg)^2
-            double sum = 0.0;
+            float sum = 0.0f;
             int count = 0;
             foreach (float val in values)
             {
                 sum += ((val - avg) * (val - avg));
+                ++count;
+            }
+
+            if (count == 0)
+                return 0.0f;
+            
+            //Put it all together
+            float stdDev = (float)Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        
+        public static float StdDev<TKey>(this IEnumerable<TKey> values, Func<TKey, float> selector)
+        {
+            //Compute the Average
+            float avg = values.Average(selector);
+
+            //Perform the Sum of (value-avg)^2
+            float sum = 0.0f;
+            int count = 0;
+            foreach (TKey val in values)
+            {
+                float floatVal = selector(val);
+                sum += ((floatVal - avg) * (floatVal - avg));
                 ++count;
             }
 
