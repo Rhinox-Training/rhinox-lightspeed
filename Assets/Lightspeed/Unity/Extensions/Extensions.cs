@@ -53,5 +53,11 @@ namespace Rhinox.Lightspeed
         
             Gizmos.matrix = matrix;
         }
+
+        public static void Validate(this Pose pose)
+        {
+            if (pose.rotation.IsInvalid())
+                pose.rotation = Quaternion.identity;
+        }
     }
 }
