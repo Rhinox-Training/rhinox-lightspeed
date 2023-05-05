@@ -106,5 +106,30 @@ namespace Rhinox.Lightspeed
             var cells = lines.Select(a => a.Split(separator));
             return (cells);
         }
+
+
+        public static DataTable ReadCsvTable(string[] lines)
+        {
+            return ReadCsvTable(lines, GetCsvSeparator());
+        }
+
+        public static DataTable ReadCsvTable(string[] lines, char separator)
+        {
+            var cells2D = ReadCsv(lines).ToArray();
+            if (!cells2D.IsRectangular())
+                return null;
+
+            DataTable dt = new DataTable();
+            foreach (var headerCell in cells2D[0])
+                dt.Columns.Add(headerCell);
+
+            for (int i = 1; i < cells2D.Length; ++i)
+            {
+                for (int j = 0; j < cells2D[i].Length; ++j)
+                    dt.Rows.Add(cells2D[i][j]);
+            }
+
+            return dt;
+        }
     }
 }
