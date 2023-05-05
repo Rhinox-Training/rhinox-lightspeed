@@ -555,5 +555,23 @@ namespace Rhinox.Lightspeed
             while (enumerator.MoveNext())
                 yield return enumerator.Current;
         }
+
+        public static bool IsRectangular<T>(this T[][] arr)
+        {
+            int size = -1;
+            for (int i = 0; i < arr.Length; ++i)
+            {
+                if (size == -1)
+                {
+                    size = arr[i].Length;
+                    continue;
+                }
+
+                if (size != arr[i].Length)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
