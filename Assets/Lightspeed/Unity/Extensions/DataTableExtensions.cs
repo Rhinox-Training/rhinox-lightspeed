@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Rhinox.Lightspeed
 {
@@ -100,11 +101,14 @@ namespace Rhinox.Lightspeed
         }
 
         public static IEnumerable<string[]> ReadCsv(string[] lines) => ReadCsv(lines, GetCsvSeparator());
-        
+
         public static IEnumerable<string[]> ReadCsv(string[] lines, char separator)
         {
-            var cells = lines.Select(a => a.Split(separator));
-            return (cells);
+            foreach (var line in lines)
+            {
+                var cells = line.Split(separator).Select(x => Regex.Replace(x, "^\"(.*)\"$", e => e.Groups[1].Value)).ToArray();
+                yield return cells;
+            }
         }
 
 
@@ -123,10 +127,12 @@ namespace Rhinox.Lightspeed
             foreach (var headerCell in cells2D[0])
                 dt.Columns.Add(headerCell);
 
+            string[] row = new string[cells2D[0].Length];
             for (int i = 1; i < cells2D.Length; ++i)
             {
                 for (int j = 0; j < cells2D[i].Length; ++j)
-                    dt.Rows.Add(cells2D[i][j]);
+                    row[j] = cells2D[i][j];
+                dt.Rows.Add(row);
             }
 
             return dt;
