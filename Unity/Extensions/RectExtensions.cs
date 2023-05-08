@@ -168,5 +168,24 @@ namespace Rhinox.Lightspeed
         public static Vector2 GetTopRight(this Rect r) => new Vector2(r.xMax, r.yMax);
         public static Vector2 GetBottomLeft(this Rect r) => new Vector2(r.xMin, r.yMin);
         public static Vector2 GetBottomRight(this Rect r) => new Vector2(r.xMax, r.yMin);
+
+        public static Rect Encapsulate(this Rect r, Vector2 point)
+        {
+            if (r.Contains(point))
+                return r;
+
+            if (point.x > r.xMax)
+                r.xMax = point.x;
+            
+            if (point.x < r.xMin)
+                r.xMin = point.x;
+            
+            if (point.y > r.yMax)
+                r.yMax = point.y;
+            
+            if (point.y < r.yMin)
+                r.yMin = point.y;
+            return r;
+        }
     }
 }
