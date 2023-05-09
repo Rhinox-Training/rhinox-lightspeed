@@ -84,5 +84,10 @@ namespace Rhinox.Lightspeed
             return ("(" + _quaternion.x.ToString("0.0#######") + ", " + _quaternion.y.ToString("0.0#######")
                     + ", " + _quaternion.z.ToString("0.0#######") + ", " + _quaternion.w.ToString("0.0#######") + ")");
         }
+
+        public static bool IsInvalid(this Quaternion q)
+        {
+            return Quaternion.Dot(q, q) <= float.Epsilon;
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Rhinox.Lightspeed
 {
@@ -17,7 +18,7 @@ namespace Rhinox.Lightspeed
             
             StringBuilder result = new StringBuilder();
             
-            char separator = GetCsvSeparator();
+            char separator = Utility.GetCsvSeparator();
             
             table.Columns.AppendAsCsv(result, separator);
             result.Append(Environment.NewLine);
@@ -31,7 +32,7 @@ namespace Rhinox.Lightspeed
             return result.ToString();
         }
 
-        private static void AppendAsCsv(this DataColumnCollection columns, StringBuilder result) => AppendAsCsv(columns, result, GetCsvSeparator());
+        private static void AppendAsCsv(this DataColumnCollection columns, StringBuilder result) => AppendAsCsv(columns, result, Utility.GetCsvSeparator());
 
         private static void AppendAsCsv(this DataColumnCollection columns, StringBuilder result, char separator)
         {
@@ -60,7 +61,7 @@ namespace Rhinox.Lightspeed
             }
         }
 
-        public static string ToCsv(this DataColumnCollection columns) => ToCsv(columns, GetCsvSeparator());
+        public static string ToCsv(this DataColumnCollection columns) => ToCsv(columns, Utility.GetCsvSeparator());
         
         public static string ToCsv(this DataColumnCollection columns, char separator)
         {
@@ -74,7 +75,7 @@ namespace Rhinox.Lightspeed
             return result.ToString();
         }
 
-        public static string ToCsv(this DataRow row) => ToCsv(row, GetCsvSeparator());
+        public static string ToCsv(this DataRow row) => ToCsv(row, Utility.GetCsvSeparator());
         
         public static string ToCsv(this DataRow row, char separator)
         {
@@ -86,25 +87,6 @@ namespace Rhinox.Lightspeed
             AppendAsCsv(row, result, separator);
 
             return result.ToString();
-        }
-        
-        public static char GetCsvSeparator()
-        {
-            var numSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
-
-            char separator;
-            if (numSeparator == ",") separator = ';';
-            else if (numSeparator == ".") separator = ',';
-            else separator = ';';
-            return separator;
-        }
-
-        public static IEnumerable<string[]> ReadCsv(string[] lines) => ReadCsv(lines, GetCsvSeparator());
-        
-        public static IEnumerable<string[]> ReadCsv(string[] lines, char separator)
-        {
-            var cells = lines.Select(a => a.Split(separator));
-            return (cells);
         }
     }
 }
