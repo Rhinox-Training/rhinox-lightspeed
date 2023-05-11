@@ -190,14 +190,29 @@ namespace Rhinox.Lightspeed.Reflection
             {
                 string argStr = string.Join(", ", type.GetGenericArguments().Select(x => x.GetNiceName()));
                 var regex = new Regex(@"\`([0-9]+)");
-                string newName = regex.Replace(GetProgrammerFriendlyName(type), $"<{argStr}>");
+                string newName = regex.Replace(type.Name, $"<{argStr}>");
                 string titleCaseReplaced = newName.ToTitleCase();
                 if (splitCamelCase)
                     return titleCaseReplaced.SplitCamelCase();
                 return titleCaseReplaced;
             }
+            
+            switch (Type.GetTypeCode(type)) {
+                case TypeCode.Boolean: return "bool";
+                case TypeCode.Byte: return "byte";
+                case TypeCode.Char: return "char";
+                case TypeCode.Int16: return "short";
+                case TypeCode.Int32: return "int";
+                case TypeCode.Int64: return "long";
+                case TypeCode.Single: return "float";
+                case TypeCode.Double: return "double";
+                case TypeCode.String: return "string";
+                case TypeCode.Decimal: return "decimal";
+            }
 
-            string titleCase = GetProgrammerFriendlyName(type).ToTitleCase();
+            if (type == typeof(void)) return "void";
+            
+            string titleCase = type.Name.ToTitleCase();
             if (splitCamelCase)
                 return titleCase.SplitCamelCase();
             return titleCase;
@@ -207,13 +222,6 @@ namespace Rhinox.Lightspeed.Reflection
         {
             string separator = splitCamelCase ? "/" : ".";
             return type.Namespace + separator + GetNiceName(type, splitCamelCase);
-        }
-
-        private static string GetProgrammerFriendlyName(Type t)
-        {
-            if (t == typeof(float) || t == typeof(Single))
-                return "float";
-            return t.Name;
         }
         
         public static bool IsStatic(this MemberInfo member)
