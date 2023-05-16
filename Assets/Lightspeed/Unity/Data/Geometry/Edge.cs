@@ -7,12 +7,16 @@ namespace Rhinox.Lightspeed
     {
         public Vector3 V1 { get; private set; }
         public Vector3 V2 { get; private set; }
+        
+        public Vector3 Direction { get; private set; }
 
         public Edge(Vector3 v1, Vector3 v2)
         {
             V1 = v1;
             V2 = v2;
-            SqrLength = (V2 - V1).sqrMagnitude;
+            var edgeVector = V2 - V1;
+            Direction = edgeVector.normalized;
+            SqrLength = edgeVector.sqrMagnitude;
         }
 
         public float SqrLength { get; private set; }
@@ -22,6 +26,7 @@ namespace Rhinox.Lightspeed
             var v1 = V1;
             V1 = V2;
             V2 = v1;
+            Direction = -Direction;
         }
 
         public Edge Flipped()
