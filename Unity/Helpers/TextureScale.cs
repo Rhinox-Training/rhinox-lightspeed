@@ -1,5 +1,4 @@
-﻿// #if UNITY_2021_2_OR_NEWER
-using System.Threading;
+﻿using System.Threading;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -168,4 +167,3 @@ namespace Rhinox.Lightspeed
             }
         }
 }
-// #endif

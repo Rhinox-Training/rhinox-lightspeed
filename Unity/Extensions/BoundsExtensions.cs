@@ -615,15 +615,15 @@ namespace Rhinox.Lightspeed
 			return rect.width * rect.height;
 		}
 
-		public static Bounds AddMarginToExtends(this Bounds bounds, Vector3 margin)
+		public static Bounds AddMarginToExtents(this Bounds bounds, Vector3 margin)
 		{
 			bounds.extents += margin;
 			return bounds;
 		}
 
-		public static Bounds AddMarginToExtends(this Bounds bounds, float margin)
+		public static Bounds AddMarginToExtents(this Bounds bounds, float margin)
 		{
-			return bounds.AddMarginToExtends(new Vector3(margin, margin, margin));
+			return bounds.AddMarginToExtents(new Vector3(margin, margin, margin));
 		}
 		
 		public static Vector3 GetCorner(this Bounds bound, bool maxNotMinFlipped, Axis axis)

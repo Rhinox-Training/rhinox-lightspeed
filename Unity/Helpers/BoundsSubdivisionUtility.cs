@@ -33,7 +33,7 @@ namespace Rhinox.Lightspeed
             {
                 for (int i = 0; i < boundsList.Count; ++i)
                 {
-                    boundsList[i] = boundsList[i].AddMarginToExtends(margin);
+                    boundsList[i] = boundsList[i].AddMarginToExtents(margin);
                 }
             }
 
