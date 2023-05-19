@@ -226,6 +226,13 @@ namespace Rhinox.Lightspeed
                     stringBuilder.Append(upper);
                     ++index;
                 }
+                else if (index == 0)
+                {
+                    char upper = input[index];
+                    if (char.IsLower(upper))
+                        upper = char.ToUpper(upper, CultureInfo.InvariantCulture);
+                    stringBuilder.Append(upper);
+                }
                 else
                     stringBuilder.Append(ch);
             }

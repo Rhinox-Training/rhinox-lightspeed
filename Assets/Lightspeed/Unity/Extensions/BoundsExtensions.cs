@@ -42,7 +42,58 @@ namespace Rhinox.Lightspeed
 			    matrix.MultiplyPoint(max),
 		    };
 	    }
-	    
+
+	    public static IEnumerable<Vector3> Sample(this Bounds bounds, int increments = 3)
+	    {
+		    float stepX = bounds.size.x / increments;
+		    float stepY = bounds.size.y / increments;
+		    float stepZ = bounds.size.z / increments;
+
+		    float samplePointBorderOffsetX = 0.5f * stepX;
+		    float samplePointBorderOffsetY = 0.5f * stepZ;
+		    float samplePointBorderOffsetZ = 0.5f * stepZ;
+
+		    for (int i = 0; i < increments; ++i)
+		    {
+			    float x = bounds.center.x - bounds.extents.x + i * stepX + samplePointBorderOffsetX;
+
+			    for (int j = 0; j < increments; ++j)
+			    {
+				    float y = bounds.center.y - bounds.extents.y + j * stepY + samplePointBorderOffsetY;
+				    
+				    for (int k = 0; k < increments; ++k)
+				    {
+					    float z = bounds.center.z - bounds.extents.z + k * stepZ + samplePointBorderOffsetZ;
+
+					    Vector3 pt = new Vector3(x, y, z);
+					    yield return pt;
+				    }
+			    }
+		    }
+	    }
+
+	    public static IEnumerable<Vector3> Sample2D(this Bounds bounds, int increments = 3)
+	    {
+		    float stepX = bounds.size.x / increments;
+		    float stepZ = bounds.size.z / increments;
+
+		    float samplePointBorderOffsetX = 0.5f * stepX;
+		    float samplePointBorderOffsetZ = 0.5f * stepZ;
+
+		    for (int i = 0; i < increments; ++i)
+		    {
+			    float x = bounds.center.x - bounds.extents.x + i * stepX + samplePointBorderOffsetX;
+
+			    for (int j = 0; j < increments; ++j)
+			    {
+				    float z = bounds.center.z - bounds.extents.z + j * stepZ + samplePointBorderOffsetZ;
+
+				    Vector3 pt = new Vector3(x, bounds.center.y - bounds.extents.y, z);
+				    yield return pt;
+			    }
+		    }
+	    }
+
 	    public static bool Contains(this BoundingSphere bounds, Vector3 pos)
 	    {
 		    var sqDis = bounds.position.SqrDistanceTo(pos);
@@ -315,6 +366,44 @@ namespace Rhinox.Lightspeed
 			}
 			return b;
 		}
+
+		public enum Side
+		{
+			Negative,
+			Center,
+			Positive
+		}
+
+		public static Bounds Resize(this Bounds bounds, Axis axis, float newSize, Side resizeOrigin = Side.Center)
+		{
+			var size = bounds.size;
+			var oldHalfSize = size / 2.0f;
+			var center = bounds.center;
+
+			var offset = resizeOrigin == Side.Center ? 0.0f : oldHalfSize.x - (newSize / 2.0f);
+			bool isPositive = resizeOrigin != Side.Negative;
+			offset = isPositive ? -offset : offset;
+			
+			switch (axis)
+			{
+				case Axis.X:
+					size.x = newSize;
+					center.x += offset;
+					break;
+				case Axis.Y:
+					size.y = newSize;
+					center.y += offset;
+					break;
+				case Axis.Z:
+					size.z = newSize;
+					center.z += offset;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+			}
+
+			return new Bounds(center, size);
+		}
 		
 		/// <summary>
 		/// Slice a Axisaligned bounds according to one of the cardinal axes
@@ -457,5 +546,158 @@ namespace Rhinox.Lightspeed
 
 			return offset;
 		}
+		
+		public static float GetSmallestDimension(this Bounds bounds)
+		{
+			return Mathf.Min(Mathf.Min(bounds.size.x, bounds.size.y), bounds.size.z);
+		}
+		
+		public static float GetLargestDimension(this Bounds bounds)
+		{
+			return Mathf.Max(Mathf.Max(bounds.size.x, bounds.size.y), bounds.size.z);
+		}
+		
+		public static int CountDimensionsBiggerThan(this Bounds bounds, float length)
+		{
+			int dimCount = 0;
+			if (bounds.size.x >= length)
+				++dimCount;
+			if (bounds.size.y >= length)
+				++dimCount;
+			if (bounds.size.z >= length)
+				++dimCount;
+			return dimCount;
+		}
+		
+		public static Rect ToScreenSpace(this Bounds bounds, Camera camera)
+		{
+			var corners = bounds.GetCorners().Select(x => camera.WorldToScreenPoint(x)).ToArray();
+			Rect screenbounds = new Rect(corners[0], Vector2.zero);
+
+			for (int idx = 1; idx < corners.Length; ++idx)
+			{
+				screenbounds = screenbounds.Encapsulate(corners[idx]);
+			}
+
+			float oldYmin = screenbounds.yMin;
+			screenbounds.yMin = Screen.height - screenbounds.yMax;
+			screenbounds.yMax = Screen.height - oldYmin;
+
+			return screenbounds;
+		}
+
+		public static Rect ToScreenSpace(this Bounds bounds, CameraSpoof cameraSpoof)
+		{
+			var corners = bounds.GetCorners().Select(x => cameraSpoof.WorldToScreenPoint(x)).ToArray();
+			Rect screenbounds = new Rect(corners[0], Vector2.zero);
+
+			for (int idx = 1; idx < corners.Length; ++idx)
+			{
+				screenbounds = screenbounds.Encapsulate(corners[idx]);
+			}
+
+			float oldYmin = screenbounds.yMin;
+			screenbounds.yMin = Screen.height - screenbounds.yMax;
+			screenbounds.yMax = Screen.height - oldYmin;
+
+			return screenbounds;
+		}
+    
+		public static float GetScreenPixels(this Bounds bounds, Camera camera)
+		{
+			var rect = ToScreenSpace(bounds, camera);
+			return rect.width * rect.height;
+		}
+
+		public static float GetScreenPixels(this Bounds bounds, CameraSpoof cameraSpoof)
+		{
+			var rect = ToScreenSpace(bounds, cameraSpoof);
+			return rect.width * rect.height;
+		}
+
+		public static Bounds AddMarginToExtents(this Bounds bounds, Vector3 margin)
+		{
+			bounds.extents += margin;
+			return bounds;
+		}
+
+		public static Bounds AddMarginToExtents(this Bounds bounds, float margin)
+		{
+			return bounds.AddMarginToExtents(new Vector3(margin, margin, margin));
+		}
+		
+		public static Vector3 GetCorner(this Bounds bound, bool maxNotMinFlipped, Axis axis)
+		{
+			switch (axis)
+			{
+				case Axis.X:
+					if (!maxNotMinFlipped)
+						return new Vector3(bound.max.x, bound.min.y, bound.min.z);
+					else
+						return new Vector3(bound.min.x, bound.max.y, bound.max.z);
+				case Axis.Y:
+					if (!maxNotMinFlipped)
+						return new Vector3(bound.min.x, bound.max.y, bound.min.z);
+					else
+						return new Vector3(bound.max.x, bound.min.y, bound.max.z);
+				case Axis.Z:
+					if (!maxNotMinFlipped)
+						return new Vector3(bound.min.x, bound.min.y, bound.max.z);
+					else
+						return new Vector3(bound.max.x, bound.max.y, bound.min.z);
+				default:
+					throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+			}
+		}
+
+		public static bool IsAxisAlignedWith(this Bounds bound, Bounds otherBound)
+		{
+			Vector3 centerAxis = (otherBound.center - bound.center).normalized;
+			if (!centerAxis.TryGetCardinalAxis(out var axis))
+				return false;
+			return TestBoundAlignmentOnAxis(bound, otherBound, axis);
+		}
+
+		private static bool TestBoundAlignmentOnAxis(Bounds bound, Bounds otherBound, Axis axis)
+		{
+			Vector3 corner1 = bound.min;
+			Vector3 corner2 = bound.GetCorner(false, axis);
+
+			Vector3 lineSegmentA = corner2 - corner1;
+
+			if (!lineSegmentA.IsColinear(otherBound.min - corner2))
+				return false;
+
+			Vector3 corner3 = bound.max;
+			Vector3 corner4 = bound.GetCorner(true, axis);
+
+			Vector3 lineSegmentB = corner4 - corner3;
+
+			if (!lineSegmentB.IsColinear(otherBound.max - corner3))
+				return false;
+			return AreTouching(bound, otherBound, axis, 0.0001f);
+		}
+
+		private static bool AreTouching(Bounds bound, Bounds otherBound, Axis axis, float epsilon = float.Epsilon)
+		{
+			switch (axis)
+			{
+				case Axis.X:
+					return CheckTouchingSegments(bound.min.x, bound.max.x, otherBound.min.x, otherBound.max.x, epsilon);
+				case Axis.Y:
+					return CheckTouchingSegments(bound.min.y, bound.max.y, otherBound.min.y, otherBound.max.y, epsilon);
+				case Axis.Z:
+					return CheckTouchingSegments(bound.min.z, bound.max.z, otherBound.min.z, otherBound.max.z, epsilon);
+				default:
+					throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+			}
+		}
+
+		private static bool CheckTouchingSegments(float minA, float maxA, float minB, float maxB, float epsilon = float.Epsilon)
+		{
+			return Mathf.Min(minA, maxA).LossyEquals(Mathf.Max(minB, maxB), epsilon) ||
+			       Mathf.Max(minA, maxA).LossyEquals(Mathf.Min(minB, maxB), epsilon);
+		}
+
 	}
 }

@@ -5,7 +5,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Rhinox.GUIUtils
+namespace Rhinox.Lightspeed
 {
     public enum ShaderParameterType
     {

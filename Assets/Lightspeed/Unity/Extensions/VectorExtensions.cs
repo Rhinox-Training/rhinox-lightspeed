@@ -463,5 +463,15 @@ namespace Rhinox.Lightspeed
         {
             return (1.0f - Mathf.Abs(Vector3.Dot(direction.normalized, otherDirection.normalized))) < float.Epsilon;
         }
+
+        public static Bounds GetBounds(this IList<Vector3> vertices)
+        {
+            if (vertices == null || vertices.Count == 0)
+                return default(Bounds);
+            var b = new Bounds(vertices[0], Vector3.zero);
+            for (int i = 1; i < vertices.Count; ++i)
+                b.Encapsulate(vertices[i]);
+            return b;
+        }
     }
 }
