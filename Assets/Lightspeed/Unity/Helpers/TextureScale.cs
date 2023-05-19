@@ -1,4 +1,4 @@
-﻿#if UNITY_2021_2_OR_NEWER
+﻿// #if UNITY_2021_2_OR_NEWER
 using System.Threading;
 using UnityEngine;
 
@@ -60,7 +60,7 @@ namespace Rhinox.Lightspeed
                         threadData = new ThreadData(slice * i, slice * (i + 1));
                         ParameterizedThreadStart
                             ts = useBilinear ? BilinearScale : new ParameterizedThreadStart(PointScale);
-                        Thread thread = new(ts);
+                        Thread thread = new Thread(ts);
                         thread.Start(threadData);
                     }
      
@@ -81,7 +81,7 @@ namespace Rhinox.Lightspeed
                 }
                 else
                 {
-                    ThreadData threadData = new(0, newHeight);
+                    ThreadData threadData = new ThreadData(0, newHeight);
                     if (useBilinear)
                     {
                         BilinearScale(threadData);
@@ -91,11 +91,12 @@ namespace Rhinox.Lightspeed
                         PointScale(threadData);
                     }
                 }
-     
+#if UNITY_2021_2_OR_NEWER
                 tex.Reinitialize(newWidth, newHeight);
-    #pragma warning disable UNT0017 // SetPixels invocation is slow
+#else
+                tex.Resize(newWidth, newHeight);
+#endif
                 tex.SetPixels(newColors);
-    #pragma warning restore UNT0017 // SetPixels invocation is slow
                 tex.Apply(true);
      
                 texColors = null;
@@ -167,4 +168,4 @@ namespace Rhinox.Lightspeed
             }
         }
 }
-#endif
+// #endif
