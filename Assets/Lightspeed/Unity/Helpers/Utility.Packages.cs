@@ -75,7 +75,7 @@ namespace Rhinox.Lightspeed
 #if UNITY_EDITOR
         public static ICollection<PackageInfo> ListPackages(bool includeUnityPackages = false)
         {
-            string STANDARD_UNITY_PACKAGE_PREFIX = "com.unity.";
+            const string STANDARD_UNITY_PACKAGE_PREFIX = "com.unity.";
             ListRequest lr = Client.List(true, false);
             while (!lr.IsCompleted)
             {
