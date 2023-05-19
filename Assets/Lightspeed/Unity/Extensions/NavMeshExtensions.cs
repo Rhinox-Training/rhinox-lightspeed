@@ -56,5 +56,13 @@ namespace Rhinox.Lightspeed
 
             return false;
         }
+
+        public static Bounds GetBounds(this NavMeshTriangulation triangulation)
+        {
+            if (triangulation.vertices.IsNullOrEmpty())
+                return default(Bounds);
+            var vertices = triangulation.vertices;
+            return vertices.GetBounds();
+        }
     }
 }
