@@ -196,6 +196,12 @@ namespace Rhinox.Lightspeed
             return comps.GetCombinedBounds();
         }
 
+        public static Bounds BoundsFromMinMax(Vector3 min, Vector3 max)
+        {
+            Vector3 center = (min + max) / 2;
+            return new Bounds(center, (max - min).Abs());
+        }
+
         public static BoxCollider WrapRectTransformInCollider(RectTransform t, float zSize = .05f)
             => WrapRectTransformInCollider(t, Vector2.one, zSize);
 
