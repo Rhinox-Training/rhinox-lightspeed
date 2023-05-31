@@ -507,44 +507,12 @@ namespace Rhinox.Lightspeed
 
 		public static float GetExtents(this Bounds bounds, Axis axis)
 		{
-			float offset = 0.0f;
-			switch (axis)
-			{
-				case Axis.X:
-					offset = bounds.extents.x;
-					break;
-				case Axis.Y:
-					offset = bounds.extents.y;
-					break;
-				case Axis.Z:
-					offset = bounds.extents.z;
-					break;
-				default:
-					throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
-			}
-
-			return offset;
+			return bounds.extents.Get(axis);
 		}
 
 		public static float GetSize(this Bounds bounds, Axis axis)
 		{
-			float offset = 0.0f;
-			switch (axis)
-			{
-				case Axis.X:
-					offset = bounds.size.x;
-					break;
-				case Axis.Y:
-					offset = bounds.size.y;
-					break;
-				case Axis.Z:
-					offset = bounds.size.z;
-					break;
-				default:
-					throw new ArgumentException("Axis is wrong range, only X,Y,Z are supported", nameof(axis));
-			}
-
-			return offset;
+			return bounds.size.Get(axis);
 		}
 		
 		public static float GetSmallestDimension(this Bounds bounds)
@@ -602,7 +570,7 @@ namespace Rhinox.Lightspeed
 
 			return screenbounds;
 		}
-    
+		
 		public static float GetScreenPixels(this Bounds bounds, Camera camera)
 		{
 			var rect = ToScreenSpace(bounds, camera);
