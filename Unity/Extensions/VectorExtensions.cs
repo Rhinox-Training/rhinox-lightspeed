@@ -248,10 +248,15 @@ namespace Rhinox.Lightspeed
         /// <returns></returns>
         public static Vector3 GetAverage(this Vector3[] vectors)    
         {
+            Vector3 sum = vectors.Sum();
+            return sum / vectors.Length;
+        }
+        
+        public static Vector3 Sum(this Vector3[] vectors)    
+        {
             Vector3 sum = Vector3.zero;
             foreach (var v in vectors)
                 sum += v;
-            sum = sum / vectors.Length;
             return sum;
         }
         
