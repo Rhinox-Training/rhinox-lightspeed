@@ -30,8 +30,9 @@ namespace Rhinox.Lightspeed
 
 		public static void SetAllMaterials(this Renderer renderer, Material mat)
 		{
-			var mats = new Material[renderer.materials.Length];
-			for (int i = 0; i < renderer.materials.Length; ++i)
+			var length = renderer.sharedMaterials.Length;
+			var mats = new Material[length];
+			for (int i = 0; i < length; ++i)
 				mats[i] = mat;
 			renderer.materials = mats;
 		}
