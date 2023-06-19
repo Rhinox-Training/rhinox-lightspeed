@@ -298,6 +298,7 @@ namespace Rhinox.Lightspeed.IO
                 else
                 {
                     Directory.CreateDirectory(fullPath);
+                    AssetDatabase.Refresh();
                 }
             }
         }
