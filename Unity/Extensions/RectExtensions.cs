@@ -71,6 +71,27 @@ namespace Rhinox.Lightspeed
             rect.height = height;
             return rect;
         }
+
+        public static void SplitX(this Rect rect, float width, out Rect left, out Rect right)
+        {
+            float rightWidth = rect.width - width;
+            left = rect.AlignLeft(width);
+            right = rect.AlignRight(rightWidth);
+        }
+
+        public static void SplitX(this Rect rect, float width1, float width2, out Rect left, out Rect middle, out Rect right)
+        {
+            rect.SplitX(width1, out left, out Rect overflow);
+            float offset = width2 - width1;
+            overflow.SplitX(offset, out middle, out right);
+        }
+
+        public static void SplitY(this Rect rect, float height, out Rect top, out Rect bottom)
+        {
+            float bottomHeight = rect.height - height;
+            top = rect.AlignTop(height);
+            bottom = rect.AlignBottom(bottomHeight);
+        }
         
         public static Rect SetX(this Rect rect, float x)
         {
