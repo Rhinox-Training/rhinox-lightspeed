@@ -5,9 +5,9 @@ namespace Rhinox.Lightspeed
 {
     public interface IConvex
     {
-        public IList<Vector3> GetAxes();
+        IList<Vector3> GetAxes();
         
-        public IList<Vector3> GetVertices();
+        IList<Vector3> GetVertices();
 
     }
 }
