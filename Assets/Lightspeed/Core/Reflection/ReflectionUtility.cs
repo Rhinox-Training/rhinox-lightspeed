@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Rhinox.Lightspeed.Reflection
 {
     public static class ReflectionUtility
     {
         private static IReadOnlyCollection<ICustomTypeResolver> _customTypeResolvers;
-        
+
         private const BindingFlags ALL_FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
         private const BindingFlags ALL_FLAGS_WITH_INHERITED = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
         private const MemberTypes ALL_MEMBERS = MemberTypes.Field | MemberTypes.Method | MemberTypes.Property;
@@ -292,23 +294,59 @@ namespace Rhinox.Lightspeed.Reflection
             return false;
         }
         
-        public static Type FindTypeExtensively(ref string assemblyQualifiedName, bool throwOnError = false)
+        public static Type FindTypeExtensively(ref string assemblyName, ref string typeName, bool throwOnError = false)
         {
-            if (string.IsNullOrWhiteSpace(assemblyQualifiedName))
+            if (string.IsNullOrWhiteSpace(assemblyName) || string.IsNullOrWhiteSpace(typeName))
                 return null;
-            
-            var type = Type.GetType(assemblyQualifiedName);
-            if (type != null) return type;
+
+            string assemblyNameCopy = assemblyName;
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName == assemblyNameCopy);
+            if (assembly != null)
+            {
+                var type = assembly.GetType(typeName, throwOnError);
+                if (type != null) 
+                    return type;
+            }
 
             if (_customTypeResolvers == null)
                 FindCustomTypeResolvers(ref _customTypeResolvers);
             
             // If type is not found, try the GetType overload with an assemblyResolver
-            type = Type.GetType(assemblyQualifiedName, DefaultAssemblyResolver, DefaultTypeResolver, throwOnError);
+            assembly = FindAssembly(assemblyName, typeName);
+            if (assembly == null)
+            {
+                return null;
+            }
 
+            Type customResolvedType = DefaultTypeResolver(assembly, typeName, false);
+            if (customResolvedType != null) // update the assemblyQualifiedName
+            {
+                typeName = customResolvedType.FullName;
+                assemblyName = customResolvedType.Assembly.GetName().Name;
+            }
+
+            if (throwOnError && customResolvedType == null)
+                throw new FileNotFoundException($"Could not find type for {typeName}, {assemblyName}");
+            
+            return customResolvedType;
+        }
+        
+        public static Type FindTypeExtensively(ref string assemblyQualifiedName, bool throwOnError = false)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyQualifiedName))
+                return null;
+            
+            var type = Type.GetType(assemblyQualifiedName, false);
+            if (type != null) 
+                return type;
+
+            var qualifiedName = new AssemblyQualifiedName(assemblyQualifiedName);
+            qualifiedName.ValidateAndUpdate();
+
+            type = Type.GetType(qualifiedName.ToString(), throwOnError);
             if (type != null) // update the assemblyQualifiedName
-                assemblyQualifiedName = type.AssemblyQualifiedName;
-
+                assemblyQualifiedName = type.AssemblyQualifiedName;            
+            
             return type;
         }
 
@@ -325,31 +363,49 @@ namespace Rhinox.Lightspeed.Reflection
             customTypeResolvers = list;
         }
 
-        private static Assembly DefaultAssemblyResolver(AssemblyName assemblyName)
+        private static Assembly FindAssembly(string assemblyName, string typeName)
         {
+            if (_customTypeResolvers != null)
+            {
+                string searchTypeName = typeName;
+                if (typeName.EndsWith("[]"))
+                    searchTypeName = typeName.Substring(0, typeName.Length - 2);
+                foreach (var assemblyResolver in _customTypeResolvers)
+                {
+                    if (assemblyResolver.CheckForAssembly(assemblyName, searchTypeName, out Assembly assembly))
+                        return assembly;
+                }
+            }
+            
             // Returns the assembly of the type by enumerating loaded assemblies in the app domain
             foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (a.FullName == assemblyName.FullName)
+                if (a.FullName == assemblyName)
                     return a;
             }
             return null;
         }
 
-        private static Type DefaultTypeResolver(Assembly assembly, string name, bool ignoreCase)
+        private static Type DefaultTypeResolver(Assembly assembly, string typeName, bool ignoreCase)
         {
             var comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
 
+            var queryTypeName = typeName;
+            bool isArrayType = typeName.EndsWith("[]");
+            if (isArrayType)
+                queryTypeName = queryTypeName.Substring(0, queryTypeName.Length - 2);
+                
+            
             // First check the given assembly; might just be in there
-            if (TryFindTypeInAssembly(assembly, name, comparison, out Type type))
-                return type;
+            if (TryFindTypeInAssembly(assembly, queryTypeName, comparison, out Type type))
+                return isArrayType ? type.MakeArrayType() : type;
 
             if (_customTypeResolvers != null)
             {
                 foreach (var typeResolver in _customTypeResolvers)
                 {
-                    if (typeResolver.CheckForType(name, out Type customType))
-                        return customType;
+                    if (typeResolver.CheckForType(queryTypeName, out Type customType))
+                        return isArrayType ? customType.MakeArrayType() : customType;
                 }
             }
             
@@ -358,8 +414,8 @@ namespace Rhinox.Lightspeed.Reflection
             {
                 if (a == assembly) continue; // already handled this
 
-                if (TryFindTypeInAssembly(a, name, comparison, out type))
-                    return type;
+                if (TryFindTypeInAssembly(a, queryTypeName, comparison, out type))
+                    return isArrayType ? type.MakeArrayType() : type;
             }
 
             return null;
@@ -626,6 +682,13 @@ namespace Rhinox.Lightspeed.Reflection
         {
             TryGetAncestryDistance(parent, baseType, out int ancestry);
             return ancestry;
+        }
+
+        public static string SanitizeAssemblyQualifiedName(string text)
+        {
+            var qualifiedName = new AssemblyQualifiedName(text);
+            qualifiedName.ValidateAndUpdate();
+            return qualifiedName.ToString();
         }
     }
 }
