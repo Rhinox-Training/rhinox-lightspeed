@@ -38,6 +38,22 @@ namespace Rhinox.Lightspeed.Reflection
             foundType = _refactoredTypesAttributes.GetOrDefault(typeName);
             return foundType != null;
         }
+
+        public bool CheckForAssembly(string assemblyName, string typeName, out Assembly assembly)
+        {
+            assembly = null;
+            // Returns the assembly of the type by enumerating loaded assemblies in the app domain
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (a.FullName == assemblyName)
+                {
+                    assembly = a;
+                    break;
+                }
+            }
+
+            return assembly != null;
+        }
     }
 }
 #endif
