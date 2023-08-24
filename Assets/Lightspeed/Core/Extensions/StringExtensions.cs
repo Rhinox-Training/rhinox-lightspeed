@@ -245,5 +245,16 @@ namespace Rhinox.Lightspeed
                 return s2 == null;
             return s1.Equals(s2, StringComparison.InvariantCultureIgnoreCase);
         }
+        
+        public static bool CaseInvariantEqualsOneOf(this string first, params string[] others)
+        {
+            for (var i = 0; i < others.Length; i++)
+            {
+                if (first.Equals(others[i], StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

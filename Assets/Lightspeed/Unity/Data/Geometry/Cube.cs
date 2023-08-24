@@ -25,10 +25,15 @@ namespace Rhinox.Lightspeed
         public static Cube FromTransformBounds(Transform t, Bounds bounds)
         {
             var center = t.TransformPoint(bounds.center);
-            var forward = Vector3.Scale(t.forward, bounds.extents);
-            var up = Vector3.Scale(t.up, bounds.extents);
-            var right = Vector3.Scale(t.right, bounds.extents);
-            
+            var right = t.TransformVector(new Vector3(bounds.extents.x, 0, 0));
+            var up = t.TransformVector(new Vector3(0, bounds.extents.y, 0));
+            var forward = t.TransformVector(new Vector3(0, 0, bounds.extents.z));
+            //
+            // var forward = Vector3.Scale(t.forward, bounds.extents);
+            // var forward = t.forward * bounds.extents.z;
+            // var up = Vector3.Scale(t.up, bounds.extents);
+            // var right = Vector3.Scale(t.right, bounds.extents);
+            //
             return new Cube(center, forward, up, right);
         }
 
@@ -36,9 +41,19 @@ namespace Rhinox.Lightspeed
 
         public static Cube FromGameObject(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBounds());
 
-        public static Cube ToScreenSpace(GameObject go, Camera cam)
+        public static IConvex ToScreenSpace(GameObject go, Camera cam)
         {
             return FromRenderers(go).ToScreenSpace(cam);
+        }
+        
+        public static IConvex ToScreenSpace3D(GameObject go, Camera cam)
+        {
+            return FromRenderers(go).ToScreenSpace3D(cam);
+        }
+        
+        public static IConvex ToViewSpace(GameObject go, Camera cam)
+        {
+            return FromRenderers(go).ToViewSpace(cam);
         }
 
         private Cube(Vector3 center, Vector3 forward, Vector3 up, Vector3 right)
@@ -72,10 +87,27 @@ namespace Rhinox.Lightspeed
             Center = Vertices.GetAverage();
         }
 
-        public Cube ToScreenSpace(Camera cam)
+        public IConvex ToScreenSpace(Camera cam)
+        {
+            var verts = Vertices.Select(x =>
+            {
+                var screenPoint = cam.WorldToScreenPoint(x);
+                return new Vector2(screenPoint.x, screenPoint.y);
+            }).ToArray();
+            return new Square(verts);
+        }
+        
+        public IConvex ToScreenSpace3D(Camera cam)
         {
             var axes = Axes.Select(x => cam.transform.InverseTransformDirection(x)).ToArray();
             var verts = Vertices.Select(x => cam.WorldToScreenPoint(x)).ToArray();
+            return new Cube(axes, verts);
+        }
+        
+        public IConvex ToViewSpace(Camera cam)
+        {
+            var axes = Axes.Select(x => cam.transform.InverseTransformDirection(x)).ToArray();
+            var verts = Vertices.Select(x => cam.transform.InverseTransformPoint(x)).ToArray();
             return new Cube(axes, verts);
         }
 
