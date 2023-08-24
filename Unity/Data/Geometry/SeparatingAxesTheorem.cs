@@ -10,6 +10,7 @@ namespace Rhinox.Lightspeed
             public Vector3 Axis;
             public Overlap Overlap;
             public float Distance => Overlap.Amount;
+            public bool HasOverlap => Overlap.HasOverlap;
         }
 
         public class Overlap
@@ -22,6 +23,8 @@ namespace Rhinox.Lightspeed
             public Vector3 B;
 
             public float Amount => End - Begin;
+
+            public bool HasOverlap => Amount > 0.0f;
         }
 
         private static List<Vector3> GetAllAxes(IConvex a, IConvex b)
@@ -171,13 +174,13 @@ namespace Rhinox.Lightspeed
         {
             if (aMin < bMin)
             {
-                if (aMax < bMin)
-                    return new Overlap
-                    {
-                        Begin = bMin,
-                        End = aMax,
-                        Inverted = true
-                    };
+                // if (aMax < bMin)
+                //     return new Overlap
+                //     {
+                //         Begin = bMin,
+                //         End = aMax,
+                //         Inverted = true
+                //     };
 
                 return new Overlap
                 {
@@ -187,13 +190,13 @@ namespace Rhinox.Lightspeed
                 };
             }
 
-            if (bMax < aMin)
-                return new Overlap
-                {
-                    Begin = aMin,
-                    End = bMax,
-                    Inverted = false
-                };
+            // if (bMax < aMin)
+            //     return new Overlap
+            //     {
+            //         Begin = aMin,
+            //         End = bMax,
+            //         Inverted = false
+            //     };
 
             return new Overlap
             {
