@@ -21,6 +21,21 @@ namespace Rhinox.Lightspeed
         {
             return new Cube(center, forward, up, right);
         }
+
+        public static Cube FromBounds(Bounds bounds)
+        {
+            var center = bounds.center;
+            var right = new Vector3(bounds.extents.x, 0, 0);
+            var up = new Vector3(0, bounds.extents.y, 0);
+            var forward = new Vector3(0, 0, bounds.extents.z);
+            //
+            // var forward = Vector3.Scale(t.forward, bounds.extents);
+            // var forward = t.forward * bounds.extents.z;
+            // var up = Vector3.Scale(t.up, bounds.extents);
+            // var right = Vector3.Scale(t.right, bounds.extents);
+            //
+            return new Cube(center, forward, up, right);
+        }
         
         public static Cube FromTransformBounds(Transform t, Bounds bounds)
         {
@@ -37,7 +52,7 @@ namespace Rhinox.Lightspeed
             return new Cube(center, forward, up, right);
         }
 
-        public static Cube FromRenderers(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBounds(colliders: Array.Empty<Collider>()));
+        public static Cube FromRenderers(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBoundsFromRenderers());
 
         public static Cube FromGameObject(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBounds());
 
