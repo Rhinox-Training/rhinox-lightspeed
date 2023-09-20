@@ -6,10 +6,12 @@ namespace Rhinox.Lightspeed
     public sealed class RefactoringOldNamespaceAttribute : Attribute
     {
         public string PreviousNamespace { get; }
+        public string PreviousAssembly { get; }
         
-        public RefactoringOldNamespaceAttribute(string namespaceString)
+        public RefactoringOldNamespaceAttribute(string namespaceString, string previousAssemblyString = null)
         {
             PreviousNamespace = namespaceString;
+            PreviousAssembly = previousAssemblyString;
         }
     }
 }

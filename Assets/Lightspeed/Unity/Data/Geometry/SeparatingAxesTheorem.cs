@@ -83,7 +83,6 @@ namespace Rhinox.Lightspeed
             var aVerts = a.GetVertices();
             var bVerts = b.GetVertices();
 
-            float minOverlap = 0;
             penetrations = new List<Penetration>();
 
             foreach (Vector3 axis in axes)

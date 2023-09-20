@@ -39,14 +39,7 @@ namespace Rhinox.Lightspeed
             return rect;
         }
 
-        public static Rect AlignRight(this Rect rect, float width)
-        {
-            rect.x = rect.x + rect.width - width;
-            rect.width = width;
-            return rect;
-        }
-
-        public static Rect AlignRight(this Rect rect, float width, bool clamp)
+        public static Rect AlignRight(this Rect rect, float width, bool clamp = false)
         {
             if (clamp)
             {
@@ -57,6 +50,19 @@ namespace Rhinox.Lightspeed
             rect.x = rect.x + rect.width - width;
             rect.width = width;
             return rect;
+        }
+
+        public static Rect AlignRightForText(this Rect rect, string text, GUIStyle style, float padding = 4.0f)
+        {
+            float x = style.CalcSize(new GUIContent(text)).x;
+            Rect alignedRect = rect.AlignRight(x + padding, true);
+            return alignedRect;
+        }
+
+        public static Rect AlignRightBefore(this Rect rect, float width, Rect otherRect, bool clamp = false)
+        {
+            var r = rect.AddX(otherRect.xMin - rect.xMax);
+            return r.AlignRight(width);
         }
         
         public static Rect AlignTop(this Rect rect, float height)
@@ -70,6 +76,32 @@ namespace Rhinox.Lightspeed
             rect.y = rect.y + rect.height - height;
             rect.height = height;
             return rect;
+        }
+        
+        public static Rect MoveDownLine(this Rect rect, int lineCount = 1, float padding = 2.0f, float lineHeight = 18f)
+        {
+            return rect.AddY(lineCount * padding + lineCount * lineHeight);
+        }
+
+        public static void SplitX(this Rect rect, float width, out Rect left, out Rect right)
+        {
+            float rightWidth = rect.width - width;
+            left = rect.AlignLeft(width);
+            right = rect.AlignRight(rightWidth);
+        }
+
+        public static void SplitX(this Rect rect, float width1, float width2, out Rect left, out Rect middle, out Rect right)
+        {
+            rect.SplitX(width1, out left, out Rect overflow);
+            float offset = width2 - width1;
+            overflow.SplitX(offset, out middle, out right);
+        }
+
+        public static void SplitY(this Rect rect, float height, out Rect top, out Rect bottom)
+        {
+            float bottomHeight = rect.height - height;
+            top = rect.AlignTop(height);
+            bottom = rect.AlignBottom(bottomHeight);
         }
         
         public static Rect SetX(this Rect rect, float x)
