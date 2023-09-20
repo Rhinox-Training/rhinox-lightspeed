@@ -244,7 +244,7 @@ namespace Rhinox.Lightspeed
             var newPos = Vector3.SmoothDamp(t.position, pos, ref velocity, deltaT, maxSpeed, Time.deltaTime);
             t.position = newPos;
         }
-
+        
         public static void RotateAround(this Transform t, Vector3 point, Quaternion rotation)
         {
             if (rotation == Quaternion.identity)
