@@ -210,6 +210,18 @@ namespace Rhinox.Lightspeed
 			return default(Bounds);
 		}
 		
+		public static Bounds GetObjectLocalBoundsFromRenderers(this GameObject go, bool calculateUsingVerts = false, Renderer[] renderers = null)
+		{
+			if (renderers == null) renderers = go.GetComponentsInChildren<Renderer>();
+			if (renderers.Any())
+			{
+				var bounds = renderers.GetCombinedLocalBounds(go.transform, calculateUsingVerts);
+				return bounds;
+			}
+
+			return default(Bounds);
+		}
+		
 		public static Bounds GetObjectLocalBounds(this GameObject go, bool calculateUsingVerts = false, Renderer[] renderers = null, Collider[] colliders = null)
 		{
 			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
@@ -270,7 +282,7 @@ namespace Rhinox.Lightspeed
 			return b.GetCornersTransformed(matrix);
 		}
 
-		public static Vector3[]  GetLocalBounds(this Collider collider, Transform axis)
+		public static Vector3[] GetLocalBounds(this Collider collider, Transform axis)
 		{
 			var matrix = axis.worldToLocalMatrix;
 			var b = collider.bounds; // World space
@@ -349,10 +361,15 @@ namespace Rhinox.Lightspeed
 			return b;
 		}
 		
+		/// <summary>
+		/// Note: this may be altered due to rotation
+		/// Colliders do not provide a way of getting their axis aligned bounds
+		/// So rotation may scew the actual size of what you receive here
+		/// </summary>
 		public static Bounds GetCombinedLocalBounds(this ICollection<Collider> colliders, Transform axis)
 		{
 			if (colliders.Count == 0) return default(Bounds);
-			
+
 			var corners = colliders.ElementAt(0).GetLocalBounds(axis);
 			var b = new Bounds(corners[0], Vector3.zero);
 			foreach (var corner in corners)
