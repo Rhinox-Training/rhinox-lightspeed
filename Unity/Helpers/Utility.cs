@@ -5,9 +5,6 @@ using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Reflection;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Component = UnityEngine.Component;
@@ -395,64 +392,5 @@ namespace Rhinox.Lightspeed
             }
             return _runtimeVersion;
         }
-        
-#if UNITY_EDITOR
-        public static GameObject CopyGameObject(GameObject src, HideFlags hideFlags, params Type[] componentTypes)
-        {
-            var dict = new Dictionary<GameObject, GameObject>();
-            var queue = new Queue<GameObject>();
-            queue.Enqueue(src);
-            while (queue.Count > 0)
-            {
-                var cur = queue.Dequeue();
-                if (cur == null)
-                    continue;
-                
-                GameObject go = new GameObject(cur.name + "(Copy)");
-                
-                var curParent = cur.transform.parent;
-                if (curParent != null && dict.ContainsKey(curParent.gameObject))
-                {
-                    go.transform.parent = dict[curParent.gameObject].transform;
-                }
-                
-                go.transform.localPosition = cur.transform.localPosition;
-                go.transform.localRotation = cur.transform.localRotation;
-                go.transform.localScale = cur.transform.localScale;
-                
-                dict.Add(cur, go);
-
-                foreach (Transform child in cur.transform)
-                {
-                    queue.Enqueue(child.gameObject);
-                }
-            }
-
-            var componentCache = new List<Component>();
-            foreach (var entry in dict)
-            {
-                entry.Key.GetComponents(componentCache);
-                if (componentTypes != null && componentTypes.Length > 0)
-                {
-                    componentCache.RemoveAll(x => !componentTypes.Contains(x.GetType()));
-                }
-
-                foreach (var component in componentCache)
-                {
-                    var copyComponent = entry.Value.AddComponent(component.GetType());
-                    EditorUtility.CopySerialized(component, copyComponent);
-                }
-            }
-
-            var result = dict[src];
-            result.hideFlags = hideFlags;
-            return result;
-        }
-
-        public static GameObject CopyGameObject(GameObject src, params Type[] componentTypes)
-        {
-            return CopyGameObject(src, HideFlags.None, componentTypes);
-        }
-#endif
     }
 }
