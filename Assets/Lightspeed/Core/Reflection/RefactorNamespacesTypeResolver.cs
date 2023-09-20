@@ -8,7 +8,7 @@ namespace Rhinox.Lightspeed.Reflection
     public class RefactorNamespacesTypeResolver : ICustomTypeResolver
     {
         private static Dictionary<string, Type> _refactoredTypesAttributes;
-        private Dictionary<string, Assembly> _refactoredAssemblies;
+        private static  Dictionary<string, Assembly> _refactoredAssemblies;
         
         public bool CheckForType(string typeName, out Type foundType)
         {
@@ -23,7 +23,6 @@ namespace Rhinox.Lightspeed.Reflection
                         {
                             var attr = type.GetCustomAttribute<RefactoringOldNamespaceAttribute>();
                             string oldName = $"{attr.PreviousNamespace}.{type.Name}";
-                            string newName = type.FullName;
                             _refactoredTypesAttributes.Add(oldName, type);
                         }
                     }
@@ -49,14 +48,10 @@ namespace Rhinox.Lightspeed.Reflection
                             if (string.IsNullOrWhiteSpace(attr.PreviousAssembly))
                                 continue;
 
-                            // if (assemblyName == attr.PreviousAssembly &&
-                            //     typeName == GetTypeName(attr, type))
-                            {
-                                string key = $"{attr.PreviousAssembly}--{GetTypeName(attr, type)}";
-                                if (_refactoredAssemblies.ContainsKey(attr.PreviousAssembly))
-                                    continue;
-                                _refactoredAssemblies.Add(key, potentialAssembly);
-                            }
+                            string key = $"{attr.PreviousAssembly}--{GetTypeName(attr, type)}";
+                            if (_refactoredAssemblies.ContainsKey(attr.PreviousAssembly))
+                                continue;
+                            _refactoredAssemblies.Add(key, potentialAssembly);
                         }
                     }
                 }
