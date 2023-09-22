@@ -159,7 +159,34 @@ namespace Rhinox.Lightspeed.Reflection
                 type = type.BaseType;
             }
         }
-        
+
+        public static IEnumerable<PropertyInfo> GetAllProperties(Type type, Type lowestBase = null)
+        {
+            if (lowestBase == null)
+                lowestBase = typeof(object);
+
+            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (var propertyInfo in type.GetProperties(flags))
+            {
+                if (propertyInfo.DeclaringType != type)
+                    continue;
+                yield return propertyInfo;
+            }
+
+            type = type.BaseType;
+            while (type != null && type != lowestBase)
+            {
+                foreach (var propertyInfo in type.GetProperties(flags))
+                {
+                    if (propertyInfo.DeclaringType != type)
+                        continue;
+                    yield return propertyInfo;
+                }
+
+                type = type.BaseType;
+            }
+        }
+
         /// <summary>
         /// Gets a list of all types that return true for the given delegate.
         /// </summary>
