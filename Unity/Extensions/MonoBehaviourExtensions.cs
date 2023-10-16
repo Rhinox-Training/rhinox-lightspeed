@@ -174,16 +174,32 @@ namespace Rhinox.Lightspeed
 			return c.gameObject.GetOrAddComponent<T>(findInChildren);
 		}
 
+		public static T GetOrAddComponent<T>(this Component c, out bool created, bool findInChildren = false) where T : Component
+		{
+			return c.gameObject.GetOrAddComponent<T>(out created, findInChildren);
+		}
+
 		public static T GetOrAddComponent<T>(this GameObject obj, bool findInChildren = false) where T : Component
 		{
+			return GetOrAddComponent<T>(obj, out _, findInChildren);
+		}
+
+		public static T GetOrAddComponent<T>(this GameObject obj, out bool created, bool findInChildren = false) where T : Component
+		{
+			
 			var c = findInChildren ? obj.GetComponentInChildren<T>() : obj.GetComponent<T>();
 
 			if (c == null)
+			{
+				created = true;
 				c = obj.AddComponent<T>() as T;
+			}
+			else
+				created = false;
 
 			return c;
 		}
-		
+
 		public static bool TryGetComponentInParent<T>(this Behaviour b, out T result)
 		{
 			result = b.GetComponentInParent<T>();
