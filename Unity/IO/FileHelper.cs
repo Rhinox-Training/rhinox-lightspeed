@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Rhinox.Lightspeed;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -46,142 +47,112 @@ namespace Rhinox.Lightspeed.IO
         public static bool Exists(string path)
         {
             if (IsFileUrl(path))
-            {
                 return ExecuteSynchronousWebRequest(path, suppressLog: true) != null;
-                // var www = UnityWebRequest.Get(path);
-                // www.timeout = 10;
-                // www.SendWebRequest();
-                // while (!www.isDone) {}
-                // return !(www.isNetworkError || www.isHttpError);
-            }
             return File.Exists(path);
         }
         
-        public static string ReadAllText(string path, int timeOut = 10)
+        public static string ReadAllText(string path, int timeOut = 10, bool suppressLog = false)
         {
-            if (IsFileUrl(path))
+            if (!IsFileUrl(path))
+                return File.ReadAllText(path);
+            
+            var response = ExecuteSynchronousWebRequest(path, timeOut);
+            if (response == null)
             {
-                var response = ExecuteSynchronousWebRequest(path, timeOut);
-                if (response == null)
-                {
+                if (!suppressLog)
                     Debug.LogError($"File at {path} failed to load...");
-                    return null;
-                }
-                return response.text;
+                return null;
             }
-            return File.ReadAllText(path);
+            return response.text;
 
         }
     
-        public static byte[] ReadAllBytes(string path, int timeOut = 10)
+        public static byte[] ReadAllBytes(string path, int timeOut = 10, bool suppressLog = false)
         {
-            if (IsFileUrl(path))
+            if (!IsFileUrl(path))
+                return File.ReadAllBytes(path);
+            
+            var response = ExecuteSynchronousWebRequest(path, timeOut);
+            if (response == null)
             {
-                var response = ExecuteSynchronousWebRequest(path, timeOut);
-                if (response == null)
-                {
+                if (!suppressLog)
                     Debug.LogError($"File at {path} failed to load...");
-                    return Array.Empty<byte>();
-                }
-                return response.data;
+                return Array.Empty<byte>();
             }
-            return File.ReadAllBytes(path);
+            return response.data;
 
         }
 
-        public static string[] ReadAllLines(string path, int timeOut = 10)
+        public static string[] ReadAllLines(string path, int timeOut = 10, bool suppressLog = false)
         {
-            if (IsFileUrl(path))
+            if (!IsFileUrl(path))
+                return File.ReadAllLines(path);
+            
+            var response = ExecuteSynchronousWebRequest(path, timeOut);
+            if (response == null)
             {
-                var response = ExecuteSynchronousWebRequest(path, timeOut);
-                if (response == null)
-                {
+                if (!suppressLog)
                     Debug.LogError($"File at {path} failed to load...");
-                    return Array.Empty<string>();
-                }
-                
-                var reader = new StringReader(response.text);
-                var list = new List<string>();
-                while (reader.Peek() >= 0)
-                {
-                    list.Add(reader.ReadLine());
-                }
-			    return list.ToArray();
+                return Array.Empty<string>();
             }
-            return File.ReadAllLines(path);
+                
+            var reader = new StringReader(response.text);
+            var list = new List<string>();
+            while (reader.Peek() >= 0)
+            {
+                list.Add(reader.ReadLine());
+            }
+            return list.ToArray();
 
         }
         
-        public static IEnumerator ReadAllBytesAsync(string filePath, Action<string, byte[]> callback)
+        public static async Task<byte[]> ReadAllBytesAsync(string filePath, int timeOut = 10, bool suppressLog = false)
         {
             byte[] data = null;
+            
             // Check if we should use UnityWebRequest or File.ReadAllBytes
-            if (filePath.Contains("://") || filePath.Contains(":///"))
+            if (filePath.Contains("://"))
             {
                 UnityWebRequest www = UnityWebRequest.Get(filePath);
-                www.timeout = 10;
-                yield return www.SendWebRequest();
+                www.timeout = timeOut;
+                await www.SendWebRequest();
 
                 if (www.IsRequestValid(out string error))
                     data = www.downloadHandler.data;
-                else
-                {
+                else if (!suppressLog)
                     Debug.LogError(error);
-                    data = null;
-                }
             }
             else
-            {
-                data = File.ReadAllBytes(filePath);
-            }
+                data = await File.ReadAllBytesAsync(filePath);
 
-            if (data == null)
-            {
+            if (data == null && !suppressLog)
                 Debug.LogError("File not found");
-                yield break;
-            }
 
-            callback?.Invoke(filePath, data);
+            return data;
         }
         
-        public static IEnumerator ReadAllLinesAsync(string filePath, Action<string, string[]> callback)
+        public static async Task<string[]> ReadAllLinesAsync(string filePath, int timeOut = 10, bool suppressLog = false)
         {
             string[] data = null;
             // Check if we should use UnityWebRequest or File.ReadAllBytes
-            if (filePath.Contains("://") || filePath.Contains(":///"))
+            if (filePath.Contains("://"))
             {
                 UnityWebRequest www = UnityWebRequest.Get(filePath);
-                www.timeout = 10;
-                yield return www.SendWebRequest();
+                www.timeout = timeOut;
+                await www.SendWebRequest();
 
                 if (www.IsRequestValid(out string error))
-                {
-                    var reader = new StringReader(www.downloadHandler.text);
-                    var list = new List<string>();
-                    while (reader.Peek() >= 0)
-                    {
-                        list.Add(reader.ReadLine());
-                    }
-                    data = list.ToArray();
-                }
-                else
-                {
-                    Debug.LogError($"Network error: {filePath} - {www.error}");
-                    data = null;
-                }
+                    data = www.downloadHandler.text.SplitLines();
+                else if (!suppressLog)
+                    Debug.LogError($"Network error: {filePath} - {error}");
             }
             else
-            {
-                data = File.ReadAllLines(filePath);
-            }
+                data = await File.ReadAllLinesAsync(filePath);
 
-            if (data == null)
-            {
+            if (data == null && !suppressLog)
                 Debug.LogError("File not found");
-                yield break;
-            }
 
-            callback?.Invoke(filePath, data);
+            return data;
         }
 
         private static DownloadHandler ExecuteSynchronousWebRequest(string path, int timeOut = 10, bool suppressLog = false)
@@ -196,11 +167,9 @@ namespace Rhinox.Lightspeed.IO
 
             if (www.IsRequestValid(out string error))
                 return www.downloadHandler;
-            
-            if (!suppressLog)
+            else if (!suppressLog)
                 Debug.LogError(error);
             return null;
-
         }
         
         public static void CreateOrCleanDirectory(string dir)
@@ -233,8 +202,8 @@ namespace Rhinox.Lightspeed.IO
             }
             catch (ArgumentException)
             {
-                UnityEngine.Debug.Log("CopyDirectoryRecursive: Pattern '" + regExExcludeFilter +
-                                      "' is not a correct Regular Expression. Not excluding any files.");
+                Debug.Log("CopyDirectoryRecursive: Pattern '" + regExExcludeFilter +
+                          "' is not a correct Regular Expression. Not excluding any files.");
                 return;
             }
 
@@ -268,11 +237,11 @@ namespace Rhinox.Lightspeed.IO
             {
                 foreach (string subdirectorypath in Directory.GetDirectories(sourceDir))
                 {
-                    if (filtercallback(subdirectorypath))
-                    {
-                        string directoryName = Path.GetFileName(subdirectorypath);
-                        CopyDirectoryFiltered(Path.Combine(sourceDir, directoryName), Path.Combine(targetDir, directoryName), overwrite, filtercallback, recursive);
-                    }
+                    if (!filtercallback(subdirectorypath))
+                        continue;
+                    
+                    string directoryName = Path.GetFileName(subdirectorypath);
+                    CopyDirectoryFiltered(Path.Combine(sourceDir, directoryName), Path.Combine(targetDir, directoryName), overwrite, filtercallback, recursive);
                 }
             }
         }

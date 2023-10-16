@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed.IO
@@ -25,19 +26,17 @@ namespace Rhinox.Lightspeed.IO
             public string Key;
         }
 
-        public static IEnumerator ReadAsync(string iniPath, Action<IIniReader> callback)
+        public static async Task ReadAsync(string iniPath, Action<IIniReader> callback)
         {
-            return (FileHelper.ReadAllLinesAsync(iniPath,(p, data) =>
+            var data = await FileHelper.ReadAllLinesAsync(iniPath);
+            IniParser parser = null;
+            if (data != null)
             {
-                IniParser parser = null;
-                if (data != null)
-                {
-                    parser = new IniParser(iniPath);
-                    parser.LoadData(data);
-                }
-                
-                callback?.Invoke(parser);
-            }));
+                parser = new IniParser(iniPath);
+                parser.LoadData(data);
+            }
+            
+            callback?.Invoke(parser);
         }
 
         public static IniParser Open(string iniPath, bool createIfNotExists)
