@@ -142,6 +142,10 @@ namespace Rhinox.Lightspeed
 
         protected virtual void HandleAfterDeserialize()
         {
+#if UNITY_EDITOR
+            // Unsubscribe so we do not get spammed
+            EditorApplication.update -= HandleAfterDeserialize;
+#endif
             // No data to recover from
             if (string.IsNullOrEmpty(scenePath) && string.IsNullOrEmpty(sceneGuid))
                 return;
@@ -163,6 +167,7 @@ namespace Rhinox.Lightspeed
                 scenePath = string.Empty;
                 sceneGuid = string.Empty;
             }
+
         }
 #endif
 
