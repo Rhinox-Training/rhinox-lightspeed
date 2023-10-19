@@ -123,7 +123,13 @@ namespace Rhinox.Lightspeed.IO
                     Debug.LogError(error);
             }
             else
+            {
+#if !UNITY_2021_1_OR_NEWER
+                data = File.ReadAllBytes(filePath);
+#else
                 data = await File.ReadAllBytesAsync(filePath);
+#endif
+            }
 
             if (data == null && !suppressLog)
                 Debug.LogError("File not found");
@@ -147,7 +153,13 @@ namespace Rhinox.Lightspeed.IO
                     Debug.LogError($"Network error: {filePath} - {error}");
             }
             else
+            {
+#if !UNITY_2021_1_OR_NEWER
+                data = File.ReadAllLines(filePath);
+#else
                 data = await File.ReadAllLinesAsync(filePath);
+#endif
+            }
 
             if (data == null && !suppressLog)
                 Debug.LogError("File not found");
