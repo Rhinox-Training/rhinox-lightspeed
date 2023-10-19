@@ -29,5 +29,13 @@ namespace Rhinox.Lightspeed
             array = _resizeArrayParameters[0];
             return array;
         }
+
+        public static T[] JoinArrays<T>(T[] arr1, T[] arr2)
+        {
+            var resultArr = new T[arr1.Length + arr2.Length];
+            arr1.CopyTo(resultArr, 0);
+            arr2.CopyTo(resultArr, arr1.Length);
+            return resultArr;
+        }
     }
 }
