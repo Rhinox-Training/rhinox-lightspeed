@@ -18,9 +18,6 @@ namespace Rhinox.Lightspeed
             public float Begin;
             public float End;
             public bool Inverted;
-            
-            public Vector3 A;
-            public Vector3 B;
 
             public float Amount => End - Begin;
 
@@ -98,8 +95,6 @@ namespace Rhinox.Lightspeed
                 
                 if (overlap.Amount > 0)
                 {
-                    // var dir = 
-                    // Debug.DrawLine();
                     penetrations.Add(new Penetration
                     {
                         Axis = axis,
@@ -151,36 +146,31 @@ namespace Rhinox.Lightspeed
                 }
             }
 
-            var overlap = FindOverlap(aProjMin, aProjMax, bProjMin, bProjMax);
-            if (overlap != null)
-            {
-                if (overlap.Inverted)
-                {
-                    overlap.A = bVerts[bMinIndex];
-                    overlap.B = aVerts[aMaxIndex];
-                }
-                else
-                {
-                    overlap.A = aVerts[aMinIndex];
-                    overlap.B = bVerts[bMaxIndex];
-                }
-            }
-
-            return overlap;
+            return FindOverlap(aProjMin, aProjMax, bProjMin, bProjMax);
         }
 
         private static Overlap FindOverlap(float aMin, float aMax, float bMin, float bMax)
         {
+            // Possible Cases
+            // 1.  a- a+ b- b+ 
+            // 2.  a- b- a+ b+
+            // 3.  a- b- b+ a+
+            // 4.  b- a- b+ a+
+            // 5.  b- b+ a- a+
+            // 6.  b- a- a+ b+
+            
             if (aMin < bMin)
             {
-                // if (aMax < bMin)
-                //     return new Overlap
-                //     {
-                //         Begin = bMin,
-                //         End = aMax,
-                //         Inverted = true
-                //     };
+                // 3
+                if (aMax > bMax)
+                    return new Overlap
+                    {
+                        Begin = bMin,
+                        End = bMax,
+                        Inverted = true
+                    };
 
+                // 1, 2
                 return new Overlap
                 {
                     Begin = bMin,
@@ -188,15 +178,17 @@ namespace Rhinox.Lightspeed
                     Inverted = true
                 };
             }
+            
+            // 6
+            if (aMax < bMax)
+                return new Overlap
+                {
+                    Begin = aMin,
+                    End = aMax,
+                    Inverted = false
+                };
 
-            // if (bMax < aMin)
-            //     return new Overlap
-            //     {
-            //         Begin = aMin,
-            //         End = bMax,
-            //         Inverted = false
-            //     };
-
+            // 4, 5
             return new Overlap
             {
                 Begin = aMin,
