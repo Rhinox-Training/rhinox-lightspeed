@@ -110,6 +110,28 @@ namespace Rhinox.Lightspeed
 
             return childComponents.ToArray();
         }
+
+        public static GameObject AddChild(this GameObject go, string name = null)
+        {
+            var childGo = new GameObject();
+            if (name != null)
+                childGo.name = name;
+            childGo.transform.SetParent(go.transform, false);
+            return childGo;
+        }
+        
+        public static GameObject AddChild(this GameObject go, string name, params Type[] componentTypes)
+        {
+            var childGo = new GameObject(name ?? "New GameObject", componentTypes);
+            childGo.transform.SetParent(go.transform, false);
+            return childGo;
+        }
+
+        public static T AddChildWithComponent<T>(this GameObject go, string name = null) where T : Component
+        {
+            var childGo = AddChild(go, name, typeof(T));
+            return childGo.GetComponent<T>();
+        }
         
         public static T AddComponent<T>(this GameObject go, T compToCopy) where T : Component
         {
