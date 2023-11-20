@@ -112,6 +112,62 @@ namespace Rhinox.Lightspeed
             return str.Remove(startI, oldValue.Length).Insert(startI, newValue);
         }
         
+        public static int CountSubstring(this string text, string value)
+        {                  
+            int count = 0, minIndex = text.IndexOf(value, 0, StringComparison.InvariantCulture);
+            while (minIndex != -1)
+            {
+                minIndex = text.IndexOf(value, minIndex + value.Length, StringComparison.InvariantCulture);
+                ++count;
+            }
+            return count;
+        }
+        
+        public static int CountAnySubstring(this string text, ICollection<string> options)
+        {
+            string curVal;
+            int count = 0, minIndex = text.FindClosestIndex(0, options, out curVal);
+            while (minIndex != -1)
+            {
+                minIndex = text.FindClosestIndex(minIndex + curVal.Length, options, out curVal);
+                ++count;
+            }
+            return count;
+        }
+
+        public static int FindClosestIndex(this string text, int startIndex, ICollection<string> options, out string option)
+        {
+            if (text == null)
+            {
+                option = string.Empty;
+                return -1;
+            }
+
+            int minIndex = text.Length;
+            option = string.Empty;
+            foreach (var value in options)
+            {
+                int testIndex = text.IndexOf(value, startIndex, StringComparison.InvariantCulture);
+                if (testIndex == -1)
+                    testIndex = text.Length;
+
+                if (testIndex < minIndex)
+                {
+                    minIndex = testIndex;
+                    option = value;
+                }
+            }
+
+            if (minIndex == text.Length)
+                return -1;
+            return minIndex;
+        }
+
+        public static int FindClosestIndex(this string text, int startIndex, ICollection<string> options)
+        {
+            return FindClosestIndex(text, startIndex, options, out _);
+        }
+        
         /// <summary>
         /// [ExtensionMethod] If given string is null or whitespace; use the alternative given string instead
         /// </summary>
