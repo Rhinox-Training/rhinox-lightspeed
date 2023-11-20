@@ -242,6 +242,15 @@ namespace Rhinox.Lightspeed.Reflection
                     throw new NotSupportedException(string.Format((IFormatProvider) CultureInfo.InvariantCulture, "Unable to determine IsStatic for member {0}.{1}MemberType was {2} but only fields, properties, methods, events and types are supported.", (object) member.DeclaringType.FullName, (object) member.Name, (object) member.GetType().FullName));
             }
         }
+
+        // NOTE: obscure blog post from investigation in CLR, this is the only way to check if a class is static
+        // https://stackoverflow.com/a/2639465
+        public static bool IsStatic(this Type t)
+        {
+            if (t == null)
+                return false;
+            return t.IsClass && t.IsSealed && t.IsAbstract;
+        }
         
         public static bool IsPublic(this MemberInfo member)
         {
@@ -290,6 +299,8 @@ namespace Rhinox.Lightspeed.Reflection
                 case PropertyInfo propertyInfo:
                     return propertyInfo.GetValue(obj);
                 case MethodInfo methodInfo:
+                    if (methodInfo.GetCustomAttribute<ExtensionAttribute>() != null)
+                        return methodInfo.Invoke(null, Utility.JoinArrays(obj, parameters));
                     return methodInfo.Invoke(obj, parameters);
                 default:
                     throw new InvalidOperationException();

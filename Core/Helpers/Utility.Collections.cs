@@ -37,5 +37,21 @@ namespace Rhinox.Lightspeed
             arr2.CopyTo(resultArr, arr1.Length);
             return resultArr;
         }
+        
+        public static T[] JoinArrays<T>(T element1, T[] arr2)
+        {
+            var resultArr = new T[1 + arr2.Length];
+            resultArr[0] = element1;
+            arr2.CopyTo(resultArr, 1);
+            return resultArr;
+        }
+        
+        public static T[] JoinArrays<T>(T[] arr1, T element2)
+        {
+            var resultArr = new T[arr1.Length + 1];
+            arr1.CopyTo(resultArr, 0);
+            resultArr[arr1.Length] = element2;
+            return resultArr;
+        }
     }
 }
