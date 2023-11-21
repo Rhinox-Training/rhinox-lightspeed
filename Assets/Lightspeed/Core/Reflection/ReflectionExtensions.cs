@@ -52,12 +52,15 @@ namespace Rhinox.Lightspeed.Reflection
             
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                    
                     if (!type.IsClass || type.IsAbstract || (!includeGeneric && type.ContainsGenericParameters))
                         continue;
                     
-                    if (!baseType.IsAssignableFrom(type))
+                    if (!type.InheritsFrom(baseType))
                         continue;
                     yield return type;
                 }
@@ -68,8 +71,11 @@ namespace Rhinox.Lightspeed.Reflection
         {
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                    
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
                     var attr = type.GetCustomAttribute<T>();
@@ -87,8 +93,11 @@ namespace Rhinox.Lightspeed.Reflection
             
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                        
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
                     var attr = type.GetCustomAttribute(baseAttributeType);
@@ -383,6 +392,19 @@ namespace Rhinox.Lightspeed.Reflection
             catch
             {
                 return false;
+            }
+        }
+
+        public static ICollection<Type> GetTypesSafe(this Assembly assembly)
+        {
+            try
+            {
+                var types = assembly.GetTypes();
+                return types;
+            }
+            catch (ReflectionTypeLoadException typeloadException)
+            {
+                return typeloadException.Types; // NOTE: ILGeneration may register null entries in this array
             }
         }
     }
