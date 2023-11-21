@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -51,12 +52,15 @@ namespace Rhinox.Lightspeed.Reflection
             
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                    
                     if (!type.IsClass || type.IsAbstract || (!includeGeneric && type.ContainsGenericParameters))
                         continue;
                     
-                    if (!baseType.IsAssignableFrom(type))
+                    if (!type.InheritsFrom(baseType))
                         continue;
                     yield return type;
                 }
@@ -67,8 +71,11 @@ namespace Rhinox.Lightspeed.Reflection
         {
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                    
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
                     var attr = type.GetCustomAttribute<T>();
@@ -86,8 +93,11 @@ namespace Rhinox.Lightspeed.Reflection
             
             foreach (var assembly in domain.GetAssemblies())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypesSafe())
                 {
+                    if (type == null)
+                        continue;
+                        
                     if (!type.IsClass || type.IsAbstract || type.ContainsGenericParameters)
                         continue;
                     var attr = type.GetCustomAttribute(baseAttributeType);
@@ -242,6 +252,15 @@ namespace Rhinox.Lightspeed.Reflection
                     throw new NotSupportedException(string.Format((IFormatProvider) CultureInfo.InvariantCulture, "Unable to determine IsStatic for member {0}.{1}MemberType was {2} but only fields, properties, methods, events and types are supported.", (object) member.DeclaringType.FullName, (object) member.Name, (object) member.GetType().FullName));
             }
         }
+
+        // NOTE: obscure blog post from investigation in CLR, this is the only way to check if a class is static
+        // https://stackoverflow.com/a/2639465
+        public static bool IsStatic(this Type t)
+        {
+            if (t == null)
+                return false;
+            return t.IsClass && t.IsSealed && t.IsAbstract;
+        }
         
         public static bool IsPublic(this MemberInfo member)
         {
@@ -290,6 +309,8 @@ namespace Rhinox.Lightspeed.Reflection
                 case PropertyInfo propertyInfo:
                     return propertyInfo.GetValue(obj);
                 case MethodInfo methodInfo:
+                    if (methodInfo.GetCustomAttribute<ExtensionAttribute>() != null)
+                        return methodInfo.Invoke(null, Utility.JoinArrays(obj, parameters));
                     return methodInfo.Invoke(obj, parameters);
                 default:
                     throw new InvalidOperationException();
@@ -371,6 +392,19 @@ namespace Rhinox.Lightspeed.Reflection
             catch
             {
                 return false;
+            }
+        }
+
+        public static ICollection<Type> GetTypesSafe(this Assembly assembly)
+        {
+            try
+            {
+                var types = assembly.GetTypes();
+                return types;
+            }
+            catch (ReflectionTypeLoadException typeloadException)
+            {
+                return typeloadException.Types; // NOTE: ILGeneration may register null entries in this array
             }
         }
     }

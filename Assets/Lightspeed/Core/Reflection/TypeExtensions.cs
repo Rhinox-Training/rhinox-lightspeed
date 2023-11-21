@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Rhinox.Lightspeed.Reflection
@@ -250,6 +252,60 @@ namespace Rhinox.Lightspeed.Reflection
 
 
             return code.ToString();
+        }
+        
+        public static IEnumerable<MethodInfo> GetExtensionMethodsNonAlloc(this Type t, BindingFlags bindingFlags = ReflectionUtility.ALL_FLAGS_WITH_INHERITED, bool simpleSearch = true)
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (!type.IsClass || (!type.IsSealed && type.IsAbstract) || type.ContainsGenericParameters)
+                        continue;
+
+                    if (simpleSearch && (!type.IsStatic() || !type.Name.EndsWith("Extensions", StringComparison.InvariantCultureIgnoreCase)))
+                        continue;
+                    
+                    foreach (var method in type.GetMethods(bindingFlags))
+                    {
+                        if (!method.IsStatic())
+                            continue;
+                        
+                        if (method.GetCustomAttribute<ExtensionAttribute>() == null)
+                            continue;
+                        
+                        var parameter = method.GetParameters()[0];
+                        if (parameter.ParameterType != t)
+                            continue;
+
+                        yield return method;
+                    }
+                }
+            }
+        }
+
+        public static ICollection<MethodInfo> GetExtensionMethods(this Type t, BindingFlags bindingFlags = ReflectionUtility.ALL_FLAGS_WITH_INHERITED, bool simpleSearch = true)
+        {
+            var methods = new List<MethodInfo>();
+            foreach (var extensionMethod in GetExtensionMethodsNonAlloc(t, bindingFlags, simpleSearch))
+                methods.Add(extensionMethod);
+            return methods;
+        }
+
+        public static MethodInfo GetExtensionMethod(this Type t, string methodName, BindingFlags bindingFlags = ReflectionUtility.ALL_FLAGS_WITH_INHERITED, bool simpleSearch = true)
+        {
+            if (string.IsNullOrWhiteSpace(methodName))
+                return null;
+            
+            foreach (var extensionMethod in GetExtensionMethodsNonAlloc(t, bindingFlags, simpleSearch))
+            {
+                if (extensionMethod.Name.CaseInvariantEquals(methodName))
+                {
+                    return extensionMethod;
+                }
+            }
+
+            return null;
         }
     }
 }
