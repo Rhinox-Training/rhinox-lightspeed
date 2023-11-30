@@ -57,7 +57,19 @@ namespace Rhinox.Lightspeed
 
         public static bool IsDefault<T>(this T value)
         {
+            if (typeof(T).IsClass)
+                return value == null;
             return value.Equals(default(T));
+        }
+        
+        public static int GetDigitCount(this int number)
+        {
+            return number.ToString().Length;
+        }
+
+        public static string MatchDigitCountWith(this int number, int other)
+        {
+            return number.ToString($"D{other.GetDigitCount()}");
         }
     }
 }

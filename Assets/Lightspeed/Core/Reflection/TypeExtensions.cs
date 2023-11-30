@@ -187,7 +187,7 @@ namespace Rhinox.Lightspeed.Reflection
             throw new ArgumentException("Not a collection type", nameof(collectionType));
         }
         
-        public static string GetCSharpName(this Type type, Stack<Type> genericArgs = null, StringBuilder arrayBrackets = null)
+        public static string GetCSharpName(this Type type, Stack<Type> genericArgs = null, StringBuilder arrayBrackets = null, bool includeNameSpace = true)
         {
             StringBuilder code = new StringBuilder();
             Type declaringType = type.DeclaringType;
@@ -195,7 +195,12 @@ namespace Rhinox.Lightspeed.Reflection
             bool arrayBracketsWasNull = arrayBrackets == null;
 
             if (genericArgs == null)
-                genericArgs = new Stack<Type>(type.GetGenericArguments());
+            {
+                if (type.IsGenericTypeDefinition)
+                    genericArgs = new Stack<Type>();
+                else
+                    genericArgs = new Stack<Type>(type.GetGenericArguments());
+            }
 
 
             int currentTypeGenericArgsCount = genericArgs.Count;
@@ -240,7 +245,7 @@ namespace Rhinox.Lightspeed.Reflection
                     code.Append('>');
                 }
 
-                if (declaringType == null && !string.IsNullOrEmpty(type.Namespace))
+                if (includeNameSpace && declaringType == null && !string.IsNullOrEmpty(type.Namespace))
                 {
                     code.Insert(0, '.').Insert(0, type.Namespace);
                 }
