@@ -10,6 +10,7 @@ using UnityEngine.Events;
 using Sirenix.Serialization;
 #endif
 
+
 namespace Rhinox.Lightspeed
 {
     public static class SerializeHelper
@@ -20,15 +21,17 @@ namespace Rhinox.Lightspeed
 
             return GetPublicAndSerializedMembers(type);
         }
-        
+
         public static IReadOnlyCollection<MemberInfo> GetPublicAndSerializedMembers(Type type)
         {
             var publicMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.Public |
-                                                BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
+                                                BindingFlags.GetField | BindingFlags.GetProperty |
+                                                BindingFlags.FlattenHierarchy);
             publicMembers = publicMembers.Where(x => !(x is MethodBase)).ToArray();
-            
+
             var serializedMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.NonPublic |
-                                                    BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
+                                                    BindingFlags.GetField | BindingFlags.GetProperty |
+                                                    BindingFlags.FlattenHierarchy);
             serializedMembers = serializedMembers.Where(x => !(x is MethodBase) && x.IsSerialized()).ToArray();
 
             var list = new List<MemberInfo>();
@@ -37,16 +40,24 @@ namespace Rhinox.Lightspeed
 
             return list.Distinct().ToArray();
         }
-        
-        
+
+
         public static IReadOnlyCollection<MemberInfo> GetSerializedMembers(Type type)
         {
-            var serializedMembers = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic |
-                                                    BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.FlattenHierarchy);
-            serializedMembers = serializedMembers.Where(x => !(x is MethodBase) && x.IsSerialized()).ToArray(); 
+            var members = new List<MemberInfo>();
+
+            var fields = ReflectionUtility.GetAllFields(type);
+            members.AddRange(fields);
+
+#if ODIN_INSPECTOR
+            var properties = ReflectionUtility.GetAllProperties(type);
+            members.AddRange(properties.Where(x => x.GetMethod != null));
+#endif
+
+            var serializedMembers = members.Where(x => !(x is MethodBase) && x.IsSerialized()).ToArray();
             return serializedMembers;
         }
-        
+
         public static bool IsSerialized(this FieldInfo fieldInfo)
         {
             bool nonSerializedAttr = fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null;
@@ -88,7 +99,7 @@ namespace Rhinox.Lightspeed
         {
             if (GuessIfUnityWillSerializePrivate(info))
                 return true;
-            
+
 #if ODIN_INSPECTOR
             if (Sirenix.Serialization.UnitySerializationUtility.OdinWillSerialize(info, true))
                 return true;
@@ -112,11 +123,11 @@ namespace Rhinox.Lightspeed
                 !fieldInfo.IsPublic &&
                 !Rhinox.Lightspeed.Reflection.ReflectionExtensions.IsDefined<SerializeField>(fieldInfo))
                 return false;
-            #if UNITY_2017_1_OR_NEWER
+#if UNITY_2017_1_OR_NEWER
             if (fieldInfo.IsDefined<FixedBufferAttribute>())
                 return true;
-            #endif
-            
+#endif
+
             return GuessIfUnityWillSerializePrivate(fieldInfo.FieldType);
         }
 
@@ -142,16 +153,16 @@ namespace Rhinox.Lightspeed
             bool isBaseDotNetType = type.IsPrimitive || type == typeof(string);
             if (isBaseDotNetType)
                 return true;
-            
+
             if (type.IsDelegateType())
                 return false;
-            
+
             if (typeof(UnityEventBase).IsAssignableFrom(type))
             {
-                #if !UNITY_2020_1_OR_NEWER
+#if !UNITY_2020_1_OR_NEWER
                 if (type.IsGenericType)
                     return false;
-                #endif
+#endif
                 return type == typeof(UnityEvent) ||
                        type.IsDefined<SerializableAttribute>(inherit: false);
             }
@@ -159,9 +170,9 @@ namespace Rhinox.Lightspeed
             if (type.IsArray)
             {
                 System.Type elementType = type.GetElementType();
-                return type.GetArrayRank() == 1 && 
+                return type.GetArrayRank() == 1 &&
                        !elementType.IsArray &&
-                       !elementType.ImplementsOpenGenericClass(typeof(List<>)) && 
+                       !elementType.ImplementsOpenGenericClass(typeof(List<>)) &&
                        GuessIfUnityWillSerializePrivate(elementType);
             }
 
@@ -177,19 +188,19 @@ namespace Rhinox.Lightspeed
             if (type.Assembly.FullName.StartsWith("UnityEngine", StringComparison.InvariantCulture) ||
                 type.Assembly.FullName.StartsWith("UnityEditor", StringComparison.InvariantCulture))
                 return true;
-            
-            #if !UNITY_2020_1_OR_NEWER
+
+#if !UNITY_2020_1_OR_NEWER
             if (type.IsGenericType)
                 return false;
-            #endif
-            
+#endif
+
             if (type.Assembly == typeof(string).Assembly) // No other .NET Types
                 return false;
-            
+
             if (type.IsDefined<SerializableAttribute>(inherit: false))
                 return type.IsClass;
-            
-            #if !UNITY_2018_2_OR_NEWER
+
+#if !UNITY_2018_2_OR_NEWER
                 // Ported this hack from Sirenix.Serialization, ask them for more info
                 for (System.Type baseType = type.BaseType;
                     baseType != null && baseType != typeof(object);
@@ -199,7 +210,7 @@ namespace Rhinox.Lightspeed
                         "UnityEngine.Networking.SyncListStruct`1")
                         return true;
                 }
-            #endif
+#endif
 
             return false;
         }
