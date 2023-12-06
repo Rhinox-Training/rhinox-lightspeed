@@ -53,5 +53,11 @@ namespace Rhinox.Lightspeed
             resultArr[arr1.Length] = element2;
             return resultArr;
         }
+
+        public static void AddToArray<T>(ref T[] arr, T val)
+        {
+            Array.Resize(ref arr, arr.Length + 1);
+            arr[arr.Length - 1] = val;
+        }
     }
 }

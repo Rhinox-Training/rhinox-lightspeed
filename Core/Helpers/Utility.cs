@@ -50,8 +50,11 @@ namespace Rhinox.Lightspeed
             return input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         }
         
-        public static string GetLongestCommonPrefix(string[] s)
+        public static string GetLongestCommonPrefix(params string[] s)
         {
+            if (s.IsNullOrEmpty())
+                return string.Empty;
+            
             int k = s[0].Length;
             for (int i = 1; i < s.Length; ++i)
             {
