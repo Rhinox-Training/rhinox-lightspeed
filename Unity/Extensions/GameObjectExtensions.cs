@@ -133,7 +133,8 @@ namespace Rhinox.Lightspeed
             return childGo.GetComponent<T>();
         }
         
-        public static T AddComponent<T>(this GameObject go, T compToCopy) where T : Component
+        public static T AddComponent<T>(this GameObject go, T compToCopy)
+            where T : Component
         {
             var newComp = go.AddComponent<T>();
             newComp.CopyDataFrom(compToCopy);
@@ -144,6 +145,24 @@ namespace Rhinox.Lightspeed
         {
             result = go.GetComponentInParent<T>();
             return result != null;
+        }
+
+        public static bool TryGetComponentsInParent<T>(this GameObject go, out T[] results, bool includeInactive = false)
+        {
+            results = go.GetComponentsInParent<T>(includeInactive);
+            return results.IsNullOrEmpty();
+        }
+        
+        public static bool TryGetComponentInChildren<T>(this GameObject go, out T result)
+        {
+            result = go.GetComponentInChildren<T>();
+            return result != null;
+        }
+        
+        public static bool TryGetComponentsInChildren<T>(this GameObject go, out T[] results, bool includeInactive = false)
+        {
+            results = go.GetComponentsInChildren<T>(includeInactive);
+            return results.IsNullOrEmpty(); 
         }
         
         /// <summary>

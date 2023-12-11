@@ -204,7 +204,7 @@ namespace Rhinox.Lightspeed.Reflection
             return Info.ToString();
         }
 
-        private static Regex _qualifiedNameRegex = new Regex(@"([a-zA-Z0-9.]+)((?:\[\])*),\s([a-zA-Z0-9.]+)(,\sVersion=[0-9]\.[0-9]\.[0-9]\.[0-9],\sCulture=[a-zA-Z\-]+,\sPublicKeyToken=[a-zA-Z0-9]+)*"); 
+        private static Regex _qualifiedNameRegex = new Regex(@"([a-zA-Z]{0}[a-zA-Z0-9.]*)((?:\[\])*),\s([a-zA-Z0-9.]+)(,\sVersion=[0-9]\.[0-9]\.[0-9]\.[0-9],\sCulture=[a-zA-Z\-]+,\sPublicKeyToken=[a-zA-Z0-9]+)*"); 
         
         public static bool TryParse(string assemblyQualifiedName, out string typeName, out string assemblyName)
         {
@@ -225,6 +225,13 @@ namespace Rhinox.Lightspeed.Reflection
             assemblyName = match.Groups[3].Value;
             remainder = match.Groups[4].Value ?? "";
             return true;
+        }
+
+        public static string TrimVersion(string assemblyQualifiedName)
+        {
+            if (TryParse(assemblyQualifiedName, out string type, out string assembly, out string _))
+                return $"{type}, {assembly}";
+            return assemblyQualifiedName;
         }
     }
 }
