@@ -312,5 +312,10 @@ namespace Rhinox.Lightspeed.Reflection
 
             return null;
         }
+
+        public static string GetShortAssemblyQualifiedName(this Type type)
+        {
+            return AssemblyQualifiedName.TrimVersion(type.AssemblyQualifiedName);
+        }
     }
 }
