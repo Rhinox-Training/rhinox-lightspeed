@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using Rhinox.Lightspeed.IO;
 using Rhinox.Lightspeed.Reflection;
@@ -85,6 +86,30 @@ namespace Rhinox.Lightspeed.Editor
 			// Selection.activeObject = asset;
 
 			return asset;
+		}
+		
+		public static IEnumerable<string> FetchAssemblyQualifiedNamesFromScriptableObject(ScriptableObject asset)
+		{
+			string assetPath = AssetDatabase.GetAssetPath(asset);
+			if (string.IsNullOrEmpty(assetPath))
+				yield break;
+
+			string[] lines = FileHelper.ReadAllLines(assetPath);
+			foreach (var line in lines)
+			{
+				if (line == null)
+					continue;
+
+				if (!AssemblyQualifiedName.TryParse(line, out string typeName, out string assemblyName))
+					continue;
+
+				string assemblyQualifiedName = $"{typeName}, {assemblyName}";
+
+				if (!line.Contains("|" + assemblyQualifiedName)) // NOTE: assemblyQualifiedNames are always prefixed by | in Unity serialized context
+					continue;
+
+				yield return assemblyQualifiedName;
+			}
 		}
 	}
 }
