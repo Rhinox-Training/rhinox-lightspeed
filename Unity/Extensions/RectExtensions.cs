@@ -77,9 +77,21 @@ namespace Rhinox.Lightspeed
             rect.height = height;
             return rect;
         }
-        
-        public static Rect MoveDownLine(this Rect rect, int lineCount = 1, float padding = 2.0f, float lineHeight = 18f)
+
+        public static Rect MoveBeneath(this Rect rect, float height)
         {
+            Rect r = new Rect(rect.x, rect.yMax, rect.width, height);
+            return r;
+        }
+        
+        public static Rect MoveDownLine(this Rect rect, int lineCount = 1, float padding = 2.0f, float lineHeight = 18f, bool autoClamp = false)
+        {
+            if (autoClamp)
+            {
+                rect.yMin += lineCount * padding + lineCount * lineHeight;
+                return rect;
+            }
+
             return rect.AddY(lineCount * padding + lineCount * lineHeight);
         }
 
@@ -218,6 +230,23 @@ namespace Rhinox.Lightspeed
             if (point.y < r.yMin)
                 r.yMin = point.y;
             return r;
+        }
+
+        public static Rect BeginList(this Rect listRect, int elementCount)
+        {
+            if (!listRect.IsValid() || elementCount <= 1)
+                return listRect;
+            float elementHeight = listRect.height / elementCount;
+            Rect elementRect = listRect.SetHeight(elementHeight);
+            return elementRect;
+        }
+
+        public static Rect MoveNext(this Rect elementRect, Rect listRect)
+        {
+            elementRect.y += elementRect.height;
+            if (elementRect.yMax > listRect.yMax)
+                elementRect.yMax = listRect.yMax;
+            return elementRect;
         }
     }
 }
