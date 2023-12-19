@@ -13,7 +13,7 @@ namespace Rhinox.Lightspeed
     }
     
     [RefactoringOldNamespace("Rhinox.Utilities")]
-    [Serializable]
+    [Serializable, InlineProperty, InlineButton("$value.Regenerate", " G ")]
     public class SerializableGuid : IEquatable<SerializableGuid>
     {
         private const int BytesLength = 16;
@@ -50,6 +50,12 @@ namespace Rhinox.Lightspeed
         }
 
         public static SerializableGuid CreateNew() => new SerializableGuid(Guid.NewGuid());
+
+        public void Regenerate()
+        {
+            _guidRef = Guid.NewGuid();
+            SerializedBytes = _guidRef.ToByteArray();
+        }
 
         private Guid AsSystemGuid()
         {
