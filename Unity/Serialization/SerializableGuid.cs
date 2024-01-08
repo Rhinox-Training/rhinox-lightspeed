@@ -1,8 +1,5 @@
 using System;
-using System.IO;
-using Rhinox.Lightspeed;
 using Sirenix.OdinInspector;
-using UnityEditor;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -13,7 +10,7 @@ namespace Rhinox.Lightspeed
     }
     
     [RefactoringOldNamespace("Rhinox.Utilities")]
-    [Serializable, InlineProperty, InlineButton("$value.Regenerate", " G ")]
+    [Serializable, InlineProperty, InlineButton("$value.Regenerate", "G")]
     public class SerializableGuid : IEquatable<SerializableGuid>
     {
         private const int BytesLength = 16;
