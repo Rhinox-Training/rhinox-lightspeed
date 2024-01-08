@@ -10,13 +10,15 @@ namespace Rhinox.Lightspeed.IO
         public static void ClearDirectoryContentsIfExists(string path)
         {
             DirectoryInfo  di = new DirectoryInfo(path);
+            
             if (!di.Exists)
                 return;
+            
             foreach (FileInfo file in di.EnumerateFiles())
-                file.Delete(); 
+                file.Delete();
             
             foreach (DirectoryInfo dir in di.EnumerateDirectories())
-                dir.Delete(true); 
+                dir.Delete(true);
         }
 
         public static void DeleteDirectoryIfExists(string path)
@@ -148,6 +150,52 @@ namespace Rhinox.Lightspeed.IO
                 }
             }
         }
+        
+        public static void MoveFolder(string source, string target, bool overwriteTarget = true, bool includeEmptyDirectories = false)
+        {
+            var files = FileHelper.GetFiles(source, "*.*", SearchOption.AllDirectories);
+            
+            foreach (var assetPath in files)
+            {
+                string path = assetPath.ToLinuxSafePath();
+                string newPath = path.Replace(source, target).ToLinuxSafePath();
+
+                FileHelper.MoveFile(assetPath, newPath, overwriteTarget);
+            }
+
+            if (!includeEmptyDirectories)
+                return;
+
+            var directories = FileHelper.GetChildFolders(source, true);
+
+            foreach (var directory in directories)
+            {
+                string path = directory.FullName.ToLinuxSafePath();
+                string newPath = path.Replace(source, target).ToLinuxSafePath();
+
+                var di = new DirectoryInfo(newPath);
+                if (!di.Exists)
+                    di.Create();
+            }
+        }
+        
+        public static bool MoveFile(string filePath, string newPath, bool overwrite)
+        {
+            if (!File.Exists(filePath))
+                return false;
+            
+            var directory = Path.GetDirectoryName(newPath);
+            FileHelper.CreateDirectoryIfNotExists(directory);
+            if (File.Exists(newPath))
+            {
+                if (overwrite)
+                    File.Delete(newPath);
+                else
+                    return false;
+            }
+            File.Move(filePath, newPath);
+            return true;
+        }
 
         public class Folders
         {
@@ -241,11 +289,14 @@ namespace Rhinox.Lightspeed.IO
             return path;
         }
 
-        public static IReadOnlyCollection<DirectoryInfo> GetChildFolders(string path)
+        public static IReadOnlyCollection<DirectoryInfo> GetChildFolders(string path, bool recursive = false)
         {
             DirectoryInfo di = new DirectoryInfo(path);
             if (!di.Exists)
                 return Array.Empty<DirectoryInfo>();
+            
+            if (recursive)
+                return di.GetDirectories("*", SearchOption.AllDirectories);
 
             return di.GetDirectories();
         }

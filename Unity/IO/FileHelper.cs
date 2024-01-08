@@ -259,8 +259,24 @@ namespace Rhinox.Lightspeed.IO
         }
        
 #if UNITY_EDITOR
+        public static bool MoveAsset(string assetPath, string newPath)
+        {
+            if (!File.Exists(assetPath))
+                return false;
+            
+            var directory = Path.GetDirectoryName(newPath);
+            FileHelper.CreateAssetsDirectory(directory);
+            var error = AssetDatabase.MoveAsset(assetPath, newPath);
+            if (error.IsNullOrEmpty())
+                return true;
+            
+            Debug.LogError($"Failed to move asset '{assetPath}': {error}");
+            return false;
+        }
+        
         public static void CreateAssetsDirectory(string directory)
         {
+            
             var directories = directory.Split('\\', '/', Path.PathSeparator);
             var currentPath = string.Empty;
             foreach (var dir in directories)
