@@ -1,15 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed.Collections
 {
+    [Serializable]
     public abstract class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,
         ISerializationCallbackReceiver
     {
         [SerializeField, HideInInspector] private List<TKey> _keyData = new List<TKey>();
 
-        [SerializeField, HideInInspector] private List<TValue> _valueData = new List<TValue>();
+        [SerializeField, HideInInspector, SerializeReference] private List<TValue> _valueData = new List<TValue>();
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {

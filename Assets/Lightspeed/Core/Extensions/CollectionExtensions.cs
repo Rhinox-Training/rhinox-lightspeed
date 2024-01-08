@@ -307,17 +307,23 @@ namespace Rhinox.Lightspeed
             }
         }
         
-        public static void RemoveAll<T>(this ICollection<T> set, Func<T, bool> condition)
+        public static int RemoveAll<T>(this ICollection<T> set, Func<T, bool> condition)
         {
-            set.RemoveRange(set.Where(condition));
+            return set.RemoveRange(set.Where(condition));
         }
 
-        public static void RemoveRange<T>(this ICollection<T> set, IEnumerable<T> toRemove)
+        public static int RemoveRange<T>(this ICollection<T> set, IEnumerable<T> toRemove)
         {
             // the IEnumerable is potentially part of the Set; cast it to ensure it is not
             var l = toRemove.ToArray();
+            int i = 0;
             foreach (var entry in l)
-                set.Remove(entry);
+            {
+                if (set.Remove(entry))
+                    ++i;
+            }
+
+            return i;
         }
 
         public static bool RemoveFirst<T>(this ICollection<T> set, Func<T, bool> condition) where T : struct
