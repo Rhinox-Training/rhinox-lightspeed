@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace Rhinox.GUIUtils.Utils
+namespace Rhinox.Lightspeed
 {
-    public static class LayerUtils
+    public static partial class Utility
     {
         public static string[] GetLayerNames()
         {
