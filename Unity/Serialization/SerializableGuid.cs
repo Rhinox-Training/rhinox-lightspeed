@@ -154,7 +154,7 @@ namespace Rhinox.Lightspeed
         }
     }
     
-    public static partial class Extensions
+    public static class SerializableGuidExtensions
     {
         public static bool IsNullOrEmpty(this SerializableGuid guid)
         {

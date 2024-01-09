@@ -115,25 +115,27 @@ namespace Rhinox.Lightspeed
             return enumerable.SelectMany(selector).Where(x => x != null);
         }
         
-        public static bool IsSorted<T>(this List<T> src) where T: IComparable
+        public static bool IsSorted<T>(this List<T> src, bool descending = false) where T: IComparable
         {
             var comparer = Comparer<T>.Default;
-
-            for (int i = 1; i < src.Count; i++)
-            {
-                if (comparer.Compare(src[i-1], src[i]) == 1)
-                    return false;
-            }
-            return true;
+            return IsSorted(src, comparer, descending);
         }
         
-        public static bool IsSorted<T>(this List<T> src, Comparison<T> comparison)
+        public static bool IsSorted<T>(this List<T> src, Comparison<T> comparison, bool descending = false)
         {
             var comparer = Comparer<T>.Create(comparison);
-
+            return IsSorted(src, comparer, descending);
+        }
+        
+        private static bool IsSorted<T>(this List<T> src, Comparer<T> comparer, bool descending = false)
+        {
             for (int i = 1; i < src.Count; i++)
             {
-                if (comparer.Compare(src[i-1], src[i]) == 1)
+                // Returns 1 if y is greater; -1 if y is smaller; 0 if equal
+                var comparison = comparer.Compare(src[i - 1], src[i]);
+                if (comparison > 0 && !descending)
+                    return false;
+                if (comparison < 0 && descending)
                     return false;
             }
             return true;
