@@ -16,6 +16,19 @@ namespace Rhinox.Lightspeed
                 destinationList[destinationIndex + i] = sourceList[sourceIndex + i];
         }
         
+        public static void SortStable<T, TKey>(this IList<T> list, Func<T, TKey> selector, bool descending = false)
+            where TKey : IComparable<TKey>
+        {
+            IList<T> orderedList;
+            // We are clearing the original so we need to resolve it
+
+            if (descending)
+                orderedList = list.OrderByDescending(selector).ToList();
+            else
+                orderedList = list.OrderBy(selector).ToList();
+            CopyTo(orderedList, list);
+        }
+        
         public static void Sort<T>(this IList<T> list, Comparison<T> comparison)
         {
             if (list is List<T>)
@@ -34,9 +47,7 @@ namespace Rhinox.Lightspeed
             where TParam: IComparable
         {
             var comparison = new Comparison<T>((x, y) => sortFunc(x).CompareTo(sortFunc(y)));
-            
             list.Sort(comparison);
-
         }
         
         public static void SortByDescending<T, TParam>(this IList<T> list, Func<T, TParam> sortFunc)
