@@ -31,6 +31,18 @@ namespace Rhinox.Lightspeed
             return JsonUtility.FromJson<T>(o);
         }
         
+        public static object FromJson(string o, Type type, bool useNewtonsoftIfAvailable = false)
+        {
+            if (useNewtonsoftIfAvailable)
+            {
+#if NEWTONSOFT
+                // Include Newtonsoft json to support anonymous objects
+                return JsonConvert.DeserializeObject(o, type);
+#endif
+            }
+            return JsonUtility.FromJson(o, type);
+        }
+        
         public static string ToJson<T>(T o, bool useNewtonsoftIfAvailable = false)
         {
             if (useNewtonsoftIfAvailable)
