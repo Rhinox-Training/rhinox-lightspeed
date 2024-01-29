@@ -312,5 +312,13 @@ namespace Rhinox.Lightspeed
 
             return false;
         }
+                
+        public static string MakePathSafe(this string str)
+        {
+            var parts = str.Split(' ', '\n', '\r', '\t', '$', '^', '&', '|', ',')
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+            return string.Join("_", parts);
+        }
     }
 }
