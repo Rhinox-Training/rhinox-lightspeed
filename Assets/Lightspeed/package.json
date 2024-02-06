@@ -1,7 +1,7 @@
 {
   "name": "com.rhinox.open.lightspeed",
   "displayName": "Lightspeed - Coding Utility Library",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "unity": "2019.3",
   "description": "Coding extensions library: New basic datatypes, static helper methods and extensions on Unity datatypes ",
   "keywords": [
