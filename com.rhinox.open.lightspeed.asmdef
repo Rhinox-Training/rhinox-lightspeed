@@ -1,7 +1,8 @@
 {
     "name": "com.rhinox.open.lightspeed",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -20,6 +21,11 @@
             "name": "com.unity.nuget.newtonsoft-json",
             "expression": "1.0.0",
             "define": "NEWTONSOFT"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "UNITY_INPUTSYSTEM"
         }
     ],
     "noEngineReferences": false

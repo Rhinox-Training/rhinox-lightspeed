@@ -133,7 +133,8 @@ namespace Rhinox.Lightspeed
         /// </summary>
         public static bool ClickRaycast(out RaycastHit hitInfo, LayerMask mask)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var mousePos = Utility.GetMousePosition();
+            Ray ray = Camera.main.ScreenPointToRay(mousePos);
             return Physics.Raycast(ray, out hitInfo, Mathf.Infinity, mask);
         }
 
@@ -142,26 +143,14 @@ namespace Rhinox.Lightspeed
         /// </summary>
         public static bool ClickRaycast(out RaycastHit hitInfo)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var mousePos = Utility.GetMousePosition();
+            Ray ray = Camera.main.ScreenPointToRay(mousePos);
             return Physics.Raycast(ray, out hitInfo);
         }
 
         public static string FormatSizeBinary(long num, int toBase)
         {
             return Convert.ToString(num, toBase);
-        }
-
-        /// <summary>
-        /// Returns wether any of the given keys are currently pressed.
-        /// </summary>
-        public static bool IsAnyKeyDown(params KeyCode[] keycodes)
-        {
-            return keycodes.Any(Input.GetKey);
-        }
-
-        public static Vector2 MousePosition
-        {
-            get { return new Vector2(Input.mousePosition.x, Input.mousePosition.y); }
         }
         
         public static bool IsOnScreen(Vector3 position)
