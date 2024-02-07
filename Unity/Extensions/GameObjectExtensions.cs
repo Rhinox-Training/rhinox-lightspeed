@@ -22,25 +22,31 @@ namespace Rhinox.Lightspeed
             obj.SetActive(oldState);
             return comp;
         }
-    
-        public static GameObject[] GetAllChildren(this GameObject obj, bool includeInactive = false)
+
+        public static GameObject[] GetAllChildren(this GameObject obj, bool includeInactive = false,
+            bool includeSelf = true)
         {
-            var transforms = obj.GetComponentsInChildren<Transform>(includeInactive);
-            var arr = new GameObject[transforms.Length];
-            for (var i = 0; i < transforms.Length; i++)
-                arr[i] = transforms[i].gameObject;
+            var results = obj.transform.GetAllChildren(includeInactive, includeSelf);
+            var arr = new GameObject[results.Count];
+            for (int index = 0; index < results.Count; index++)
+                arr[index] = results[index].gameObject;
+            
             return arr;
         }
-        
-        public static void GetAllChildren(this GameObject obj, IList<GameObject> gameObjects, bool includeInactive = false)
+
+        public static void GetAllChildren(this GameObject obj, IList<GameObject> gameObjects,
+            bool includeInactive = false, bool includeSelf = true)
         {
-            foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
+            var results = obj.transform.GetAllChildren(includeInactive, includeSelf);
+            foreach (var t in results)
                 gameObjects.Add(t.gameObject);
         }
-        
-        public static void GetAllChildren(this GameObject obj, ISet<GameObject> gameObjects, bool includeInactive = false)
+
+        public static void GetAllChildren(this GameObject obj, ISet<GameObject> gameObjects,
+            bool includeInactive = false, bool includeSelf = true)
         {
-            foreach (var t in obj.GetComponentsInChildren<Transform>(includeInactive))
+            var results = obj.transform.GetAllChildren(includeInactive, includeSelf);
+            foreach (var t in results)
                 gameObjects.Add(t.gameObject);
         }
 
@@ -52,7 +58,7 @@ namespace Rhinox.Lightspeed
             to.layer = from.layer;
             to.tag = from.tag;
         }
-        
+
         public static ICollection<GameObject> GetDirectChildren(this GameObject obj)
         {
             var list = new List<GameObject>();
@@ -63,28 +69,29 @@ namespace Rhinox.Lightspeed
 
             return list;
         }
-        
+
         public static T GetComponentInDirectChildren<T>(this GameObject go) where T : Component
         {
             var comp = go.GetComponentInChildren<T>();
-            if (comp.transform.parent == go.transform) 
+            if (comp.transform.parent == go.transform)
                 return comp;
             return null;
         }
+
         public static T[] GetComponentsInDirectChildren<T>(this GameObject go) where T : Component
         {
             return go.GetComponentsInChildren<T>()
                 .Where(x => x.transform.parent == go.transform)
                 .ToArray();
         }
-        
+
         public static void DestroyAllChildren(this GameObject obj)
         {
             var children = obj.GetDirectChildren();
             foreach (var child in children)
                 Utility.Destroy(child);
         }
-        
+
         public static T GetComponentOnlyInChildren<T>(this GameObject gameObject) where T : Component
         {
             foreach (Transform child in gameObject.transform)
@@ -119,7 +126,7 @@ namespace Rhinox.Lightspeed
             childGo.transform.SetParent(go.transform, false);
             return childGo;
         }
-        
+
         public static GameObject AddChild(this GameObject go, string name, params Type[] componentTypes)
         {
             var childGo = new GameObject(name ?? "New GameObject", componentTypes);
@@ -132,7 +139,7 @@ namespace Rhinox.Lightspeed
             var childGo = AddChild(go, name, typeof(T));
             return childGo.GetComponent<T>();
         }
-        
+
         public static T AddComponent<T>(this GameObject go, T compToCopy)
             where T : Component
         {
@@ -147,24 +154,26 @@ namespace Rhinox.Lightspeed
             return result != null;
         }
 
-        public static bool TryGetComponentsInParent<T>(this GameObject go, out T[] results, bool includeInactive = false)
+        public static bool TryGetComponentsInParent<T>(this GameObject go, out T[] results,
+            bool includeInactive = false)
         {
             results = go.GetComponentsInParent<T>(includeInactive);
             return results.IsNullOrEmpty();
         }
-        
+
         public static bool TryGetComponentInChildren<T>(this GameObject go, out T result)
         {
             result = go.GetComponentInChildren<T>();
             return result != null;
         }
-        
-        public static bool TryGetComponentsInChildren<T>(this GameObject go, out T[] results, bool includeInactive = false)
+
+        public static bool TryGetComponentsInChildren<T>(this GameObject go, out T[] results,
+            bool includeInactive = false)
         {
             results = go.GetComponentsInChildren<T>(includeInactive);
-            return results.IsNullOrEmpty(); 
+            return results.IsNullOrEmpty();
         }
-        
+
         /// <summary>
         /// Does the action for each child of the given parent. The action has 1 param [GameObject] which is the child.
         /// </summary>
@@ -172,7 +181,7 @@ namespace Rhinox.Lightspeed
         {
             parent.transform.ForeachChild(execute);
         }
-        
+
         /// <summary>
         /// Does the action for each child of the given parent. The action has 2 param [GameObject] which is the child and an [int] which is the index of the child.
         /// </summary>
@@ -185,7 +194,7 @@ namespace Rhinox.Lightspeed
         {
             if (obj == null)
                 return string.Empty;
-            
+
             Transform t = obj.transform;
             StringBuilder sb = new StringBuilder();
             while (t != null)
@@ -204,12 +213,12 @@ namespace Rhinox.Lightspeed
 
             return sb.ToString();
         }
-        
+
         public static bool IsEmpty(this GameObject go)
         {
             if (go == null)
                 return true;
-            
+
             var children = go.GetDirectChildren();
             if (children.Count > 0)
                 return false;
