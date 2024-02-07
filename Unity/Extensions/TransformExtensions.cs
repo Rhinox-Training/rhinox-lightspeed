@@ -151,7 +151,7 @@ namespace Rhinox.Lightspeed
 
         public static void DestroyAllChildren(this Transform obj)
         {
-            var children = obj.GetAllChildren();
+            var children = obj.GetAllChildren(false);
             foreach (var child in children)
                 UnityEngine.Object.DestroyImmediate(child.gameObject);
         }
