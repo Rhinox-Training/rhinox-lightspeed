@@ -123,12 +123,23 @@ namespace Rhinox.Lightspeed
             return list;
         }
         
-        public static ICollection<Transform> GetAllChildren(this Transform obj, bool includeInactive = false)
+        public static ICollection<Transform> GetAllChildren(this Transform obj, bool includeYourself = true, bool includeInactive = false)
         {
             var transforms = obj.GetComponentsInChildren<Transform>(includeInactive);
-            var arr = new Transform[transforms.Length];
-            for (var i = 0; i < transforms.Length; i++)
-                arr[i] = transforms[i];
+            int length = includeYourself ? transforms.Length : transforms.Length - 1;
+            var arr = new Transform[length];
+             int idx = 0;
+
+             foreach (var child in transforms)
+             {
+                 //if not include yourself, skip
+                 if (!includeYourself && child == obj)
+                     continue;
+                 
+                arr[idx] = child;
+                ++idx;
+             }
+             
             return arr;
         }
         
