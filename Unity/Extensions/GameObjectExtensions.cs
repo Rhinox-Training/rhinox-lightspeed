@@ -85,11 +85,11 @@ namespace Rhinox.Lightspeed
                 .ToArray();
         }
 
-        public static void DestroyAllChildren(this GameObject obj)
+        public static void DestroyAllChildren(this GameObject obj, bool immediate = false)
         {
             var children = obj.GetDirectChildren();
             foreach (var child in children)
-                Utility.Destroy(child);
+                Utility.Destroy(child, immediate);
         }
 
         public static T GetComponentOnlyInChildren<T>(this GameObject gameObject) where T : Component

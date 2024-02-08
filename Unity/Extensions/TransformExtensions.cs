@@ -149,11 +149,9 @@ namespace Rhinox.Lightspeed
                 transforms.Add(t);
         }
 
-        public static void DestroyAllChildren(this Transform obj)
+        public static void DestroyAllChildren(this Transform obj, bool immediate = false)
         {
-            var children = obj.GetAllChildren(false);
-            foreach (var child in children)
-                UnityEngine.Object.DestroyImmediate(child.gameObject);
+            obj.gameObject.DestroyAllChildren(immediate);
         }
         
         public static void SetPosition(this Transform t, Vector3 vec)
