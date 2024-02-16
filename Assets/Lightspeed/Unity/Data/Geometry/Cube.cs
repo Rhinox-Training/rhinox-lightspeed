@@ -51,24 +51,22 @@ namespace Rhinox.Lightspeed
             //
             return new Cube(center, forward, up, right);
         }
-
-        public static Cube FromRenderers(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBoundsFromRenderers());
-
+        
         public static Cube FromGameObject(GameObject go) => FromTransformBounds(go.transform, go.GetObjectLocalBounds());
 
         public static IConvex ToScreenSpace(GameObject go, Camera cam)
         {
-            return FromRenderers(go).ToScreenSpace(cam);
+            return FromGameObject(go).ToScreenSpace(cam);
         }
         
         public static IConvex ToScreenSpace3D(GameObject go, Camera cam)
         {
-            return FromRenderers(go).ToScreenSpace3D(cam);
+            return FromGameObject(go).ToScreenSpace3D(cam);
         }
         
         public static IConvex ToViewSpace(GameObject go, Camera cam)
         {
-            return FromRenderers(go).ToViewSpace(cam);
+            return FromGameObject(go).ToViewSpace(cam);
         }
 
         private Cube(Vector3 center, Vector3 forward, Vector3 up, Vector3 right)
