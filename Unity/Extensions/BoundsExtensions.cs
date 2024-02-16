@@ -194,28 +194,17 @@ namespace Rhinox.Lightspeed
 
 		public static Bounds GetObjectBounds(this GameObject go, Renderer[] renderers = null, Collider[] colliders = null)
 		{
-			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
-			if (colliders.Any())
-			{
-				var bounds = colliders.GetCombinedBounds();
-				return bounds;
-			}
 			if (renderers == null) renderers = go.GetComponentsInChildren<Renderer>();
 			if (renderers.Any())
 			{
 				var bounds = renderers.GetCombinedBounds();
 				return bounds;
 			}
-
-			return default(Bounds);
-		}
-		
-		public static Bounds GetObjectLocalBoundsFromRenderers(this GameObject go, bool calculateUsingVerts = false, Renderer[] renderers = null)
-		{
-			if (renderers == null) renderers = go.GetComponentsInChildren<Renderer>();
-			if (renderers.Any())
+			
+			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
+			if (colliders.Any())
 			{
-				var bounds = renderers.GetCombinedLocalBounds(go.transform, calculateUsingVerts);
+				var bounds = colliders.GetCombinedBounds();
 				return bounds;
 			}
 
@@ -224,17 +213,17 @@ namespace Rhinox.Lightspeed
 		
 		public static Bounds GetObjectLocalBounds(this GameObject go, bool calculateUsingVerts = false, Renderer[] renderers = null, Collider[] colliders = null)
 		{
-			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
-			if (colliders.Any())
-			{
-				var bounds = colliders.GetCombinedLocalBounds(go.transform);
-				return bounds;
-			}
-			
 			if (renderers == null) renderers = go.GetComponentsInChildren<Renderer>();
 			if (renderers.Any())
 			{
 				var bounds = renderers.GetCombinedLocalBounds(go.transform, calculateUsingVerts);
+				return bounds;
+			}
+			
+			if (colliders == null) colliders = go.GetComponentsInChildren<Collider>();
+			if (colliders.Any())
+			{
+				var bounds = colliders.GetCombinedLocalBounds(go.transform);
 				return bounds;
 			}
 
@@ -284,9 +273,29 @@ namespace Rhinox.Lightspeed
 
 		public static Vector3[] GetLocalBounds(this Collider collider, Transform axis)
 		{
-			var matrix = axis.worldToLocalMatrix;
-			var b = collider.bounds; // World space
-			return b.GetCornersTransformed(matrix);
+			Bounds b;
+			switch (collider)
+			{
+				case BoxCollider box:
+					b = new Bounds(box.center, box.size);
+					return b.GetCorners();
+				case SphereCollider sphere:
+					b = new Bounds(sphere.center, new UniformVector(sphere.radius * 2));
+					return b.GetCorners();
+				case CapsuleCollider capsule:
+					Vector3 size = new UniformVector(capsule.radius * 2);
+					var height = capsule.height;
+					var direction = capsule.GetAxis();
+					b = new Bounds(capsule.center, size.With(height, direction));
+					return b.GetCorners();
+				case MeshCollider mesh:
+					return mesh.sharedMesh.bounds.GetCorners();
+				default:
+					var matrix = axis.worldToLocalMatrix;
+					b = collider.bounds; // World space
+					return b.GetCornersTransformed(matrix);
+			}
+			
 		}
 		
 		public static Bounds GetCombinedBounds(this IEnumerable<Collider> colliders)
@@ -498,19 +507,21 @@ namespace Rhinox.Lightspeed
 			return b;
 		}
 
-		public static void CenterObjectBoundsOnPosition(this GameObject go, Vector3 position, Quaternion? rotation = null)
+		public static Vector3 GetOffsetToCenterOnBounds(this GameObject go, Vector3 position)
 		{
-			var localBounds = go.GetObjectLocalBounds();
-			Vector3 localPositionOfCenter = localBounds.center;
-
-			Vector3 globalPositionOfCenter = go.transform.TransformPoint(localPositionOfCenter);
-			Vector3 offset = go.transform.position - globalPositionOfCenter;
-
-			Vector3 rotatedOffset = (rotation ?? Quaternion.identity) * offset;
+			var bounds = go.GetObjectBounds();
+			Vector3 currentCenter = bounds.center;
 			
-			if (rotation != null)
-				TransformExtensions.RotateAround(go.transform, globalPositionOfCenter, rotation.Value);
-			go.transform.position = position + rotatedOffset;
+			// Calculate the offset between the current position of the object and the center of its bounds
+			Vector3 offset = position - currentCenter;
+			
+			return offset;
+		}
+
+		public static void CenterObjectBoundsOnPosition(this GameObject go, Vector3 position)
+		{
+			Vector3 offset = GetOffsetToCenterOnBounds(go, position);
+			go.transform.position += offset;
 		}
 		
 		public static Axis GetDominantAxis(this Bounds b)

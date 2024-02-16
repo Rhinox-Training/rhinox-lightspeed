@@ -9,11 +9,11 @@ namespace Rhinox.Lightspeed
     public enum Axis
     {
         None = 0,
-        
+
         X = 1 << 0,
         Y = 1 << 1,
         Z = 1 << 2,
-        
+
         XYZ = X | Y | Z
     }
     
@@ -92,6 +92,24 @@ namespace Rhinox.Lightspeed
         public static Quaternion ToQuaternion(this Axis axis, float value)
         {
             return Quaternion.Euler(axis.ToVector(value));
+        }
+
+        /// <summary>
+        /// Gets the direction of a capsulecollider as an axis
+        /// </summary>
+        public static Axis GetAxis(this CapsuleCollider collider)
+        {
+            switch (collider.direction)
+            {
+                case 0:
+                    return Axis.X;
+                case 1:
+                    return Axis.Y;
+                case 2:
+                    return Axis.Z;
+                default:
+                    return Axis.None;
+            }
         }
 
     }
