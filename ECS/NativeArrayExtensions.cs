@@ -1,10 +1,11 @@
-#if UNITY_MATHEMATICS
+// Taken from Deform package
+// https://github.com/keenanwoodall/Deform
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Rhinox.Lightspeed
+namespace Rhinox.Lightspeed.Mathematics
 {
     public static class NativeArrayExtensions
     {
@@ -196,4 +197,3 @@ namespace Rhinox.Lightspeed
 		}
     }
 }
-#endif
