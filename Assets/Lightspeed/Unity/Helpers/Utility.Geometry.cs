@@ -83,7 +83,8 @@ namespace Rhinox.Lightspeed
             int j = polygon.Length - 1;
             for (int i = 0; i < polygon.Length; i++)
             {
-                if (polygon[i].y < testPoint.y && polygon[j].y >= testPoint.y || polygon[j].y < testPoint.y && polygon[i].y >= testPoint.y)
+                if (polygon[i].y < testPoint.y && polygon[j].y >= testPoint.y ||
+                    polygon[j].y < testPoint.y && polygon[i].y >= testPoint.y)
                 {
                     if (polygon[i].x + (testPoint.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < testPoint.x)
                     {

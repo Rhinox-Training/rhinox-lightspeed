@@ -1,11 +1,10 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.SceneManagement;
-
 #endif
 
 // MIT License
@@ -34,69 +33,197 @@ using UnityEditor.SceneManagement;
 
 namespace Rhinox.Lightspeed
 {
-    [Serializable, RefactoringOldNamespace("")]
-    public class SceneReference : SceneReferenceData
+    /// <summary>
+    /// The base of wrapper that provides the means to safely serialize Scene Asset References.
+    /// </summary>
+    [Serializable, HideReferenceObjectPicker, RefactoringOldNamespace("")]
+    public class SceneReference : ISerializationCallbackReceiver
     {
-#if UNITY_EDITOR
-        // What we use in editor to select the scene
-        [SerializeField] private Object sceneAsset;
+        // =============================================
+        // Properties
+        // =============================================
 
-        public override Object SceneAsset
+#if UNITY_EDITOR
+        [SerializeField] protected string sceneGuid;
+        public virtual Object SceneAsset { get; protected set; }
+        protected bool IsValidSceneAsset
         {
-            get => sceneAsset;
-            protected set => sceneAsset = value;
+            get
+            {
+                if (!SceneAsset) return false;
+
+                return SceneAsset is SceneAsset;
+            }
         }
 #endif
+
+        // This should only ever be set during serialization/deserialization!
+        [SerializeField] protected string scenePath = string.Empty;
+
+        // Use this when you want to actually have the scene path
+        public string ScenePath
+        {
+            get => GetScenePath();
+            set => SetScenePath(value);
+        }
+
+        public int BuildIndex => SceneUtility.GetBuildIndexByScenePath(scenePath);
+
+        // =============================================
+        // Constructor(s)
+        // =============================================
 
         public SceneReference()
         {
         }
 
-        public SceneReference(string path) : base(path)
+        public SceneReference(string path)
         {
+            SetScenePath(path);
         }
 
-        public SceneReference(Scene scene) : base(scene)
+        public SceneReference(Scene scene) : this(scene.path)
         {
         }
-
 
 #if UNITY_EDITOR
-        public SceneReference(SceneAsset scene) : base(scene)
+        public SceneReference(SceneAsset scene)
         {
-            sceneAsset = scene;
+            ScenePath = AssetDatabase.GetAssetPath(scene);
         }
 
-        protected override void HandleBeforeSerialize()
-        {
-            // Asset is invalid but have Path to try and recover from
-            if (IsValidSceneAsset == false && !string.IsNullOrEmpty(scenePath))
-            {
-                sceneAsset = GetSceneAssetFromPath();
-                sceneGuid = GetGuidFromAssetPath();
-                if (sceneAsset == null) scenePath = string.Empty;
+        // =============================================
+        // Methods
+        // =============================================
 
-                EditorSceneManager.MarkAllScenesDirty();
-            }
-            // Asset takes precedence and overwrites Path
-            else
-            {
-                scenePath = GetScenePathFromAsset();
-                sceneGuid = GetGuidFromAssetPath();
-            }
+        protected string GetScenePathFromAsset()
+        {
+            return SceneAsset == null ? string.Empty : AssetDatabase.GetAssetPath(SceneAsset);
         }
 
-        protected override void HandleAfterDeserialize()
+        protected string GetGuidFromAssetPath()
         {
-            EditorApplication.update -= HandleAfterDeserialize;
-            // Asset is valid, don't do anything - Path will always be set based on it when it matters
-            if (IsValidSceneAsset) return;
+            return string.IsNullOrEmpty(scenePath) ? null : AssetDatabase.AssetPathToGUID(scenePath);
+        }
 
-            // Try to recover the SceneAsset from the data
-            base.HandleAfterDeserialize();
-
-            if (!Application.isPlaying) EditorSceneManager.MarkAllScenesDirty();
+        protected SceneAsset GetSceneAssetFromPath()
+        {
+            return string.IsNullOrEmpty(scenePath) ? null : AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
         }
 #endif
+
+        protected virtual string GetScenePath()
+        {
+#if UNITY_EDITOR
+            // In editor we always use the asset's path
+            return GetScenePathFromAsset();
+#else
+        // At runtime we rely on the stored path value which we assume was serialized correctly at build time.
+        // See OnBeforeSerialize and OnAfterDeserialize
+        return scenePath;
+#endif
+        }
+
+        protected void SetScenePath(string path)
+        {
+            scenePath = path;
+#if UNITY_EDITOR
+            sceneGuid = GetGuidFromAssetPath();
+            SceneAsset = GetSceneAssetFromPath();
+#endif
+
+        }
+
+        public static implicit operator string(SceneReference sceneReference)
+        {
+            return sceneReference.ScenePath;
+        }
+
+
+        // Called to prepare this data for serialization. Stubbed out when not in editor.
+        public void OnBeforeSerialize()
+        {
+#if UNITY_EDITOR
+            HandleBeforeSerialize();
+#endif
+        }
+
+        // Called to set up data for deserialization. Stubbed out when not in editor.
+        public void OnAfterDeserialize()
+        {
+#if UNITY_EDITOR
+            // We sadly cannot touch assetdatabase during serialization, so defer by a bit.
+            EditorApplication.update += HandleAfterDeserialize;
+#endif
+        }
+
+#if UNITY_EDITOR
+        protected virtual void HandleBeforeSerialize()
+        {
+            if (!string.IsNullOrEmpty(scenePath))
+                sceneGuid = GetGuidFromAssetPath();
+        }
+
+        protected virtual void HandleAfterDeserialize()
+        {
+#if UNITY_EDITOR
+            // Unsubscribe so we do not get spammed
+            EditorApplication.update -= HandleAfterDeserialize;
+#endif
+            // No data to recover from
+            if (string.IsNullOrEmpty(scenePath) && string.IsNullOrEmpty(sceneGuid))
+                return;
+
+            // Try to find asset from ScenePath
+            if (!string.IsNullOrEmpty(scenePath))
+                SceneAsset = GetSceneAssetFromPath();
+
+            // No asset found, path was invalid. Try to recover it from the GUID
+            if (!SceneAsset)
+            {
+                scenePath = AssetDatabase.GUIDToAssetPath(sceneGuid);
+                SceneAsset = GetSceneAssetFromPath();
+            }
+
+            // Still no asset found, path & guid were invalid
+            if (!SceneAsset)
+            {
+                scenePath = string.Empty;
+                sceneGuid = string.Empty;
+            }
+
+        }
+#endif
+
+        protected bool Equals(SceneReference other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return scenePath == other.scenePath &&
+#if UNITY_EDITOR
+                   Equals(SceneAsset, other.SceneAsset) && sceneGuid == other.sceneGuid;
+#else
+               true;
+#endif
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SceneReference)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 0;
+            hashCode = (hashCode * 397) ^ (scenePath != null ? scenePath.GetHashCode() : 0);
+#if UNITY_EDITOR
+            hashCode = (hashCode * 397) ^ (sceneGuid != null ? sceneGuid.GetHashCode() : 0);
+#endif
+            return hashCode;
+        }
     }
 }

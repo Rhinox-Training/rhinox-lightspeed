@@ -3,7 +3,6 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Rhinox.Lightspeed;
 
 namespace Rhinox.Lightspeed
 {
@@ -32,13 +31,11 @@ namespace Rhinox.Lightspeed
         }
         
         public static DataTable ReadCsvTable(string[] lines)
-        {
-            return ReadCsvTable(lines, GetCsvSeparator());
-        }
+            => ReadCsvTable(lines, GetCsvSeparator());
 
         public static DataTable ReadCsvTable(string[] lines, char separator)
         {
-            var cells2D = ReadCsv(lines).ToArray();
+            var cells2D = ReadCsv(lines, separator).ToArray();
             if (!cells2D.IsRectangular())
                 return null;
 

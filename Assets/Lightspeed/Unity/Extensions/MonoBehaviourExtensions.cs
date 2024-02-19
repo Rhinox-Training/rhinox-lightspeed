@@ -124,11 +124,6 @@ namespace Rhinox.Lightspeed
 			parent.position = target.position + worldOffset;
 		}
 
-		public static Matrix4x4 GetLocalTransform(this Transform t)
-		{
-			return Matrix4x4.TRS(t.localPosition, t.localRotation, t.localScale);
-		}
-
 		public static T GetClosestTo<T>(this IEnumerable<T> objects, Vector3 position, Predicate<T> predicate = null)
 			where T : Component
 		{

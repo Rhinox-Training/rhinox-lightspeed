@@ -72,7 +72,7 @@ namespace Rhinox.Lightspeed
 #if UNITY_EDITOR
             return PrefabStageUtility.GetPrefabStage(obj) != null;
 #else
-        return false;
+            return false;
 #endif
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using Rhinox.Lightspeed;
 using UnityEngine;
 
 namespace Rhinox.Lightspeed
@@ -47,8 +46,7 @@ namespace Rhinox.Lightspeed
             var remainingRot = (q1 * Quaternion.Inverse(q2));
 
             float angle;
-            Vector3 axis;
-            remainingRot.ToAngleAxis(out angle, out axis);
+            remainingRot.ToAngleAxis(out angle, out _);
             var remainingAngle = Mathf.Abs(angle > 180.0f ? angle - 360.0f : angle);
             return remainingAngle;
         }
@@ -56,8 +54,7 @@ namespace Rhinox.Lightspeed
         public static float Norm(this Quaternion q)
         {
             float angle;
-            Vector3 axis;
-            q.ToAngleAxis(out angle, out axis);
+            q.ToAngleAxis(out angle, out _);
             if (angle > 180.0f)
                 angle -= 360.0f;
             return Mathf.Abs(angle);
