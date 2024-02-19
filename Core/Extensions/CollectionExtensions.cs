@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Rhinox.Lightspeed
 {
@@ -21,29 +19,6 @@ namespace Rhinox.Lightspeed
             }
 
             return false;
-        }
-        
-        /// <summary>
-        /// Swaps 2 elements in a List
-        /// </summary>
-        public static IList<T> Swap<T>(this IList<T> list, int indexA, int indexB)
-        {
-            T tmp = list[indexA];
-            list[indexA] = list[indexB];
-            list[indexB] = tmp;
-            return list;
-        }
-
-        public static IList<T> Swap<T>(this IList<T> list, T objA, T objB)
-        {
-            var indexA = list.IndexOf(objA);
-            var indexB = list.IndexOf(objB);
-
-            T tmp = objA;
-            list[indexA] = list[indexB];
-            list[indexB] = tmp;
-
-            return list;
         }
 
         public static IEnumerable<T> Except<T>(this IEnumerable<T> list, T obj)
@@ -114,32 +89,6 @@ namespace Rhinox.Lightspeed
         {
             return enumerable.SelectMany(selector).Where(x => x != null);
         }
-        
-        public static bool IsSorted<T>(this List<T> src, bool descending = false) where T: IComparable
-        {
-            var comparer = Comparer<T>.Default;
-            return IsSorted(src, comparer, descending);
-        }
-        
-        public static bool IsSorted<T>(this List<T> src, Comparison<T> comparison, bool descending = false)
-        {
-            var comparer = Comparer<T>.Create(comparison);
-            return IsSorted(src, comparer, descending);
-        }
-        
-        private static bool IsSorted<T>(this List<T> src, Comparer<T> comparer, bool descending = false)
-        {
-            for (int i = 1; i < src.Count; i++)
-            {
-                // Returns 1 if y is greater; -1 if y is smaller; 0 if equal
-                var comparison = comparer.Compare(src[i - 1], src[i]);
-                if (comparison > 0 && !descending)
-                    return false;
-                if (comparison < 0 && descending)
-                    return false;
-            }
-            return true;
-        }
 
         /// <summary>
         /// Returns random objects from the list
@@ -192,122 +141,6 @@ namespace Rhinox.Lightspeed
         {
             return list != null && i >= 0 && i < list.Count;
         }
-
-        /*public static T GetAtIndex<T>(this ICollection<T> list, int i, T defaultValue = default(T)) {
-            return list.HasIndex(i) ? list.ElementAt(i) : defaultValue;
-        }*/
-
-        public static T GetAtIndex<T>(this IReadOnlyList<T> list, int i, T defaultValue = default(T))
-        {
-            return list.HasIndex(i) ? list[i] : defaultValue;
-        }
-
-        public static int FindIndex<T>(this IReadOnlyList<T> list, Func<T, bool> predicate)
-        {
-            for (int i = 0; i < list.Count; ++i)
-                if (predicate(list[i]))
-                    return i;
-
-            return -1;
-        }
-        
-        public static int IndexOf<T>(this IReadOnlyList<T> list, T elementToFind)
-        {
-            for (var i = 0; i < list.Count; ++i)
-            {
-                if (Equals(list[i], elementToFind))
-                    return i;
-            }
-
-            return -1;
-        }
-
-        /// <summary>
-        /// Where statement that returns a dictionary instead of the IEnumerable with a KeyValuePair
-        /// </summary>
-        public static Dictionary<TK, TV> DicWhere<TK, TV>(this IDictionary<TK, TV> dict,
-            Func<KeyValuePair<TK, TV>, bool> predicate)
-        {
-            return dict.Where(predicate).ToDictionary(pair => pair.Key, pair => pair.Value);
-        }
-
-        /// <summary>
-        /// Usage:
-        /// foreach (var (id, name) in nameByID) {  }
-        /// </summary>
-        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey k, out TValue v)
-        {
-            k = kvp.Key;
-            v = kvp.Value;
-        }
-        
-        /// <summary>
-        /// Returns the default value of type U if the key does not exist in the dictionary
-        /// </summary>
-        public static T GetOrDefault<T>(this IList<T> list, int index, T onMissing = default(T))
-        {
-            if (list == null || !list.HasIndex(index))
-                return onMissing;
-                
-            return list[index];
-        }
-
-        /// <summary>
-        /// Returns the default value of type U if the key does not exist in the dictionary
-        /// </summary>
-        public static TV GetOrDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV onMissing = default(TV))
-        {
-            if (key == null)
-                return onMissing;
-            TV value;
-            return dict.TryGetValue(key, out value) ? value : onMissing;
-        }
-
-        public static TV GetOrDefault<TK, TV>(this IDictionary<TK, object> dict, TK key, TV onMissing = default(TV))
-        {
-            object o = dict.GetOrDefault(key);
-            if (o == null)
-                return onMissing;
-            return (TV) Convert.ChangeType(o, typeof(TV));
-        }
-        
-        public static bool ContainsNonDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key, out TV value)
-        {
-            if (dict.IsNullOrEmpty())
-            {
-                value = default;
-                return false;
-            }
-            
-            if (dict.TryGetValue(key, out value))
-                return !value.IsDefault();
-
-            return false;
-        }
-        
-        public static bool ContainsNonDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key)
-        {
-            if (dict.IsNullOrEmpty()) return false;
-            
-            if (dict.TryGetValue(key, out TV value))
-                return !value.IsDefault();
-
-            return false;
-        }
-
-        /// <summary>
-        /// Removes all elements where the given condition is true.
-        /// </summary>
-        public static void RemoveAll<TKey, TValue>(this IDictionary<TKey, TValue> dict, Func<TKey, TValue, bool> condition)
-        {
-            var keys = dict.Keys.ToList();
-
-            foreach (var key in keys)
-            {
-                if (dict.ContainsKey(key) && condition(key, dict[key]))
-                    dict.Remove(key);
-            }
-        }
         
         public static int RemoveAll<T>(this ICollection<T> set, Func<T, bool> condition)
         {
@@ -339,7 +172,6 @@ namespace Rhinox.Lightspeed
             return false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool AddUnique<T>(this ICollection<T> list, T entry)
         {
             if (list.Contains(entry))
@@ -379,7 +211,7 @@ namespace Rhinox.Lightspeed
         {
             // IEnumerable version might allocate some comparerer
             if (set2 == null)
-                return set1 == null || set1.Count == 0;
+                return set1.IsNullOrEmpty();
             
             int entriesFound = 0;
             foreach (var entry in set2)
@@ -432,86 +264,22 @@ namespace Rhinox.Lightspeed
                 .ToLookup(x => x.key, x => x.source);
         }
         
-        public static void Move<T>(this List<T> list, int fromIndex, int toIndex)
-        {
-            if (0 > fromIndex || fromIndex >= list.Count)
-                throw new ArgumentException("From index is invalid");
-            if (0 > toIndex || toIndex >= list.Count)
-                throw new ArgumentException("To index is invalid");
-
-            if (fromIndex == toIndex) return;
-
-            var i = 0;
-            T tmp = list[fromIndex];
-            // Move element down and shift other elements up
-            if (fromIndex < toIndex)
-            {
-                for (i = fromIndex; i < toIndex; i++)
-                    list[i] = list[i + 1];
-            }
-            // Move element up and shift other elements down
-            else
-            {
-                for (i = fromIndex; i > toIndex; i--)
-                {
-                    list[i] = list[i - 1];
-                }
-            }
-            
-            // put element from position 1 to destination
-            list[toIndex] = tmp;
-        }
-
-        public static void MoveUp<T>(this List<T> list, T item)
-        {
-            var i = list.IndexOf(item);
-            if (i < 0)
-                throw new ArgumentException("Could not find item in list");
-            list.Move(i, i-1);
-        }
-        
-        public static void MoveDown<T>(this List<T> list, T item)
-        {
-            var i = list.IndexOf(item);
-            if (i < 0)
-                throw new ArgumentException("Could not find item in list");
-            list.Move(i, i+1);
-        }
-
-        public static bool Contains<ItemT, T>(this IList<ItemT> list, T value)
-            where ItemT : IEquatable<T>
-        {
-            if (list.IsNullOrEmpty()) return false;
-            
-            for (var i = 0; i < list.Count; i++)
-                if (list[i].Equals(value))
-                    return true;
-
-            return false;
-        }
-        
         public static string StringJoin<T>(this IEnumerable<T> coll, string separator, Func<T, string> selector)
         {
-            if (coll.IsNullOrEmpty()) return string.Empty;
-            // TODO optimize
-
+            if (coll == null) return string.Empty;
             return string.Join(separator, coll.Select(selector));
         }
         
         public static string StringJoin<T, TIntermediate>(this IEnumerable<T> coll, string separator, Func<T, TIntermediate> selector)
         {
-            if (coll.IsNullOrEmpty()) return string.Empty;
-            // TODO optimize
-
+            if (coll == null) return string.Empty;
             var intermediateColl = coll.Select(selector);
             return StringJoin(intermediateColl, separator);
         }
 
         public static string StringJoin<T>(this IEnumerable<T> coll, string separator)
         {
-            if (coll.IsNullOrEmpty()) return string.Empty;
-
-            // TODO optimize
+            if (coll == null) return string.Empty;
             return string.Join(separator, coll.Select(x => x.ToString()));
         }
         
@@ -523,31 +291,6 @@ namespace Rhinox.Lightspeed
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> coll)
         {
             return coll == null || !coll.Any();
-        }
-
-        private static MethodInfo _removeAtMethod;
-        public static Array RemoveAtGeneric(this Array arr, int index)
-        {
-            var type = arr.GetType();
-            var elemType = type.GetElementType();
-            if (_removeAtMethod == null)
-                _removeAtMethod = typeof(CollectionExtensions).GetMethod(nameof(RemoveAt), BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-            var properRemoveMethod = _removeAtMethod.MakeGenericMethod(elemType);
-            var parameters = new object[] { arr, index };
-            var array = (Array) properRemoveMethod.Invoke(null, parameters);
-            return array;
-        }
-        
-        public static T[] RemoveAt<T>(this T[] source, int index)
-        {
-            T[] dest = new T[source.Length - 1];
-            if( index > 0 )
-                Array.Copy(source, 0, dest, 0, index);
-
-            if( index < source.Length - 1 )
-                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-
-            return dest;
         }
         
         public static IEnumerable Enumerate(this IEnumerator enumerator)
@@ -563,23 +306,118 @@ namespace Rhinox.Lightspeed
             while (enumerator.MoveNext())
                 yield return enumerator.Current;
         }
-
-        public static bool IsRectangular<T>(this T[][] arr)
+        
+        public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> source, int chunkSize)
         {
-            int size = -1;
-            for (int i = 0; i < arr.Length; ++i)
+            var pos = 0; 
+            while (source.Skip(pos).Any())
             {
-                if (size == -1)
-                {
-                    size = arr[i].Length;
-                    continue;
-                }
+                yield return source.Skip(pos).Take(chunkSize);
+                pos += chunkSize;
+            }
+        }
+        
+        public static IEnumerable<T> Flatten<T, TKey, TValue>(this IDictionary<TKey, TValue> source, Func<KeyValuePair<TKey, TValue>, IEnumerable<T>> flattenFunc)
+        {
+            foreach (var pair in source)
+            {
+                IEnumerable<T> resultCollection = flattenFunc.Invoke(pair);
+                
+                foreach (var result in resultCollection)
+                    yield return result;
+            }
+        }
 
-                if (size != arr[i].Length)
-                    return false;
+        public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source, Func<IEnumerable<T>, IEnumerable<T>> flattenFunc = null)
+        {
+            foreach (var collection in source)
+            {
+                IEnumerable<T> resultCollection = flattenFunc != null ? flattenFunc.Invoke(collection) : collection;
+                
+                foreach (var result in resultCollection)
+                    yield return result;
+            }
+        }
+
+        public static float StdDev(this IEnumerable<float> values)
+        {
+            //Compute the Average
+            float avg = values.Average();
+
+            //Perform the Sum of (value-avg)^2
+            float sum = 0.0f;
+            int count = 0;
+            foreach (float val in values)
+            {
+                sum += ((val - avg) * (val - avg));
+                ++count;
             }
 
-            return true;
+            if (count == 0)
+                return 0.0f;
+            
+            //Put it all together
+            float stdDev = (float)Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        public static float StdDev<TKey>(this IEnumerable<TKey> values, Func<TKey, float> selector)
+        {
+            //Compute the Average
+            float avg = values.Average(selector);
+
+            //Perform the Sum of (value-avg)^2
+            float sum = 0.0f;
+            int count = 0;
+            foreach (TKey val in values)
+            {
+                float floatVal = selector(val);
+                sum += ((floatVal - avg) * (floatVal - avg));
+                ++count;
+            }
+
+            if (count == 0)
+                return 0.0f;
+            
+            //Put it all together
+            float stdDev = (float)Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        public static double StdDev(this IEnumerable<double> values)
+        {
+            //Compute the Average
+            double avg = values.Average();
+
+            //Perform the Sum of (value-avg)^2
+            double sum = 0.0;
+            int count = 0;
+            foreach (var val in values)
+            {
+                sum += ((val - avg) * (val - avg));
+                ++count;
+            }
+
+            if (count == 0)
+                return 0.0;
+            
+            //Put it all together
+            var stdDev = Math.Sqrt(sum / count);
+            return stdDev;
+        }
+        
+        public static IOrderedEnumerable<T> Order<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> selector, bool ascending)
+        {
+            if (ascending)
+                return enumerable.OrderBy(selector);
+            return enumerable.OrderByDescending(selector);
+        }
+        
+        public static IOrderedEnumerable<T> ThenBy<T, TKey>(this IOrderedEnumerable<T> enumerable, Func<T, TKey> selector, bool ascending)
+        {
+            if (ascending)
+                return enumerable.ThenBy(selector);
+            return enumerable.ThenByDescending(selector);
         }
     }
 }

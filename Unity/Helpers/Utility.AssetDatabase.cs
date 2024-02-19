@@ -1,29 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Rhinox.Lightspeed
 {
     public static partial class Utility
     {
 #if UNITY_EDITOR
+        public static string[] FindAssetGuidsByFilter(string filter, params string[] folders)
+        {
+            return AssetDatabase.FindAssets(filter, folders);
+        }
+
+        public static string[] FindAssetGuids<T>(params string[] folders) where T : UnityEngine.Object
+            => FindAssetGuidsByFilter($"t:{typeof(T).Name}", folders);
+        
+        public static T LoadAssetFromGuid<T>(string guid) where T : UnityEngine.Object
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            return AssetDatabase.LoadAssetAtPath<T>(path);
+        }
+
+        public static T[] AssetsFromGuids<T>(params string[] guids) where T : UnityEngine.Object
+        {
+            var arr = new T[guids.Length];
+            for (var i = 0; i < guids.Length; i++)
+                arr[i] = LoadAssetFromGuid<T>(guids[i]);
+            return arr;
+        }
+        
+        public static T[] FindAssetsByFilter<T>(string filter, params string[] folders) where T : UnityEngine.Object
+        {
+            string[] guids = FindAssetGuidsByFilter(filter, folders);
+            return AssetsFromGuids<T>(guids);
+        }
+        
+        public static T[] FindAssets<T>(params string[] folders) where T : UnityEngine.Object
+        {
+            string[] guids = FindAssetGuids<T>(folders);
+            return AssetsFromGuids<T>(guids);
+        }
+        
         public static T FindAssetApproximately<T>(params string[] possibleNames) where T : UnityEngine.Object
         {
+            var typeFilter = $"t:{typeof(T).Name}";
             foreach (var name in possibleNames)
             {
-                string[] guids = AssetDatabase.FindAssets(name);
+                string[] guids = AssetDatabase.FindAssets($"{typeFilter} {name}");
                 foreach (var guid in guids)
-                {
-                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                    // NOTE: Unity is stupid, so we need to load every variant as a potential typed instance to check if it is of a certain type
-                    var potentialInstance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-                    if (potentialInstance != null)
-                    {
-                        return potentialInstance;
-                    }
-                }
+                    return LoadAssetFromGuid<T>(guid);
             }
 
             return null;
@@ -41,7 +70,7 @@ namespace Rhinox.Lightspeed
 
             //AssetDatabase.Refresh();
 
-            string[] guids = AssetDatabase.FindAssets("t:Object", folders.Length == 0 ? new[] { "Assets" } : folders);
+            string[] guids = AssetDatabase.FindAssets("t:prefab", folders.Length == 0 ? null : folders);
 
             foreach (string guid in guids)
             {
@@ -63,26 +92,6 @@ namespace Rhinox.Lightspeed
 
             return prefabMonoBehaviours.ToArray();
         }
-
-        public static T[] FindScriptableObjectsOfType<T>(params string[] folders) where T : ScriptableObject
-        {
-            //AssetDatabase.Refresh();
-            string[] assetGUIDs = AssetDatabase.FindAssets($"t:{typeof(T).FullName}", folders.Length == 0 ? new[] { "Assets" } : folders);
-
-            List<T> scriptableObjects = new List<T>();
-            foreach (string guid in assetGUIDs)
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                T asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-                if (asset == null)
-                    continue;
-
-                scriptableObjects.Add(asset);
-            }
-
-            return scriptableObjects.ToArray();
-        }
-
 #endif
     }
 }

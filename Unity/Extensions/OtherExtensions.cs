@@ -8,6 +8,53 @@ namespace Rhinox.Lightspeed
 {
 	public static partial class OtherExtensions
 	{
+		public static bool IsWithinFrustum(this Mesh mesh, Camera camera)
+		{
+			if (camera == null) return false;
+            
+			var frustumPlanes = GeometryUtility.CalculateFrustumPlanes(camera);
+			return GeometryUtility.TestPlanesAABB(frustumPlanes, mesh.bounds);
+		}
+        
+		public static bool IsWithinFrustum(this Renderer renderer, Camera camera)
+		{
+			Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+			return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+		}
+
+		public static bool IsWithinFrustum(this Vector3 position, Camera camera)
+		{
+			if (camera == null) return false;
+            
+			var viewPos = camera.WorldToViewportPoint(position);
+			return viewPos.x.IsBetween(0, 1) && viewPos.y.IsBetween(0, 1) && viewPos.z > 0;
+		}
+        
+		public static void DrawCameraFrustum(this Camera camera)
+		{
+			var matrix = Gizmos.matrix;
+			Gizmos.matrix = Matrix4x4.TRS(camera.transform.position, camera.transform.rotation, Vector3.one);
+        
+			if (camera.orthographic) 
+			{
+				var spread = camera.farClipPlane - camera.nearClipPlane;
+				var center = (camera.farClipPlane + camera.nearClipPlane) * 0.5f;
+				Gizmos.DrawWireCube(new Vector3(0, 0, center), new Vector3(camera.orthographicSize * 2 * camera.aspect, camera.orthographicSize * 2, spread));
+			} 
+			else 
+			{
+				Gizmos.DrawFrustum(Vector3.zero, camera.fieldOfView, camera.farClipPlane, camera.nearClipPlane, camera.aspect);
+			}
+        
+			Gizmos.matrix = matrix;
+		}
+
+		public static void Validate(this ref Pose pose)
+		{
+			if (pose.rotation.IsInvalid())
+				pose.rotation = Quaternion.identity;
+		}
+		
 		/// <summary>
 		/// Used to determine whether text displayed on this color should be white or black.
 		/// Luminant colors work best with black.

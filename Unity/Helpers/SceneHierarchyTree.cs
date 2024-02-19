@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 namespace Rhinox.Lightspeed
 {
+    /// <summary>
+    /// Cashes the entire unity hierarchy in a Lazy Tree.
+    /// This tree should be invalidated every frame unless frozen.
+    /// </summary>
     public class SceneHierarchyTree
     {
         public struct PathData

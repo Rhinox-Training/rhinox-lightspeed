@@ -4,8 +4,26 @@ using UnityEngine.AI;
 
 namespace Rhinox.Lightspeed
 {
-    public static class NavMeshExtensions
+    public static class PathExtensions
     {
+        public static float GetLength(this LineRenderer line)
+        {
+            if (line == null) return 0;
+            if (line.positionCount < 2) return 0;
+
+            float distance = 0;
+
+            for (int i = 0; i < line.positionCount - 1; i++)
+            {
+                var a = line.GetPosition(i);
+                var b = line.GetPosition(i+1);
+
+                distance += Vector3.Distance(a, b);
+            }
+
+            return distance;
+        }
+        
         public static float PathDistance(this NavMeshPath path, Vector3 startPos)
         {
             if (path.corners == null || !path.corners.Any()) return 0;

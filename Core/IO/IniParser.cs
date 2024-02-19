@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Rhinox.Lightspeed.IO
 {
@@ -39,7 +38,7 @@ namespace Rhinox.Lightspeed.IO
             callback?.Invoke(parser);
         }
 
-        public static IniParser Open(string iniPath, bool createIfNotExists)
+        public static IniParser Open(string iniPath, bool createIfNotExists, out string error)
         {
             IniParser iniParser = null;
             try
@@ -54,6 +53,7 @@ namespace Rhinox.Lightspeed.IO
                     }
                     else
                     {
+                        error = null;
                         return null;
                     }
                 }
@@ -64,10 +64,12 @@ namespace Rhinox.Lightspeed.IO
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to open Ini file at {iniPath}. \n" + ex.ToString());
+                error = $"Failed to open Ini file at {iniPath}. \n" + ex;
                 iniParser = null;
                 // throw ex;
             }
+
+            error = null;
             return iniParser;
         }
 

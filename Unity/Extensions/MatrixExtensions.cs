@@ -28,6 +28,18 @@ namespace Rhinox.Lightspeed
         {
             return gameObject.transform.localToWorldMatrix;
         }
+        
+        public static Matrix4x4 GetLocalTransform(this Component component)
+        {
+            var t = component.transform;
+            return Matrix4x4.TRS(t.localPosition, t.localRotation, t.localScale);
+        }
+        
+        public static Matrix4x4 GetLocalTransform(this GameObject gameObject)
+        {
+            var t = gameObject.transform;
+            return Matrix4x4.TRS(t.localPosition, t.localRotation, t.localScale);
+        }
     }
 
     public static partial class Utility

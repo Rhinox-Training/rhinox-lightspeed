@@ -320,5 +320,10 @@ namespace Rhinox.Lightspeed
                 .ToArray();
             return string.Join("_", parts);
         }
+
+        public static string[] SplitLines(this string input)
+        {
+            return input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        }
     }
 }

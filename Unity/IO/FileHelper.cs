@@ -1,22 +1,18 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Rhinox.Lightspeed;
+using UnityEngine;
+using UnityEngine.Networking;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Rhinox.Lightspeed.IO
 {
     public static partial class FileHelper
     {
-    #if UNITY_EDITOR
         /// <summary>
         /// Absolute path to project
         /// </summary>
@@ -25,7 +21,6 @@ namespace Rhinox.Lightspeed.IO
             var directoryInfo  = new DirectoryInfo(Application.dataPath);
             return directoryInfo.Parent.FullName;
         }
-    #endif
 
         public static void CreateDirectoryIfNotExists(string path)
         {
@@ -201,16 +196,11 @@ namespace Rhinox.Lightspeed.IO
         // Copies the contents of one directory to another.
         public static void CopyDirectoryFiltered(string source, string target, bool overwrite, string regExExcludeFilter, bool recursive)
         {
-            RegexMatcher excluder = new RegexMatcher()
-            {
-                exclude = null
-            };
+            RegexMatcher excluder = new RegexMatcher();
             try
             {
                 if (regExExcludeFilter != null)
-                {
-                    excluder.exclude = new Regex(regExExcludeFilter);
-                }
+                    excluder.Exclude = new Regex(regExExcludeFilter);
             }
             catch (ArgumentException)
             {
@@ -245,16 +235,15 @@ namespace Rhinox.Lightspeed.IO
             }
 
             // Go into sub directories
-            if (recursive)
+            if (!recursive) return;
+            
+            foreach (string subdirectorypath in Directory.GetDirectories(sourceDir))
             {
-                foreach (string subdirectorypath in Directory.GetDirectories(sourceDir))
-                {
-                    if (!filtercallback(subdirectorypath))
-                        continue;
+                if (!filtercallback(subdirectorypath))
+                    continue;
                     
-                    string directoryName = Path.GetFileName(subdirectorypath);
-                    CopyDirectoryFiltered(Path.Combine(sourceDir, directoryName), Path.Combine(targetDir, directoryName), overwrite, filtercallback, recursive);
-                }
+                string directoryName = Path.GetFileName(subdirectorypath);
+                CopyDirectoryFiltered(Path.Combine(sourceDir, directoryName), Path.Combine(targetDir, directoryName), overwrite, filtercallback, recursive);
             }
         }
        
@@ -326,11 +315,11 @@ namespace Rhinox.Lightspeed.IO
 
         internal struct RegexMatcher
         {
-            public Regex exclude;
+            public Regex Exclude;
 
             public bool CheckInclude(string s)
             {
-                return exclude == null || !exclude.IsMatch(s);
+                return Exclude == null || !Exclude.IsMatch(s);
             }
         }
     }

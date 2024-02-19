@@ -28,6 +28,33 @@ namespace Rhinox.Lightspeed
             return Input.mousePosition;
 #endif
         }
+        
+        public static bool GetMouseButton(int button)
+        {
+#if USE_NEW_INPUTSYSTEM
+            return GetKey(_mouseButtons[button]);
+#else
+            return Input.GetMouseButton(button);
+#endif
+        }
+        
+        public static bool GetMouseButtonDown(int button)
+        {
+#if USE_NEW_INPUTSYSTEM
+            return GetKeyDown(_mouseButtons[button]);
+#else
+            return Input.GetMouseButtonDown(button);
+#endif
+        }
+        
+        public static bool GetMouseButtonUp(int button)
+        {
+#if USE_NEW_INPUTSYSTEM
+            return GetKeyUp(_mouseButtons[button]);
+#else
+            return Input.GetMouseButtonUp(button);
+#endif
+        }
 
         public static bool GetKey(KeyCode key)
         {
