@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Rhinox.Lightspeed.Reflection
 {
@@ -237,13 +240,21 @@ namespace Rhinox.Lightspeed.Reflection
             {
                 var assembly = assemblies[i];
                 var types = assembly.GetTypes();
-                for (int j = 0; j < types.Length; ++j)
-                {
-                    if (predicate(types[j]))
-                        list.Add(types[j]);
-                }
+                FindTypes(ref list, types, predicate);
             }
             return list;
+        }
+        
+        /// <summary>
+        /// Fill the given list with all types that return true for the given delegate.
+        /// </summary>
+        private static void FindTypes(ref List<Type> outList, IList<Type> types, Func<Type, bool> predicate)
+        {
+            for (int i = 0; i < types.Count; ++i)
+            {
+                if (predicate(types[i]))
+                    outList.Add(types[i]);
+            }
         }
 
         /// <summary>
@@ -251,7 +262,16 @@ namespace Rhinox.Lightspeed.Reflection
         /// This does not include: Generics Definitions & Abstract classes
         /// </summary>
         public static List<Type> GetTypesInheritingFrom(Type t)
-            => GetTypesInheritingFrom(t, AppDomain.CurrentDomain.GetAssemblies());
+        {
+#if UNITY_EDITOR
+            var list = new List<Type>();
+            var types = TypeCache.GetTypesDerivedFrom(t);
+            FindTypes(ref list, types, x => IsBasicInheritedType(x, t));
+            return list;
+#else
+            return GetTypesInheritingFrom(t, AppDomain.CurrentDomain.GetAssemblies());
+#endif
+        }
         
         /// <summary>
         /// <para>Gets a list of all usable types inheriting from the given type.</para>
