@@ -59,7 +59,25 @@ namespace Rhinox.Lightspeed.IO
                 return null;
             }
             return response.text;
-
+        }
+        
+        public static async Task<string> ReadAllTextAsync(string path, int timeOut = 10, bool suppressLog = false)
+        {
+            if (!IsFileUrl(path))
+#if !UNITY_2021_1_OR_NEWER
+                return File.ReadAllText(path);
+#else
+                return await File.ReadAllTextAsync(path);
+#endif
+            
+            var response = await ExecuteWebRequestAsync(path, timeOut);
+            if (response == null)
+            {
+                if (!suppressLog)
+                    Debug.LogError($"File at {path} failed to load...");
+                return null;
+            }
+            return response.text;
         }
     
         public static byte[] ReadAllBytes(string path, int timeOut = 10, bool suppressLog = false)
@@ -75,7 +93,27 @@ namespace Rhinox.Lightspeed.IO
                 return Array.Empty<byte>();
             }
             return response.data;
-
+        }
+        
+        public static async Task<byte[]> ReadAllBytesAsync(string path, int timeOut = 10, bool suppressLog = false)
+        {
+            if (!IsFileUrl(path))
+            {
+#if !UNITY_2021_1_OR_NEWER
+                return File.ReadAllBytes(path);
+#else
+                return await File.ReadAllBytesAsync(path);
+#endif
+            }
+            
+            var response = await ExecuteWebRequestAsync(path, timeOut);
+            if (response == null)
+            {
+                if (!suppressLog)
+                    Debug.LogError($"File at {path} failed to load...");
+                return Array.Empty<byte>();
+            }
+            return response.data;
         }
 
         public static string[] ReadAllLines(string path, int timeOut = 10, bool suppressLog = false)
@@ -101,65 +139,36 @@ namespace Rhinox.Lightspeed.IO
 
         }
         
-        public static async Task<byte[]> ReadAllBytesAsync(string filePath, int timeOut = 10, bool suppressLog = false)
+        public static async Task<string[]> ReadAllLinesAsync(string path, int timeOut = 10, bool suppressLog = false)
         {
-            byte[] data = null;
+            if (!IsFileUrl(path))
+            {
+#if !UNITY_2021_1_OR_NEWER
+                return File.ReadAllLines(path);
+#else
+                return await File.ReadAllLinesAsync(path);
+#endif
+            }
             
-            // Check if we should use UnityWebRequest or File.ReadAllBytes
-            if (filePath.Contains("://"))
+            var response = await ExecuteWebRequestAsync(path, timeOut, suppressLog);
+            if (response == null)
             {
-                UnityWebRequest www = UnityWebRequest.Get(filePath);
-                www.timeout = timeOut;
-                await www.SendWebRequest();
-
-                if (www.IsRequestValid(out string error))
-                    data = www.downloadHandler.data;
-                else if (!suppressLog)
-                    Debug.LogError(error);
+                if (!suppressLog)
+                    Debug.LogError($"File at {path} failed to load...");
+                return Array.Empty<string>();
             }
-            else
+            
+            var reader = new StringReader(response.text);
+            var list = new List<string>();
+            while (reader.Peek() >= 0)
             {
 #if !UNITY_2021_1_OR_NEWER
-                data = File.ReadAllBytes(filePath);
+                list.Add(reader.ReadLine());
 #else
-                data = await File.ReadAllBytesAsync(filePath);
+                list.Add(await reader.ReadLineAsync());
 #endif
             }
-
-            if (data == null && !suppressLog)
-                Debug.LogError("File not found");
-
-            return data;
-        }
-        
-        public static async Task<string[]> ReadAllLinesAsync(string filePath, int timeOut = 10, bool suppressLog = false)
-        {
-            string[] data = null;
-            // Check if we should use UnityWebRequest or File.ReadAllBytes
-            if (filePath.Contains("://"))
-            {
-                UnityWebRequest www = UnityWebRequest.Get(filePath);
-                www.timeout = timeOut;
-                await www.SendWebRequest();
-
-                if (www.IsRequestValid(out string error))
-                    data = www.downloadHandler.text.SplitLines();
-                else if (!suppressLog)
-                    Debug.LogError($"Network error: {filePath} - {error}");
-            }
-            else
-            {
-#if !UNITY_2021_1_OR_NEWER
-                data = File.ReadAllLines(filePath);
-#else
-                data = await File.ReadAllLinesAsync(filePath);
-#endif
-            }
-
-            if (data == null && !suppressLog)
-                Debug.LogError("File not found");
-
-            return data;
+            return list.ToArray();
         }
 
         private static DownloadHandler ExecuteSynchronousWebRequest(string path, int timeOut = 10, bool suppressLog = false)
@@ -172,6 +181,20 @@ namespace Rhinox.Lightspeed.IO
             
             while (!www.isDone) { }
 
+            if (www.IsRequestValid(out string error))
+                return www.downloadHandler;
+            else if (!suppressLog)
+                Debug.LogError(error);
+            return null;
+        }
+
+        private static async Task<DownloadHandler> ExecuteWebRequestAsync(string path, int timeOut = 10, bool suppressLog = false)
+        {
+            UnityWebRequest www = UnityWebRequest.Get(path);
+            www.timeout = timeOut;
+            
+            await www.SendWebRequest();
+            
             if (www.IsRequestValid(out string error))
                 return www.downloadHandler;
             else if (!suppressLog)
