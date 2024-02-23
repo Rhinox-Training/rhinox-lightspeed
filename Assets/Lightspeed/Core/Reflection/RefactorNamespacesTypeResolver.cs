@@ -38,22 +38,17 @@ namespace Rhinox.Lightspeed.Reflection
             if (_refactoredAssemblies == null)
             {
                 _refactoredAssemblies = new Dictionary<string, Assembly>();
-                foreach (var potentialAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                var types = ReflectionUtility.GetTypesWithAttribute<RefactoringOldNamespaceAttribute>();
+                foreach (var type in types)
                 {
-                    foreach (var type in potentialAssembly.GetTypes())
-                    {
-                        if (type.HasCustomAttribute<RefactoringOldNamespaceAttribute>())
-                        {
-                            var attr = type.GetCustomAttribute<RefactoringOldNamespaceAttribute>();
-                            if (string.IsNullOrWhiteSpace(attr.PreviousAssembly))
-                                continue;
+                    var attr = type.GetCustomAttribute<RefactoringOldNamespaceAttribute>();
+                    if (string.IsNullOrWhiteSpace(attr.PreviousAssembly))
+                        continue;
 
-                            string key = $"{attr.PreviousAssembly}--{GetTypeName(attr, type)}";
-                            if (_refactoredAssemblies.ContainsKey(attr.PreviousAssembly))
-                                continue;
-                            _refactoredAssemblies.Add(key, potentialAssembly);
-                        }
-                    }
+                    string key = $"{attr.PreviousAssembly}--{GetTypeName(attr, type)}";
+                    if (_refactoredAssemblies.ContainsKey(attr.PreviousAssembly))
+                        continue;
+                    _refactoredAssemblies.Add(key, type.Assembly);
                 }
             }
 

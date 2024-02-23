@@ -37,11 +37,11 @@ Please explore the code for a proper overview but here's a quick sample:
   - `string` ContainsOneOf, ReplaceFirst, GetCommonPrefix, SplitCamelCase, ...
   - `Type` InheritsFrom, HasInterfaceType, ImplementsOpenGenericClass, ...
 - `FileHelper` ClearDirectoryContentsIfExists, GetRelativePath, MoveFolder, CreateInstance, ...
-- - Static `Utility` class with a bunch of useful methods like:
+- `Utility`, a static class with a bunch of useful methods like:
   - `ReadCsv` parses csv from string
   - `ResizeArrayGeneric` Resize unknown array type
   - `JoinArrays` & `AddToArray`, ...
-- static `ReflectionUtility` class with a bunch of useful methods like: 
+- `ReflectionUtility`, a static class with a bunch of useful methods like: 
   - `GetAllFields`\\`Properties`\\`Events` which goes down the Type hierarchy to fetch everything
   - `FindTypes` with a predicate
   - `GetTypesInheritingFrom` 
