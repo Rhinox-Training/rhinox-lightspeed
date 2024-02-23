@@ -432,10 +432,9 @@ namespace Rhinox.Lightspeed.Reflection
         private static void FindCustomTypeResolvers(ref IReadOnlyCollection<ICustomTypeResolver> customTypeResolvers)
         {
             var list = new List<ICustomTypeResolver>();
-            foreach (var type in AppDomain.CurrentDomain.GetDefinedTypesOfType<ICustomTypeResolver>())
+            foreach (var type in GetTypesInheritingFrom(typeof(ICustomTypeResolver)))
             {
-                var resolverInstance = Activator.CreateInstance(type) as ICustomTypeResolver;
-                if (resolverInstance != null)
+                if (Activator.CreateInstance(type) is ICustomTypeResolver resolverInstance)
                     list.Add(resolverInstance);
             }
 
@@ -768,6 +767,24 @@ namespace Rhinox.Lightspeed.Reflection
             var qualifiedName = new AssemblyQualifiedName(text);
             qualifiedName.ValidateAndUpdate();
             return qualifiedName.ToString();
+        }
+
+        public static ICollection<Type> GetTypesWithAttribute<T>() where T : Attribute
+        {
+#if UNITY_EDITOR
+            return TypeCache.GetTypesWithAttribute<T>();
+#else
+            var list = new List<Type>();
+            foreach (var potentialAssembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in potentialAssembly.GetTypes())
+                {
+                    if (type.HasCustomAttribute<RefactoringOldNamespaceAttribute>())
+                        list.Add(type);
+                }
+            }
+            return list;
+#endif
         }
     }
 }
