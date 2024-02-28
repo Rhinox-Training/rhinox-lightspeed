@@ -179,6 +179,24 @@ namespace Rhinox.Lightspeed.IO
             }
         }
         
+        public static bool CopyFile(string filePath, string newPath, bool overwrite)
+        {
+            if (!File.Exists(filePath))
+                return false;
+            
+            var directory = Path.GetDirectoryName(newPath);
+            FileHelper.CreateDirectoryIfNotExists(directory);
+            if (File.Exists(newPath))
+            {
+                if (overwrite)
+                    File.Copy(filePath, newPath, true);
+                else
+                    return false;
+            }
+            File.Copy(filePath, newPath);
+            return true;
+        }
+        
         public static bool MoveFile(string filePath, string newPath, bool overwrite)
         {
             if (!File.Exists(filePath))
