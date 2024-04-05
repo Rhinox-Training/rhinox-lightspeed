@@ -28,5 +28,15 @@ namespace Rhinox.Lightspeed
         {
             return new DateTime(date.Year, date.Month, date.Day, value.Hour, value.Minute, value.Second);
         }
+
+        public static int SecondsPassedThatDay(this DateTime dateTime)
+        {
+            return Convert.ToInt32(dateTime.TimeOfDay.TotalSeconds);
+        }
+
+        public static DateTime Lerp(this DateTime dtA, DateTime dtB, float t)
+        {
+            return dtA.AddTicks((long)((dtB.Ticks - dtA.Ticks) * t));
+        }
     }
 }
