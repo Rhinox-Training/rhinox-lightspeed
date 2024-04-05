@@ -41,7 +41,20 @@ namespace Rhinox.Lightspeed
             return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
         }
         
+        public static double Map(this double value, double from1, double to1, double from2, double to2)
+        {
+            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        }
+        
         public static bool IsBetween(this float number, float min, float max)
+        {
+            if (min > max)
+                Utility.Swap(ref min, ref max);
+            
+            return number > min && number < max;
+        }
+        
+        public static bool IsBetween(this double number, double min, double max)
         {
             if (min > max)
                 Utility.Swap(ref min, ref max);
@@ -72,6 +85,11 @@ namespace Rhinox.Lightspeed
         public static bool IsBetweenIncl(this float f, float minValue, float maxValue)
         {
             return (f - minValue) > -float.Epsilon && (f - maxValue) < float.Epsilon;
+        }
+        
+        public static bool IsBetweenIncl(this double f, double minValue, double maxValue)
+        {
+            return (f - minValue) > -double.Epsilon && (f - maxValue) < double.Epsilon;
         }
 
         public static bool IsDefault<T>(this T value)
