@@ -4,6 +4,10 @@ namespace Rhinox.Lightspeed
 {
     public static class DateTimeExtensions
     {
+        public const int HOURS_IN_DAY = 24;
+        public const int MINUTES_IN_DAY = 24 * 60;
+        public const int SECONDS_IN_DAY = 24 * 60 * 60;
+        
         public static DateTime FirstDayOfMonth(this DateTime value)
         {
             return new DateTime(value.Year, value.Month, 1);
