@@ -7,7 +7,12 @@ namespace Rhinox.Lightspeed
     {
         public static string GetSelected(this TMP_Dropdown dropdown)
         {
-            return dropdown.options[dropdown.value].text;
+            return dropdown.GetCurrentOption()?.text;
+        }
+
+        public static TMP_Dropdown.OptionData GetCurrentOption(this TMP_Dropdown dropdown)
+        {
+            return dropdown.value != -1 ? dropdown.options[dropdown.value] : null;
         }
         
         public static void RemoveTrailingChar(this TMP_InputField field)
