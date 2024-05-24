@@ -154,8 +154,7 @@ namespace Rhinox.Lightspeed
             return result != null;
         }
 
-        public static bool TryGetComponentsInParent<T>(this GameObject go, out T[] results,
-            bool includeInactive = false)
+        public static bool TryGetComponentsInParent<T>(this GameObject go, out T[] results, bool includeInactive = false)
         {
             results = go.GetComponentsInParent<T>(includeInactive);
             return results.IsNullOrEmpty();
@@ -167,8 +166,7 @@ namespace Rhinox.Lightspeed
             return result != null;
         }
 
-        public static bool TryGetComponentsInChildren<T>(this GameObject go, out T[] results,
-            bool includeInactive = false)
+        public static bool TryGetComponentsInChildren<T>(this GameObject go, out T[] results, bool includeInactive = false)
         {
             results = go.GetComponentsInChildren<T>(includeInactive);
             return results.IsNullOrEmpty();

@@ -181,13 +181,12 @@ namespace Rhinox.Lightspeed
 
 		public static T GetOrAddComponent<T>(this GameObject obj, out bool created, bool findInChildren = false) where T : Component
 		{
-			
 			var c = findInChildren ? obj.GetComponentInChildren<T>() : obj.GetComponent<T>();
 
 			if (c == null)
 			{
 				created = true;
-				c = obj.AddComponent<T>() as T;
+				c = obj.AddComponent<T>();
 			}
 			else
 				created = false;
@@ -195,12 +194,30 @@ namespace Rhinox.Lightspeed
 			return c;
 		}
 
-		public static bool TryGetComponentInParent<T>(this Behaviour b, out T result)
+		public static bool TryGetComponentInParent<T>(this Component comp, out T result)
 		{
-			result = b.GetComponentInParent<T>();
+			result = comp.GetComponentInParent<T>();
 			return result != null;
 		}
 
+		public static bool TryGetComponentsInParent<T>(this Component comp, out T[] results, bool includeInactive = false)
+		{
+			results = comp.GetComponentsInParent<T>(includeInactive);
+			return results.IsNullOrEmpty();
+		}
+
+		public static bool TryGetComponentInChildren<T>(this Component comp, out T result)
+		{
+			result = comp.GetComponentInChildren<T>();
+			return result != null;
+		}
+
+		public static bool TryGetComponentsInChildren<T>(this Component comp, out T[] results, bool includeInactive = false)
+		{
+			results = comp.GetComponentsInChildren<T>(includeInactive);
+			return results.IsNullOrEmpty();
+		}
+		
 		public static void InvokeDelayed(this MonoBehaviour behaviour, Action action, float delay)
 		{
 			behaviour.StartCoroutine(InvokeDelayed(action, delay));
@@ -210,8 +227,7 @@ namespace Rhinox.Lightspeed
 		{
 			yield return new WaitForSeconds(delay);
 
-			if (action != null)
-				action.Invoke();
+			action?.Invoke();
 		}
 		
 		private const BindingFlags CopyFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.DeclaredOnly;
