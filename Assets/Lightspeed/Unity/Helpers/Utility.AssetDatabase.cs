@@ -92,6 +92,25 @@ namespace Rhinox.Lightspeed
 
             return prefabMonoBehaviours.ToArray();
         }
+        
+        public static T[] FindScriptableObjectsOfType<T>(params string[] folders) where T : ScriptableObject
+        {
+            //AssetDatabase.Refresh();
+            string[] assetGUIDs = AssetDatabase.FindAssets($"t:{typeof(T).FullName}", folders.Length == 0 ? new[] { "Assets" } : folders);
+
+            List<T> scriptableObjects = new List<T>();
+            foreach (string guid in assetGUIDs)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                T asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+                if (asset == null)
+                    continue;
+
+                scriptableObjects.Add(asset);
+            }
+
+            return scriptableObjects.ToArray();
+        }
 #endif
     }
 }
