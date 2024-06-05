@@ -66,6 +66,11 @@ namespace Rhinox.Lightspeed.Collections
             return ret;
         }
 
+        public void Clear()
+        {
+            _list.Clear();
+        }
+
         public IEnumerator<T> GetEnumerator()
         {
             return new Enumerator(this);
@@ -84,6 +89,8 @@ namespace Rhinox.Lightspeed.Collections
             private PriorityQueue<TPrio, T> _queue;
             private T current;
             public T Current => current;
+            
+            object IEnumerator.Current => Current;
 
             public Enumerator(PriorityQueue<TPrio, T> q)
             {
@@ -94,11 +101,16 @@ namespace Rhinox.Lightspeed.Collections
             
             public bool MoveNext()
             {
-                if (index >= _queue.Count)
-                    return MoveNextRare();
-                current = _queue[index];
-                ++index;
-                return true;
+                if (_queue == null)
+                    throw new ObjectDisposedException(nameof(_queue));
+                
+                if (index < _queue.Count - 1)
+                {
+                    index++;
+                    current = _queue[index];
+                    return true;
+                }
+                return MoveNextRare();
             }
             
             private bool MoveNextRare()
@@ -110,12 +122,13 @@ namespace Rhinox.Lightspeed.Collections
 
             public void Reset()
             {
+                if (_queue == null)
+                    throw new ObjectDisposedException(nameof(_queue));
+                
                 index = -1;
                 current = default;
             }
             
-            object IEnumerator.Current => Current;
-
             public void Dispose()
             {
                 _queue = null;
