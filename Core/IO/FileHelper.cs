@@ -343,5 +343,12 @@ namespace Rhinox.Lightspeed.IO
                 result += targetSeparator;
             return result;
         }
+        
+        public static void EnsureDirectoryForFile(string filePath)
+        {
+            string containingFolder = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrWhiteSpace(containingFolder))
+                CreateAssetsDirectory(containingFolder);
+        }
     }
 }
